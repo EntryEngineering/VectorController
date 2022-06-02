@@ -15,7 +15,7 @@ namespace VectorController.Processor
     internal class CanMessageProcessor
     {
 
-        private static XLDriver CANDemo = new();
+        private static XLDriver canBusDriver = new();
         private static string appName;
         private static XLClass.xl_driver_config driverConfig = new();
         private static XLDefine.XL_HardwareType hwType;
@@ -39,22 +39,13 @@ namespace VectorController.Processor
 
         internal static TextBox messageTextBox = new();
 
-        internal static Window testConsole = new()
-        {
-            Width = 800,
-            Height = 200,
-            Title = "CanBusConsole",
-            Background = Brushes.DimGray,
-        };
-
-
 
         internal CanMessageProcessor(XLDefine.XL_HardwareType xl_HardwareType, string aplicationName)
         {
             msgIdList.Add("ALL");
             hwType = xl_HardwareType;
             appName = aplicationName;
-            Trace.WriteLine("constuctor");
+            Trace.WriteLine($"--- Application {aplicationName} connected with {xl_HardwareType}---");
             DriverInit();
             ChanelSetup();
         }
@@ -73,7 +64,13 @@ namespace VectorController.Processor
                 msgIdList.Add(temporaryCanMessage.MessageId);
             }
             SaveMessageToFileByMessageId(value, messageId, dateTimeNowForFileName);
+            
 
+        }
+
+        internal static void PrintMessage(BaseCanMessage message) 
+        {
+            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId} MessageValue:{message.MessageValue}");
         }
 
         internal static void SaveMessageToFileByMessageId(BaseCanMessage message, string messageId, string fileName)
@@ -82,7 +79,7 @@ namespace VectorController.Processor
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
                 string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
-                Trace.Write(outputString);
+                PrintMessage(message);
 
                 try
                 {
@@ -101,7 +98,7 @@ namespace VectorController.Processor
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
                 string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
-                Trace.Write(outputString);
+                PrintMessage(message);
 
                 try
                 {
@@ -130,23 +127,23 @@ namespace VectorController.Processor
 
         internal static void DriverInit()
         {
-            CANDemo.XL_OpenDriver();
-            CANDemo.XL_GetDriverConfig(ref driverConfig);
+            canBusDriver.XL_OpenDriver();
+            canBusDriver.XL_GetDriverConfig(ref driverConfig);
 
-            if ((CANDemo.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS) ||
-                (CANDemo.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS))
+            if ((canBusDriver.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS) ||
+                (canBusDriver.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS))
             {
-                CANDemo.XL_SetApplConfig(appName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                CANDemo.XL_SetApplConfig(appName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                CANDemo.XL_PopupHwConfig();
+                canBusDriver.XL_SetApplConfig(appName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+                canBusDriver.XL_SetApplConfig(appName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+                canBusDriver.XL_PopupHwConfig();
             }
 
             if (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
             {
-                CANDemo.XL_PopupHwConfig();
+                canBusDriver.XL_PopupHwConfig();
             }
 
-            Trace.WriteLine("DriverInit");
+            Trace.WriteLine("APP_STATE: DriverInit");
         }
 
         internal static void ChanelSetup()
@@ -155,22 +152,23 @@ namespace VectorController.Processor
             permissionMask = accessMask;
 
             // Open port
-            CANDemo.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            canBusDriver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
 
             // Check port
-            CANDemo.XL_CanRequestChipState(portHandle, accessMask);
+            canBusDriver.XL_CanRequestChipState(portHandle, accessMask);
 
             // Activate channel
-            CANDemo.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
+            canBusDriver.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
 
             // Initialize EventWaitHandle object with RX event handle provided by DLL
             int tempInt = -1;
-            CANDemo.XL_SetNotification(portHandle, ref tempInt, 1);
+            canBusDriver.XL_SetNotification(portHandle, ref tempInt, 1);
             xlEvWaitHandle.SafeWaitHandle = new SafeWaitHandle(new IntPtr(tempInt), true);
 
             // Reset time stamp clock
-            CANDemo.XL_ResetClock(portHandle);
+            canBusDriver.XL_ResetClock(portHandle);
 
+            Trace.WriteLine("APP_STATE: ChanelSetup");
         }
 
         internal void StartReceive()
@@ -180,7 +178,7 @@ namespace VectorController.Processor
 
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Start();
-            Trace.WriteLine("rxThread.Start()");
+            Trace.WriteLine("APP_STATE: StartReceive");
         }
 
         internal void StopReceive()
@@ -192,15 +190,15 @@ namespace VectorController.Processor
 
         private static bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
         {
-            XLDefine.XL_Status status = CANDemo.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            XLDefine.XL_Status status = canBusDriver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
             if (status != XLDefine.XL_Status.XL_SUCCESS)
             {
                 Trace.WriteLine("XL_GetApplConfig      : " + status);
                 Trace.WriteLine("\nERROR: Function call failed!\nPress any key to continue...");
             }
 
-            chMask = CANDemo.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
-            chIdx = CANDemo.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
+            chMask = canBusDriver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
+            chIdx = canBusDriver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
             if (chIdx < 0 || chIdx >= driverConfig.channelCount)
             {
                 // the (hwType, hwIndex, hwChannel) triplet stored in the application configuration does not refer to any available channel.
@@ -235,7 +233,7 @@ namespace VectorController.Processor
                         while (blockRxThread) { Thread.Sleep(1000); }
 
                         // ...receive data from hardware.
-                        xlStatus = CANDemo.XL_Receive(portHandle, ref receivedEvent);
+                        xlStatus = canBusDriver.XL_Receive(portHandle, ref receivedEvent);
 
                         //  If receiving succeed....
                         if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
@@ -268,7 +266,7 @@ namespace VectorController.Processor
 
                                 else
                                 {
-                                    SetTempCanMessage(ConvertMessage(CANDemo.XL_GetEventString(receivedEvent)), MessageId);
+                                    SetTempCanMessage(ConvertMessage(canBusDriver.XL_GetEventString(receivedEvent)), MessageId);
                                 }
                             }
                         }
