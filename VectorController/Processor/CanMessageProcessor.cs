@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using vxlapi_NET;
 using VectorController.Messages;
 
@@ -14,7 +12,6 @@ namespace VectorController.Processor
 {
     internal class CanMessageProcessor
     {
-
         private static XLDriver canBusDriver = new();
         private static string appName;
         private static XLClass.xl_driver_config driverConfig = new();
@@ -173,9 +170,6 @@ namespace VectorController.Processor
 
         internal void StartReceive()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
-
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Start();
             Trace.WriteLine("APP_STATE: StartReceive");
@@ -183,9 +177,9 @@ namespace VectorController.Processor
 
         internal void StopReceive()
         {
-            //CancellationToken cancellationToken = new();
-
-            //rxThread.Abort();
+            Trace.WriteLine("APP_STATE: STOPtReceive");
+            canBusDriver.XL_ClosePort(portHandle);
+            canBusDriver.XL_CloseDriver();
         }
 
         private static bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
