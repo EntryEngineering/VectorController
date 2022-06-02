@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VectorController"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="200" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <StackPanel>
+        <Button x:Name="startCan" Margin="10" Width="200" Height="50" Click="startCan_Click" HorizontalAlignment="Center">Can bus start</Button>
+        <!--<Button x:Name="stopCan" Margin="10" Width="200" Click="stopCan_Click ">Can bus STOP</Button>-->
 
+        <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+            <Button x:Name="btnGetListOfMsgId" Margin="10" Width="100" Click="btnGetListOfMsgId_Click">Get Msg ID</Button>
+            <ComboBox Name="comboBoxOfMessageId" Margin="10" Width="350"/>
+            <Button x:Name="btnSetMsgIdFilter" Margin="10" Width="150" Click="btnSetMsgIdFilter_Click">Set filter</Button>
+        </StackPanel>
+
+        <TextBox x:Name="textBoxOutputForMessage" Width="700" Margin="10"/>
     </StackPanel>
 </Window>
