@@ -33,17 +33,18 @@ namespace VectorController.Processor
         internal static List<string> msgIdList = new();
         internal static string dateTimeNowForFileName = DateTime.Now.ToString("CanBusLog yyyy_MM_DD HH-mm-ss");
         private static BaseCanMessage temporaryCanMessage = new();
-
         internal static TextBox messageTextBox = new();
 
 
         internal CanMessageProcessor(XLDefine.XL_HardwareType xl_HardwareType, string aplicationName)
         {
             msgIdList.Add("ALL");
+
             hwType = xl_HardwareType;
             appName = aplicationName;
+
             Trace.WriteLine($"--- Application {aplicationName} connected with {xl_HardwareType}---");
-            DriverInit();
+            DriverInit(aplicationName,XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
             ChanelSetup();
         }
 
@@ -61,8 +62,6 @@ namespace VectorController.Processor
                 msgIdList.Add(temporaryCanMessage.MessageId);
             }
             SaveMessageToFileByMessageId(value, messageId, dateTimeNowForFileName);
-            
-
         }
 
         internal static void PrintMessage(BaseCanMessage message) 
@@ -75,16 +74,16 @@ namespace VectorController.Processor
             if (String.Equals(message.MessageId, messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
                 {
                     if (!File.Exists(path))
                     {
-                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}");
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
                     }
-                    File.AppendAllText(path, outputString);
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
                 catch (Exception ex)
                 {
@@ -94,16 +93,16 @@ namespace VectorController.Processor
             else if (String.Equals("ALL", messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
                 {
                     if (!File.Exists(path))
                     {
-                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}");
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}",System.Text.Encoding.ASCII);
                     }
-                    File.AppendAllText(path, outputString);
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
                 catch (Exception ex)
                 {
@@ -122,16 +121,16 @@ namespace VectorController.Processor
             return msgIdList;
         }
 
-        internal static void DriverInit()
+        internal static void DriverInit(string aplicationName, XLDefine.XL_BusTypes xL_BusTypes)
         {
             canBusDriver.XL_OpenDriver();
             canBusDriver.XL_GetDriverConfig(ref driverConfig);
 
-            if ((canBusDriver.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS) ||
-                (canBusDriver.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS))
+            if ((canBusDriver.XL_GetApplConfig(aplicationName, 0, ref hwType, ref hwIndex, ref hwChannel, xL_BusTypes) != XLDefine.XL_Status.XL_SUCCESS) ||
+                (canBusDriver.XL_GetApplConfig(aplicationName, 1, ref hwType, ref hwIndex, ref hwChannel, xL_BusTypes) != XLDefine.XL_Status.XL_SUCCESS))
             {
-                canBusDriver.XL_SetApplConfig(appName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                canBusDriver.XL_SetApplConfig(appName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+                canBusDriver.XL_SetApplConfig(aplicationName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, xL_BusTypes);
+                canBusDriver.XL_SetApplConfig(aplicationName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, xL_BusTypes);
                 canBusDriver.XL_PopupHwConfig();
             }
 
@@ -145,9 +144,13 @@ namespace VectorController.Processor
 
         internal static void ChanelSetup()
         {
+            Trace.WriteLine($"txMask: {txMask} and rxMask:{rxMask}");
+
             accessMask = txMask | rxMask;
             permissionMask = accessMask;
 
+            Trace.WriteLine($"accessMask: {accessMask}");
+            Trace.WriteLine($"permissionMask: {permissionMask}");
             // Open port
             canBusDriver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
 
@@ -268,6 +271,36 @@ namespace VectorController.Processor
                 }
                 // No event occurred
             }
+        }
+
+        internal void TXProcess(uint msgId,byte msgDlc,byte bytePos0, byte bytePos1, byte bytePos2, byte bytePos3, byte bytePos4, byte bytePos5, byte bytePos6, byte bytePos7)
+        {
+            blockRxThread = rxThread.IsAlive;
+            rxThread.Abort();
+
+            if (blockRxThread == false)
+            {
+                XLDefine.XL_Status txStatus;
+                XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+                xlEventCollection.xlEvent[0].tagData.can_Msg.id = msgId;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = msgDlc;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = bytePos0;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = bytePos1;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = bytePos2;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = bytePos3;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = bytePos4;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = bytePos5;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = bytePos6;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = bytePos7;
+                xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
+                txStatus = canBusDriver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+            }
+            else
+            {
+                Trace.WriteLine("RX thread still running");
+            }
+
+
         }
 
         internal static BaseCanMessage ConvertMessage(string input)

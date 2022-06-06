@@ -15,8 +15,13 @@ namespace VectorController
         public MainWindow()
         {
             InitializeComponent();
-            comboBoxOfMessageId.ItemsSource = canBus.GetListOfMsgId();
+            comboBoxOfMessageId.Items.Add("ALL");
             comboBoxOfMessageId.SelectedIndex = 0;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            canBus.StopReceive();
         }
 
         private void startCan_Click(object sender, RoutedEventArgs e)
@@ -24,10 +29,6 @@ namespace VectorController
             canBus.StartReceive();
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            canBus.StopReceive();
-        }
 
         private void stopCan_Click(object sender, RoutedEventArgs e)
         {
@@ -36,7 +37,9 @@ namespace VectorController
 
         private void btnGetListOfMsgId_Click(object sender, RoutedEventArgs e)
         {
+            comboBoxOfMessageId.Items.Clear();
             comboBoxOfMessageId.ItemsSource = canBus.GetListOfMsgId();
+            comboBoxOfMessageId.SelectedIndex = 0;
         }
 
         private void btnSetMsgIdFilter_Click(object sender, RoutedEventArgs e)
@@ -47,9 +50,9 @@ namespace VectorController
             }
         }
 
-        internal void ShowCurrentMessage(string text)
+        private void sendMessageBtn_Click(object sender, RoutedEventArgs e)
         {
-            textBoxOutputForMessage.Text = text;
+            canBus.TXProcess(0x100,8,1,2,3,4,5,6,7,8);
         }
     }
 }
