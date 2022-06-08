@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VectorController"
         mc:Ignorable="d"
-        Title="Vector Controller" Height="400" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
+        Title="Vector Controller" Height="700" Width="800" WindowStartupLocation="CenterScreen" Closed="Window_Closed">
     <Window.Resources>
 
 
@@ -25,7 +25,8 @@
             </Setter>
         </Style>
         <Style TargetType="Button" x:Key="TabButtonFirst">
-            <Setter Property="Background" Value="White" />
+            <Setter Property="Background" Value="#3664ad" />
+            <Setter Property="Foreground" Value="Black" />
             <Setter Property="Height" Value="30" />
             <Setter Property="TextBlock.TextAlignment" Value="Center" />
             <Setter Property="Margin" Value="5,5,5,2"/>
@@ -54,7 +55,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="Button" x:Key="SoloButton">
+        
+        <Style TargetType="Button" x:Key="SubSoloButton">
             <Setter Property="Background" Value="White" />
             <Setter Property="Height" Value="30" />
             <Setter Property="TextBlock.TextAlignment" Value="Center" />
@@ -63,12 +65,45 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="10,3,10,3" Background="Orange" BorderBrush="DimGray" BorderThickness="2" >
+                        <Border CornerRadius="10,3,10,3" Background="#3970b7" BorderBrush="White" BorderThickness="1" >
                             <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Foreground" Value="LightGray"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="Button" x:Key="MainSoloButton">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="MaxWidth" Value="200"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="0,5,5,0" Background="#3970b7" BorderBrush="SeaShell" BorderThickness="5,0,0,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="False">
+                    <Setter Property="Foreground" Value="LightGray"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="TriggerButton" TargetType="Button">
@@ -95,9 +130,9 @@
         <Border Margin="3" BorderBrush="White" Grid.Column="0">
             <StackPanel Background="#818589" Orientation="Vertical">
 
-                <Button x:Name="startCan" Style="{StaticResource TabButtonFirst}" Click="startCan_Click" >Can bus start</Button>
-                
-                <Button x:Name="stopCan"  Style="{StaticResource TabButtonLast}" Click="stopCan_Click" Visibility="Hidden">Can bus STOP</Button>
+                <Button x:Name="startCan" Style="{StaticResource MainSoloButton}" Click="startCan_Click" >Can bus start</Button>
+
+                <Button x:Name="stopCan"  Style="{StaticResource MainSoloButton}" Click="stopCan_Click" Visibility="Hidden">Can bus STOP</Button>
             </StackPanel>
         </Border>
 
@@ -107,12 +142,12 @@
         <Border Margin="3" BorderBrush="White" Grid.Column="1">
             <StackPanel Background="#818589">
 
-                <Expander Header="Filter">
+                <Expander Header="Filter" IsExpanded="True">
                     <WrapPanel Orientation="Horizontal" Background="#505050">
                         <TextBlock Text="List of message ID's: " Foreground="White" FontSize="14" Margin="5" VerticalAlignment="Center"/>
                         <ComboBox Name="comboBoxOfMessageId" Margin="10" MinWidth="200"/>
-                        <Button x:Name="btnGetListOfMsgId" Style="{StaticResource SoloButton}" MinWidth="100" Click="btnGetListOfMsgId_Click">Get Msg ID</Button>
-                        <Button x:Name="btnSetMsgIdFilter" Style="{StaticResource SoloButton}" MinWidth="100" Click="btnSetMsgIdFilter_Click">Set filter</Button>
+                        <Button x:Name="btnGetListOfMsgId" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="btnGetListOfMsgId_Click">Get Msg ID</Button>
+                        <Button x:Name="btnSetMsgIdFilter" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="btnSetMsgIdFilter_Click">Set filter</Button>
                     </WrapPanel>
                 </Expander>
 
@@ -173,11 +208,17 @@
 
 
                         </Grid>
-                        <Button x:Name="sendMessageBtn" Style="{StaticResource SoloButton}" MinWidth="100" Click="sendMessageBtn_Click">Send</Button>
+                        <Button x:Name="sendMessageBtn" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="sendMessageBtn_Click">Send</Button>
                     </WrapPanel>
                 </Expander>
 
-                
+                <Expander Header="RX" IsExpanded="True">
+                    <WrapPanel Orientation="Horizontal" Background="#505050" HorizontalAlignment="Stretch">
+                        <Button x:Name="startPrintingRxMsgToTextBox" Style="{StaticResource SubSoloButton}" Click="startPrintingRxMsgToTextBox_Click">Print message to TextBox</Button>
+                        <TextBox x:Name="rxTextBox" MinWidth="650" MinHeight="200" Margin="5" />
+                    </WrapPanel>
+                </Expander>
+
             </StackPanel>
         </Border>
     </Grid>

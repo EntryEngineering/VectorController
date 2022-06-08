@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows.Controls;
 using vxlapi_NET;
 using VectorController.Messages;
+using System.ComponentModel;
 
 namespace VectorController.Processor
 {
@@ -32,9 +33,8 @@ namespace VectorController.Processor
         internal static string MessageId = "ALL";
         internal static List<string> msgIdList = new();
         internal static string dateTimeNowForFileName = DateTime.Now.ToString("CanBusLog yyyy_MM_DD HH-mm-ss");
-        private static BaseCanMessage temporaryCanMessage = new();
-        internal static TextBox messageTextBox = new();
 
+        private static BaseCanMessage temporaryCanMessage = new();
 
         internal CanMessageProcessor(XLDefine.XL_HardwareType xl_HardwareType, string aplicationName)
         {
@@ -48,7 +48,9 @@ namespace VectorController.Processor
             ChanelSetup();
         }
 
-        private static BaseCanMessage GettempCanMessage()
+
+
+        public BaseCanMessage GettempCanMessage()
         {
             return temporaryCanMessage;
         }
@@ -62,6 +64,7 @@ namespace VectorController.Processor
                 msgIdList.Add(temporaryCanMessage.MessageId);
             }
             SaveMessageToFileByMessageId(value, messageId, dateTimeNowForFileName);
+
         }
 
         internal static void PrintMessage(BaseCanMessage message) 
