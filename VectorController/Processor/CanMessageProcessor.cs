@@ -32,7 +32,8 @@ namespace VectorController.Processor
         internal CancellationTokenSource _cancellationTokenSource = null;
         internal static string MessageId = "ALL";
         internal static List<string> msgIdList = new();
-        internal static string dateTimeNowForFileName = DateTime.Now.ToString("CanBusLog yyyy_MM_DD HH-mm-ss");
+        internal static string internalTimeStamp = DateTime.Now.ToString("yyyy_MM_DD HH-mm-ss");
+
 
         private static BaseCanMessage temporaryCanMessage = new();
 
@@ -63,8 +64,8 @@ namespace VectorController.Processor
             {
                 msgIdList.Add(temporaryCanMessage.MessageId);
             }
-            SaveMessageToFileByMessageId(value, messageId, dateTimeNowForFileName);
-
+            SaveMessageToFileByMessageId(value, messageId, "CanBus" + internalTimeStamp);
+            SaveMesageWhenDataChanged(value, messageId, "CanBus" + internalTimeStamp);
         }
 
         internal static void PrintMessage(BaseCanMessage message) 
@@ -104,6 +105,32 @@ namespace VectorController.Processor
                     if (!File.Exists(path))
                     {
                         File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}",System.Text.Encoding.ASCII);
+                    }
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message.ToString());
+                }
+            }
+        }
+
+        internal static void SaveMesageWhenDataChanged(BaseCanMessage message, string messageId, string fileName) 
+        {
+            string msgDataTemp = "";
+
+            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, message.MessageValue))
+            {
+                string path = $"{Environment.CurrentDirectory}\\changesOnId{messageId}_{fileName}.csv";
+                string outputString = $"{internalTimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
+                PrintMessage(message);
+
+                try
+                {
+                    if (!File.Exists(path))
+                    {
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
+                        msgDataTemp = message.MessageValue;
                     }
                     File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
