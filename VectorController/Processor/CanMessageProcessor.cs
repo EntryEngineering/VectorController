@@ -360,7 +360,7 @@ namespace VectorController.Processor
             string messageValueRaw = subStrings[5];
             baseCanMessage.MessageValue = messageValueRaw;
 
-            //TID
+            //TID 
             string tidRaw = subStrings[6];
             baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
 
