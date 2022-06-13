@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
-using System.Windows.Controls;
-using vxlapi_NET;
 using VectorController.Messages;
-using System.ComponentModel;
+using vxlapi_NET;
 
 namespace VectorController.Processor
 {
@@ -45,7 +44,7 @@ namespace VectorController.Processor
             appName = aplicationName;
 
             Trace.WriteLine($"--- Application {aplicationName} connected with {xl_HardwareType}---");
-            DriverInit(aplicationName,XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            DriverInit(aplicationName, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
             ChanelSetup();
         }
 
@@ -68,9 +67,10 @@ namespace VectorController.Processor
             SaveMesageWhenDataChanged(value, messageId, "CanBus" + internalTimeStamp);
         }
 
-        internal static void PrintMessage(BaseCanMessage message) 
+        internal static void PrintMessage(BaseCanMessage message)
         {
-            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId} MessageValue:{message.MessageValue}");
+
+            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId.PadLeft(10)} MessageValueHex:{message.MessageValueHex.PadLeft(15)} MessageValueBinary:{message.MessageValueBinary} TestKlema: {PartOfMessage(message.MessageValueBinary,22,2)}");
         }
 
         internal static void SaveMessageToFileByMessageId(BaseCanMessage message, string messageId, string fileName)
@@ -78,7 +78,7 @@ namespace VectorController.Processor
             if (String.Equals(message.MessageId, messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
@@ -97,14 +97,14 @@ namespace VectorController.Processor
             else if (String.Equals("ALL", messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
                 {
                     if (!File.Exists(path))
                     {
-                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}",System.Text.Encoding.ASCII);
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
                     }
                     File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
@@ -115,14 +115,14 @@ namespace VectorController.Processor
             }
         }
 
-        internal static void SaveMesageWhenDataChanged(BaseCanMessage message, string messageId, string fileName) 
+        internal static void SaveMesageWhenDataChanged(BaseCanMessage message, string messageId, string fileName)
         {
             string msgDataTemp = "";
 
-            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, message.MessageValue))
+            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, message.MessageValueHex))
             {
                 string path = $"{Environment.CurrentDirectory}\\changesOnId{messageId}_{fileName}.csv";
-                string outputString = $"{internalTimeStamp};{message.MessageId};{message.MessageValue};{Environment.NewLine}";
+                string outputString = $"{internalTimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
@@ -130,7 +130,7 @@ namespace VectorController.Processor
                     if (!File.Exists(path))
                     {
                         File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
-                        msgDataTemp = message.MessageValue;
+                        msgDataTemp = message.MessageValueHex;
                     }
                     File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
@@ -303,10 +303,10 @@ namespace VectorController.Processor
             }
         }
 
-        internal void TXProcess(uint msgId,byte msgDlc,byte bytePos0, byte bytePos1, byte bytePos2, byte bytePos3, byte bytePos4, byte bytePos5, byte bytePos6, byte bytePos7)
+        internal void TXProcess(uint msgId, byte msgDlc, byte bytePos0, byte bytePos1, byte bytePos2, byte bytePos3, byte bytePos4, byte bytePos5, byte bytePos6, byte bytePos7)
         {
             blockRxThread = rxThread.IsAlive;
-            rxThread.Abort();
+            //rxThread.Abort();
 
             if (blockRxThread == false)
             {
@@ -356,9 +356,14 @@ namespace VectorController.Processor
             string messageLenghtRaw = subStrings[4];
             baseCanMessage.DLC = messageLenghtRaw.Substring(messageLenghtRaw.IndexOf('=') + 1, messageLenghtRaw.Length - 3);
 
-            //MessageValue
+
             string messageValueRaw = subStrings[5];
-            baseCanMessage.MessageValue = messageValueRaw;
+            //MessageValue - HEX
+            baseCanMessage.MessageValueHex = messageValueRaw;
+            //MessageValue - BINARY
+            baseCanMessage.MessageValueBinary = HexToBinary(messageValueRaw);
+
+
 
             //TID 
             string tidRaw = subStrings[6];
@@ -366,5 +371,25 @@ namespace VectorController.Processor
 
             return baseCanMessage;
         }
+
+        internal static string HexToBinary(string input)
+        {
+            return string.Join(string.Empty, input.Select(c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')));
+        }
+
+        internal static string PartOfMessage(string binaryMessage,int startBit,int lenght) 
+        {
+            if (binaryMessage.Length >= startBit+lenght)
+            {
+                return binaryMessage.Substring(startBit, lenght);
+            }
+            else
+            {
+                return "err";
+            }
+            
+            
+        }
+
     }
 }

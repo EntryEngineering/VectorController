@@ -13,10 +13,8 @@ namespace VectorController
     /// </summary>
     public partial class MainWindow : Window
     {
-
-        CanMessageProcessor canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "VectorController_v1");
-
-        BackgroundWorker backgroundWorker = new();
+        readonly CanMessageProcessor canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "VectorController_v1");
+        readonly BackgroundWorker backgroundWorker = new();
 
 
         public MainWindow()
@@ -91,7 +89,7 @@ namespace VectorController
 
             BaseCanMessage message = canBus.GettempCanMessage();
 
-            string canMessage = $"MsgID:{message.MessageId} - Data:{message.MessageValue}";
+            string canMessage = $"MsgID:{message.MessageId} - Data:{message.MessageValueHex}";
             rxTextBox.Text = canMessage;
         }
 
