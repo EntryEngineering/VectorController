@@ -1,21 +1,19 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using vxlapi_NET;
 using VectorController.Messages;
+using vxlapi_NET;
 
 namespace VectorController.Processor
 {
     internal class CanMessageProcessor
     {
-
-        private static XLDriver CANDemo = new();
+        private static XLDriver canBusDriver = new();
         private static string appName;
         private static XLClass.xl_driver_config driverConfig = new();
         private static XLDefine.XL_HardwareType hwType;
@@ -30,36 +28,30 @@ namespace VectorController.Processor
         private static int rxCi = -1;
         private static EventWaitHandle xlEvWaitHandle = new(false, EventResetMode.AutoReset, null);
         private static Thread rxThread;
+        private static Thread txThread;
         private static bool blockRxThread = false;
         internal CancellationTokenSource _cancellationTokenSource = null;
         internal static string MessageId = "ALL";
         internal static List<string> msgIdList = new();
-        internal static string dateTimeNowForFileName = DateTime.Now.ToString("CanBusLog yyyy_MM_DD HH-mm-ss");
+        internal static string internalTimeStamp = DateTime.Now.ToString("yyyy_MM_DD HH-mm-ss");
+
+
         private static BaseCanMessage temporaryCanMessage = new();
-
-        internal static TextBox messageTextBox = new();
-
-        internal static Window testConsole = new()
-        {
-            Width = 800,
-            Height = 200,
-            Title = "CanBusConsole",
-            Background = Brushes.DimGray,
-        };
-
-
 
         internal CanMessageProcessor(XLDefine.XL_HardwareType xl_HardwareType, string aplicationName)
         {
             msgIdList.Add("ALL");
+
             hwType = xl_HardwareType;
             appName = aplicationName;
-            Trace.WriteLine("constuctor");
-            DriverInit();
+
+            Trace.WriteLine($"--- Application {aplicationName} connected with {xl_HardwareType}---");
+            DriverInit(aplicationName, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
             ChanelSetup();
         }
 
-        private static BaseCanMessage GettempCanMessage()
+
+        public BaseCanMessage GettempCanMessage()
         {
             return temporaryCanMessage;
         }
@@ -72,8 +64,14 @@ namespace VectorController.Processor
             {
                 msgIdList.Add(temporaryCanMessage.MessageId);
             }
-            SaveMessageToFileByMessageId(value, messageId, dateTimeNowForFileName);
+            SaveMessageToFileByMessageId(value, messageId, "CanBus" + internalTimeStamp);
+            SaveMesageWhenDataChanged(value, messageId, "CanBus" + internalTimeStamp);
+        }
 
+        internal static void PrintMessage(BaseCanMessage message)
+        {
+
+            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId.PadLeft(10)} MessageValueHex:{message.MessageValueHex.PadLeft(15)} MessageValueBinary:{message.MessageValueBinary} TestKlema: {PartOfMessage(message.MessageValueBinary, 22, 2)}");
         }
 
         internal static void SaveMessageToFileByMessageId(BaseCanMessage message, string messageId, string fileName)
@@ -81,16 +79,16 @@ namespace VectorController.Processor
             if (String.Equals(message.MessageId, messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
-                Trace.Write(outputString);
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
+                PrintMessage(message);
 
                 try
                 {
                     if (!File.Exists(path))
                     {
-                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}");
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
                     }
-                    File.AppendAllText(path, outputString);
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
                 catch (Exception ex)
                 {
@@ -100,21 +98,52 @@ namespace VectorController.Processor
             else if (String.Equals("ALL", messageId))
             {
                 string path = $"{Environment.CurrentDirectory}\\message_{fileName}.csv";
-                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValue};RAW_MSG[{message.RawCanMessage}]{Environment.NewLine}";
-                Trace.Write(outputString);
+                string outputString = $"{message.TimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
+                PrintMessage(message);
 
                 try
                 {
                     if (!File.Exists(path))
                     {
-                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}");
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
                     }
-                    File.AppendAllText(path, outputString);
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(ex.Message.ToString());
                 }
+            }
+        }
+
+        internal static void SaveMesageWhenDataChanged(BaseCanMessage message, string messageId, string fileName)
+        {
+            string msgDataTemp = "";
+            string partOfMessage = PartOfMessage(message.MessageValueBinary, 22, 2);
+
+            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, partOfMessage))
+            {
+                string path = $"{Environment.CurrentDirectory}\\changesOnId{messageId}_{fileName}.csv";
+                string outputString = $"{internalTimeStamp};{message.MessageId};{partOfMessage};{Environment.NewLine}";
+                PrintMessage(message);
+
+                try
+                {
+                    if (!File.Exists(path))
+                    {
+                        File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
+                        msgDataTemp = partOfMessage;
+                    }
+                    File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message.ToString());
+                }
+            }
+            else
+            {
+                msgDataTemp = partOfMessage;
             }
         }
 
@@ -128,79 +157,88 @@ namespace VectorController.Processor
             return msgIdList;
         }
 
-        internal static void DriverInit()
+        internal static void DriverInit(string aplicationName, XLDefine.XL_BusTypes xL_BusTypes)
         {
-            CANDemo.XL_OpenDriver();
-            CANDemo.XL_GetDriverConfig(ref driverConfig);
+            canBusDriver.XL_OpenDriver();
+            canBusDriver.XL_GetDriverConfig(ref driverConfig);
 
-            if ((CANDemo.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS) ||
-                (CANDemo.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS))
+            if ((canBusDriver.XL_GetApplConfig(aplicationName, 0, ref hwType, ref hwIndex, ref hwChannel, xL_BusTypes) != XLDefine.XL_Status.XL_SUCCESS) ||
+                (canBusDriver.XL_GetApplConfig(aplicationName, 1, ref hwType, ref hwIndex, ref hwChannel, xL_BusTypes) != XLDefine.XL_Status.XL_SUCCESS))
             {
-                CANDemo.XL_SetApplConfig(appName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                CANDemo.XL_SetApplConfig(appName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                CANDemo.XL_PopupHwConfig();
+                canBusDriver.XL_SetApplConfig(aplicationName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, xL_BusTypes);
+                canBusDriver.XL_SetApplConfig(aplicationName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, xL_BusTypes);
+                canBusDriver.XL_PopupHwConfig();
             }
 
             if (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
             {
-                CANDemo.XL_PopupHwConfig();
+                canBusDriver.XL_PopupHwConfig();
             }
 
-            Trace.WriteLine("DriverInit");
+            Trace.WriteLine("APP_STATE: DriverInit");
         }
 
         internal static void ChanelSetup()
         {
+            Trace.WriteLine($"txMask: {txMask} and rxMask:{rxMask}");
+
             accessMask = txMask | rxMask;
             permissionMask = accessMask;
 
+            Trace.WriteLine($"accessMask: {accessMask}");
+            Trace.WriteLine($"permissionMask: {permissionMask}");
             // Open port
-            CANDemo.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            canBusDriver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
 
             // Check port
-            CANDemo.XL_CanRequestChipState(portHandle, accessMask);
+            canBusDriver.XL_CanRequestChipState(portHandle, accessMask);
 
             // Activate channel
-            CANDemo.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
+            canBusDriver.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
 
             // Initialize EventWaitHandle object with RX event handle provided by DLL
             int tempInt = -1;
-            CANDemo.XL_SetNotification(portHandle, ref tempInt, 1);
+            canBusDriver.XL_SetNotification(portHandle, ref tempInt, 1);
             xlEvWaitHandle.SafeWaitHandle = new SafeWaitHandle(new IntPtr(tempInt), true);
 
             // Reset time stamp clock
-            CANDemo.XL_ResetClock(portHandle);
+            canBusDriver.XL_ResetClock(portHandle);
 
+            Trace.WriteLine("APP_STATE: ChanelSetup");
         }
 
         internal void StartReceive()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
-
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Start();
-            Trace.WriteLine("rxThread.Start()");
+
+            Trace.WriteLine("APP_STATE: StartReceive");
         }
 
         internal void StopReceive()
         {
-            //CancellationToken cancellationToken = new();
+            Trace.WriteLine("APP_STATE: STOPtReceive");
+            canBusDriver.XL_ClosePort(portHandle);
+            canBusDriver.XL_CloseDriver();
+        }
 
-            //rxThread.Abort();
+        internal void StartTransmit()
+        {
+            txThread = new Thread(new ThreadStart(TXThread));
+            txThread.Start();
         }
 
         private static bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
         {
-            XLDefine.XL_Status status = CANDemo.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            XLDefine.XL_Status status = canBusDriver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
             if (status != XLDefine.XL_Status.XL_SUCCESS)
             {
                 Trace.WriteLine("XL_GetApplConfig      : " + status);
                 Trace.WriteLine("\nERROR: Function call failed!\nPress any key to continue...");
             }
 
-            chMask = CANDemo.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
-            chIdx = CANDemo.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
+            chMask = canBusDriver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
+            chIdx = canBusDriver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
             if (chIdx < 0 || chIdx >= driverConfig.channelCount)
             {
                 // the (hwType, hwIndex, hwChannel) triplet stored in the application configuration does not refer to any available channel.
@@ -235,7 +273,7 @@ namespace VectorController.Processor
                         while (blockRxThread) { Thread.Sleep(1000); }
 
                         // ...receive data from hardware.
-                        xlStatus = CANDemo.XL_Receive(portHandle, ref receivedEvent);
+                        xlStatus = canBusDriver.XL_Receive(portHandle, ref receivedEvent);
 
                         //  If receiving succeed....
                         if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
@@ -268,7 +306,7 @@ namespace VectorController.Processor
 
                                 else
                                 {
-                                    SetTempCanMessage(ConvertMessage(CANDemo.XL_GetEventString(receivedEvent)), MessageId);
+                                    SetTempCanMessage(ConvertMessage(canBusDriver.XL_GetEventString(receivedEvent)), MessageId);
                                 }
                             }
                         }
@@ -276,6 +314,43 @@ namespace VectorController.Processor
                 }
                 // No event occurred
             }
+        }
+
+        internal void TXThread() 
+        {
+            while (true)
+            {
+                Thread.Sleep(2000);
+                Trace.WriteLine("TX send");
+            }
+
+        }
+
+
+        internal void TXProcess(uint msgId, byte msgDlc, byte bytePos0, byte bytePos1, byte bytePos2, byte bytePos3, byte bytePos4, byte bytePos5, byte bytePos6, byte bytePos7)
+        {
+            //blockRxThread = rxThread.IsAlive;
+            //rxThread.Abort();
+
+
+
+            XLDefine.XL_Status txStatus;
+            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = msgId;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = msgDlc;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = bytePos0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = bytePos1;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = bytePos2;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = bytePos3;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = bytePos4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = bytePos5;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = bytePos6;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = bytePos7;
+            xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
+            txStatus = canBusDriver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+
+
+
         }
 
         internal static BaseCanMessage ConvertMessage(string input)
@@ -301,15 +376,85 @@ namespace VectorController.Processor
             string messageLenghtRaw = subStrings[4];
             baseCanMessage.DLC = messageLenghtRaw.Substring(messageLenghtRaw.IndexOf('=') + 1, messageLenghtRaw.Length - 3);
 
-            //MessageValue
-            string messageValueRaw = subStrings[5];
-            baseCanMessage.MessageValue = messageValueRaw;
 
-            //TID
+            string messageValueRaw = subStrings[5];
+            //MessageValue - HEX
+            baseCanMessage.MessageValueHex = messageValueRaw;
+            //MessageValue - BINARY
+            baseCanMessage.MessageValueBinary = HexToBinary(messageValueRaw);
+
+
+
+
+
+            ////TID 
+            //string tidRaw = subStrings[6];
+            //baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+
+            ////TID
             string tidRaw = subStrings[6];
             baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            if (String.Equals(tidRaw, "TX"))
+            {
+                tidRaw = subStrings[7];
+                baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            }
+            else
+            {
+                baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            }
 
             return baseCanMessage;
         }
+
+        internal static string HexToBinary(string input)
+        {
+            return string.Join(string.Empty, input.Select(c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')));
+        }
+
+        internal static string PartOfMessage(string binaryMessage, int startBit, int lenght)
+        {
+            if (binaryMessage.Length >= startBit + lenght)
+            {
+                return binaryMessage.Substring(startBit, lenght);
+            }
+            else
+            {
+                return "err";
+            }
+        }
+
+
+        internal string SwapEndianMotorlaToIntel(string input) //  Big to Little
+        {
+
+            if (!String.IsNullOrEmpty(input))
+            {
+                // String to int32
+
+                Int32 intDatatemp = Convert.ToInt32(input);
+
+                // Int32 to byte array
+
+                byte[] bytesTemp = BitConverter.GetBytes(intDatatemp);
+
+                // Check if input is Big - array of bytes reverse
+
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(bytesTemp);
+                }
+
+                // array bytes to string (int34)
+
+
+                return System.Text.Encoding.Default.GetString(bytesTemp);
+            }
+            else
+            {
+                throw new("string is null or empty");
+            }
+        }
+
     }
 }
