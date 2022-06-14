@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace VectorController.Processor
         private static int rxCi = -1;
         private static EventWaitHandle xlEvWaitHandle = new(false, EventResetMode.AutoReset, null);
         private static Thread rxThread;
+        private static Thread txThread;
         private static bool blockRxThread = false;
         internal CancellationTokenSource _cancellationTokenSource = null;
         internal static string MessageId = "ALL";
@@ -49,7 +51,6 @@ namespace VectorController.Processor
         }
 
 
-
         public BaseCanMessage GettempCanMessage()
         {
             return temporaryCanMessage;
@@ -70,7 +71,7 @@ namespace VectorController.Processor
         internal static void PrintMessage(BaseCanMessage message)
         {
 
-            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId.PadLeft(10)} MessageValueHex:{message.MessageValueHex.PadLeft(15)} MessageValueBinary:{message.MessageValueBinary} TestKlema: {PartOfMessage(message.MessageValueBinary,22,2)}");
+            Trace.WriteLine($"TimeStamp:{message.TimeStamp} MessageId:{message.MessageId.PadLeft(10)} MessageValueHex:{message.MessageValueHex.PadLeft(15)} MessageValueBinary:{message.MessageValueBinary} TestKlema: {PartOfMessage(message.MessageValueBinary, 22, 2)}");
         }
 
         internal static void SaveMessageToFileByMessageId(BaseCanMessage message, string messageId, string fileName)
@@ -118,11 +119,12 @@ namespace VectorController.Processor
         internal static void SaveMesageWhenDataChanged(BaseCanMessage message, string messageId, string fileName)
         {
             string msgDataTemp = "";
+            string partOfMessage = PartOfMessage(message.MessageValueBinary, 22, 2);
 
-            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, message.MessageValueHex))
+            if (String.Equals(message.MessageId, messageId) && !String.Equals(msgDataTemp, partOfMessage))
             {
                 string path = $"{Environment.CurrentDirectory}\\changesOnId{messageId}_{fileName}.csv";
-                string outputString = $"{internalTimeStamp};{message.MessageId};{message.MessageValueHex};{Environment.NewLine}";
+                string outputString = $"{internalTimeStamp};{message.MessageId};{partOfMessage};{Environment.NewLine}";
                 PrintMessage(message);
 
                 try
@@ -130,7 +132,7 @@ namespace VectorController.Processor
                     if (!File.Exists(path))
                     {
                         File.AppendAllText(path, $"TimeStamp;MessageId;MessageValue;{Environment.NewLine}", System.Text.Encoding.ASCII);
-                        msgDataTemp = message.MessageValueHex;
+                        msgDataTemp = partOfMessage;
                     }
                     File.AppendAllText(path, outputString, System.Text.Encoding.ASCII);
                 }
@@ -138,6 +140,10 @@ namespace VectorController.Processor
                 {
                     throw new Exception(ex.Message.ToString());
                 }
+            }
+            else
+            {
+                msgDataTemp = partOfMessage;
             }
         }
 
@@ -205,6 +211,7 @@ namespace VectorController.Processor
         {
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Start();
+
             Trace.WriteLine("APP_STATE: StartReceive");
         }
 
@@ -213,6 +220,12 @@ namespace VectorController.Processor
             Trace.WriteLine("APP_STATE: STOPtReceive");
             canBusDriver.XL_ClosePort(portHandle);
             canBusDriver.XL_CloseDriver();
+        }
+
+        internal void StartTransmit()
+        {
+            txThread = new Thread(new ThreadStart(TXThread));
+            txThread.Start();
         }
 
         private static bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
@@ -303,32 +316,39 @@ namespace VectorController.Processor
             }
         }
 
+        internal void TXThread() 
+        {
+            while (true)
+            {
+                Thread.Sleep(2000);
+                Trace.WriteLine("TX send");
+            }
+
+        }
+
+
         internal void TXProcess(uint msgId, byte msgDlc, byte bytePos0, byte bytePos1, byte bytePos2, byte bytePos3, byte bytePos4, byte bytePos5, byte bytePos6, byte bytePos7)
         {
-            blockRxThread = rxThread.IsAlive;
+            //blockRxThread = rxThread.IsAlive;
             //rxThread.Abort();
 
-            if (blockRxThread == false)
-            {
-                XLDefine.XL_Status txStatus;
-                XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
-                xlEventCollection.xlEvent[0].tagData.can_Msg.id = msgId;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = msgDlc;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = bytePos0;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = bytePos1;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = bytePos2;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = bytePos3;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = bytePos4;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = bytePos5;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = bytePos6;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = bytePos7;
-                xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
-                txStatus = canBusDriver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
-            }
-            else
-            {
-                Trace.WriteLine("RX thread still running");
-            }
+
+
+            XLDefine.XL_Status txStatus;
+            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = msgId;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = msgDlc;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = bytePos0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = bytePos1;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = bytePos2;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = bytePos3;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = bytePos4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = bytePos5;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = bytePos6;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = bytePos7;
+            xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
+            txStatus = canBusDriver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+
 
 
         }
@@ -365,9 +385,24 @@ namespace VectorController.Processor
 
 
 
-            //TID 
+
+
+            ////TID 
+            //string tidRaw = subStrings[6];
+            //baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+
+            ////TID
             string tidRaw = subStrings[6];
             baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            if (String.Equals(tidRaw, "TX"))
+            {
+                tidRaw = subStrings[7];
+                baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            }
+            else
+            {
+                baseCanMessage.TID = tidRaw.Substring(tidRaw.IndexOf('=') + 1, tidRaw.Length - 4);
+            }
 
             return baseCanMessage;
         }
@@ -377,9 +412,9 @@ namespace VectorController.Processor
             return string.Join(string.Empty, input.Select(c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')));
         }
 
-        internal static string PartOfMessage(string binaryMessage,int startBit,int lenght) 
+        internal static string PartOfMessage(string binaryMessage, int startBit, int lenght)
         {
-            if (binaryMessage.Length >= startBit+lenght)
+            if (binaryMessage.Length >= startBit + lenght)
             {
                 return binaryMessage.Substring(startBit, lenght);
             }
@@ -387,8 +422,38 @@ namespace VectorController.Processor
             {
                 return "err";
             }
-            
-            
+        }
+
+
+        internal string SwapEndianMotorlaToIntel(string input) //  Big to Little
+        {
+
+            if (!String.IsNullOrEmpty(input))
+            {
+                // String to int32
+
+                Int32 intDatatemp = Convert.ToInt32(input);
+
+                // Int32 to byte array
+
+                byte[] bytesTemp = BitConverter.GetBytes(intDatatemp);
+
+                // Check if input is Big - array of bytes reverse
+
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(bytesTemp);
+                }
+
+                // array bytes to string (int34)
+
+
+                return System.Text.Encoding.Default.GetString(bytesTemp);
+            }
+            else
+            {
+                throw new("string is null or empty");
+            }
         }
 
     }

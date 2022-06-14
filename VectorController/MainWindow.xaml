@@ -148,6 +148,7 @@
                         <ComboBox Name="comboBoxOfMessageId" Margin="10" MinWidth="200"/>
                         <Button x:Name="btnGetListOfMsgId" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="btnGetListOfMsgId_Click">Get Msg ID</Button>
                         <Button x:Name="btnSetMsgIdFilter" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="btnSetMsgIdFilter_Click">Set filter</Button>
+                        <Button x:Name="btnSetSpecialMdgId" Style="{StaticResource SubSoloButton}" MinWidth="100" Click="btnSetSpecialMdgId_Click">Set msgId '03C0'</Button>
                     </WrapPanel>
                 </Expander>
 
@@ -201,10 +202,10 @@
                             <TextBox x:Name="msgData5Txt" HorizontalAlignment="Stretch" Text="6" Grid.Column="1" Grid.Row="7"/>
 
                             <TextBlock Text="Data[6]: " HorizontalAlignment="Stretch" Grid.Column="0" Grid.Row="8"/>
-                            <TextBox x:Name="msgData6xt" HorizontalAlignment="Stretch" Text="7" Grid.Column="1" Grid.Row="8"/>
+                            <TextBox x:Name="msgData6Txt" HorizontalAlignment="Stretch" Text="7" Grid.Column="1" Grid.Row="8"/>
 
                             <TextBlock Text="Data[7]: " HorizontalAlignment="Stretch" Grid.Column="0" Grid.Row="9"/>
-                            <TextBox x:Name="msgData7xt" HorizontalAlignment="Stretch" Text="7" Grid.Column="1" Grid.Row="9"/>
+                            <TextBox x:Name="msgData7Txt" HorizontalAlignment="Stretch" Text="7" Grid.Column="1" Grid.Row="9"/>
 
 
                         </Grid>

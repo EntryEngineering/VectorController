@@ -79,11 +79,25 @@ namespace VectorController
 
         private void sendMessageBtn_Click(object sender, RoutedEventArgs e)
         {
-            //canBus.TXProcess(0x100,8,1,2,3,4,5,6,7,8);
+            
+
+            uint MessageIdConverted = Convert.ToUInt32(msgIdTxt.Text, 16);
+            byte MessageDlcConverted = Convert.ToByte(msgDlc.Text, 16);
+
+            byte MessageData0Converted = Convert.ToByte(msgData0Txt.Text, 16);
+            byte MessageData1Converted = Convert.ToByte(msgData1Txt.Text, 16);
+            byte MessageData2Converted = Convert.ToByte(msgData2Txt.Text, 16);
+            byte MessageData3Converted = Convert.ToByte(msgData3Txt.Text, 16);
+            byte MessageData4Converted = Convert.ToByte(msgData4Txt.Text, 16);
+            byte MessageData5Converted = Convert.ToByte(msgData5Txt.Text, 16);
+            byte MessageData6Converted = Convert.ToByte(msgData6Txt.Text, 16);
+            byte MessageData7Converted = Convert.ToByte(msgData7Txt.Text, 16);
+
+            canBus.TXProcess(MessageIdConverted, MessageDlcConverted, MessageData0Converted, MessageData1Converted, MessageData2Converted, MessageData3Converted, MessageData4Converted, MessageData5Converted, MessageData6Converted, MessageData7Converted);
         }
 
 
-        
+
         private void PrintMessageToTextBox()
         {
 
@@ -96,6 +110,17 @@ namespace VectorController
         private void startPrintingRxMsgToTextBox_Click(object sender, RoutedEventArgs e)
         {
             PrintMessageToTextBox();
+        }
+
+        private void btnSetSpecialMdgId_Click(object sender, RoutedEventArgs e)
+        {
+            comboBoxOfMessageId.Items.Clear();
+            comboBoxOfMessageId.Items.Add("03C0");
+            comboBoxOfMessageId.SelectedIndex = 0;
+            if (!String.IsNullOrEmpty(comboBoxOfMessageId.SelectedItem.ToString()))
+            {
+                canBus.SetMessageIdFilter(comboBoxOfMessageId.SelectedItem.ToString());
+            }
         }
     }
 }
