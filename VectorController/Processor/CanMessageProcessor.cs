@@ -10,6 +10,9 @@ using vxlapi_NET;
 
 namespace VectorController.Processor
 {
+
+    //Přesunout utot třídu do třídy CommonVector a CanBus
+
     internal class CanMessageProcessor
     {
         private static XLDriver canBusDriver = new();
