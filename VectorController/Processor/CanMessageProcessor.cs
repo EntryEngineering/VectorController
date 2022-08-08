@@ -33,7 +33,7 @@ namespace VectorController.Processor
         internal static string MessageId = "ALL";
         internal static List<string> msgIdList = new();
         internal static string internalTimeStamp = DateTime.Now.ToString("yyyy_MM_DD HH-mm-ss");
-
+        //
 
         private static BaseCanMessage temporaryCanMessage = new();
 
