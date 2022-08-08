@@ -1,7 +1,6 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -66,6 +65,9 @@ namespace VectorController.Processor
             }
             SaveMessageToFileByMessageId(value, messageId, "CanBus" + internalTimeStamp);
             SaveMesageWhenDataChanged(value, messageId, "CanBus" + internalTimeStamp);
+
+
+
         }
 
         internal static void PrintMessage(BaseCanMessage message)
@@ -316,7 +318,7 @@ namespace VectorController.Processor
             }
         }
 
-        internal void TXThread() 
+        internal void TXThread()
         {
             while (true)
             {

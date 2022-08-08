@@ -15,7 +15,7 @@ namespace VectorController
     {
         readonly CanMessageProcessor canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "VectorController_v1");
         readonly BackgroundWorker backgroundWorker = new();
-
+        BaseCanMessage baseCanMessage = new();
 
         public MainWindow()
         {
@@ -31,7 +31,7 @@ namespace VectorController
 
         private void BackgroundWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
-            throw new NotImplementedException();
+            PrintMessageToTextBox(baseCanMessage);
         }
 
         private void BackgroundWorker_ProgressChanged(object? sender, ProgressChangedEventArgs e)
@@ -41,7 +41,7 @@ namespace VectorController
 
         private void BackgroundWorker_DoWork(object? sender, DoWorkEventArgs e)
         {
-            throw new NotImplementedException();
+            baseCanMessage = canBus.GettempCanMessage();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -98,19 +98,18 @@ namespace VectorController
 
 
 
-        private void PrintMessageToTextBox()
+        private void PrintMessageToTextBox(BaseCanMessage message)
         {
-
-            BaseCanMessage message = canBus.GettempCanMessage();
-
             string canMessage = $"MsgID:{message.MessageId} - Data:{message.MessageValueHex}";
             rxTextBox.Text = canMessage;
         }
 
         private void startPrintingRxMsgToTextBox_Click(object sender, RoutedEventArgs e)
         {
-            PrintMessageToTextBox();
+            
         }
+
+
 
         private void btnSetSpecialMdgId_Click(object sender, RoutedEventArgs e)
         {
@@ -122,5 +121,6 @@ namespace VectorController
                 canBus.SetMessageIdFilter(comboBoxOfMessageId.SelectedItem.ToString());
             }
         }
+
     }
 }
