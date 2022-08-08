@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using vxlapi_NET;
 
 namespace VectorController.Processor
@@ -16,7 +13,7 @@ namespace VectorController.Processor
         // -----------------------------------------------------------------------------------------------
         // Driver access through XLDriver (wrapper)
 
-        internal static XLDriver xlDriver { get; set; }
+        internal XLDriver xlDriver { get; set; }
         //private static XLDriver CANDemo = new XLDriver();
         private static String appName = "newVectorController";
 
@@ -59,9 +56,10 @@ namespace VectorController.Processor
         /// Open driver
         /// </summary>
         /// <returns>XLDefine.XL_Status</returns>
-        public XLDefine.XL_Status OpenDriver() 
+        public XLDefine.XL_Status OpenDriver()
         {
-            XLDefine.XL_Status status = xlDriver.XL_OpenDriver();
+            XLDefine.XL_Status status = new();
+            status = xlDriver.XL_OpenDriver();
             Trace.WriteLine("Open Driver       : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError();
 
@@ -72,7 +70,7 @@ namespace VectorController.Processor
         /// Get driver config
         /// </summary>
         /// <returns>XLDefine.XL_Status</returns>
-        public XLDefine.XL_Status GetDriverConfig() 
+        public XLDefine.XL_Status GetDriverConfig()
         {
             XLDefine.XL_Status status = xlDriver.XL_GetDriverConfig(ref driverConfig);
             Trace.WriteLine("Get Driver Config : " + status);
@@ -85,7 +83,7 @@ namespace VectorController.Processor
         /// Get DLL verion of XL Driver
         /// </summary>
         /// <returns></returns>
-        public string GetDLLVesrion() 
+        public string GetDLLVesrion()
         {
             return xlDriver.VersionToString(driverConfig.dllVersion);
         }
@@ -95,7 +93,7 @@ namespace VectorController.Processor
         /// Get chnnel count
         /// </summary>
         /// <returns></returns>
-        public uint GetChannelCount() 
+        public uint GetChannelCount()
         {
             return driverConfig.channelCount;
         }
@@ -104,7 +102,7 @@ namespace VectorController.Processor
         /// Get list of channels
         /// </summary>
         /// <returns></returns>
-        public List<string> GetListOfChannels() 
+        public List<string> GetListOfChannels()
         {
             List<string> list = new List<string>();
             for (int i = 0; i < driverConfig.channelCount; i++)
@@ -131,13 +129,13 @@ namespace VectorController.Processor
 
 
 
-        private static int PrintFunctionError()
+        private int PrintFunctionError()
         {
             Trace.WriteLine("\nERROR: Function call failed!\nPress any key to continue...");
             return -1;
         }
 
-        private static void PrintConfig()
+        private void PrintConfig()
         {
             Trace.WriteLine("\n\nAPPLICATION CONFIGURATION");
 
@@ -152,7 +150,7 @@ namespace VectorController.Processor
             Trace.WriteLine("-------------------------------------------------------------------\n");
         }
 
-        private static void PrintAssignErrorAndPopupHwConf()
+        private void PrintAssignErrorAndPopupHwConf()
         {
             Trace.WriteLine("\nPlease check application settings of \"" + appName + " CAN1/CAN2\",\nassign them to available hardware channels and press enter.");
             xlDriver.XL_PopupHwConfig();

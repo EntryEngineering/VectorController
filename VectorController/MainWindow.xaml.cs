@@ -20,6 +20,9 @@ namespace VectorController
         public MainWindow()
         {
             InitializeComponent();
+            Processor.CanBus can = new();
+            can.test();
+
 
             backgroundWorker.DoWork += BackgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;

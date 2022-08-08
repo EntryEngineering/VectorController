@@ -10,12 +10,16 @@ namespace VectorController.Processor
     internal class CanBus
     {
 
-        CommonVector CommonVector { get; set; }
-
+        CommonVector common = new(new XLDriver());
 
         public void test() 
         {
-            CommonVector.GetDLLVesrion();
+            common.OpenDriver();
+            common.GetDriverConfig();
+            common.GetDLLVesrion();
+            common.GetListOfChannels();
+
+
         }
 
 
