@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using vxlapi_NET;
+using VectorController.Models;
 
 namespace VectorController.Processor
 {
-    internal class CommonVector
+    internal partial class CommonVector
     {
         // -----------------------------------------------------------------------------------------------
         // Global variables
@@ -15,23 +16,23 @@ namespace VectorController.Processor
 
         internal XLDriver xlDriver { get; set; }
         //private static XLDriver CANDemo = new XLDriver();
-        private static String appName = "newVectorController";
+        protected static String appName = "newVectorController";
 
         // Driver configuration
         private static XLClass.xl_driver_config driverConfig = new XLClass.xl_driver_config();
 
         // Variables required by XLDriver
-        private static XLDefine.XL_HardwareType hwType = XLDefine.XL_HardwareType.XL_HWTYPE_VN1610;
-        private static uint hwIndex = 1;
-        private static uint hwChannel = 1;
-        private static int portHandle = -1;
-        private static UInt64 accessMask = 0;
-        private static UInt64 permissionMask = 0;
-        private static UInt64 txMask = 0;
-        private static UInt64 rxMask = 0;
-        private static int txCi = -1;
-        private static int rxCi = -1;
-        private static EventWaitHandle xlEvWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, null);
+        protected static XLDefine.XL_HardwareType hwType = XLDefine.XL_HardwareType.XL_HWTYPE_VN1610;
+        protected static uint hwIndex = 1;
+        protected static uint hwChannel = 1;
+        protected static int portHandle = -1;
+        protected static UInt64 accessMask = 0;
+        protected static UInt64 permissionMask = 0;
+        protected static UInt64 txMask = 0;
+        protected static UInt64 rxMask = 0;
+        protected static int txCi = -1;
+        protected static int rxCi = -1;
+        protected static EventWaitHandle xlEvWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, null);
 
         // RX thread
         private static Thread rxThreadDDD;
@@ -58,8 +59,7 @@ namespace VectorController.Processor
         /// <returns>XLDefine.XL_Status</returns>
         public XLDefine.XL_Status OpenDriver()
         {
-            XLDefine.XL_Status status = new();
-            status = xlDriver.XL_OpenDriver();
+            XLDefine.XL_Status status = xlDriver.XL_OpenDriver();
             Trace.WriteLine("Open Driver       : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError();
 
@@ -102,15 +102,24 @@ namespace VectorController.Processor
         /// Get list of channels
         /// </summary>
         /// <returns></returns>
-        public List<string> GetListOfChannels()
+        internal List<VectorDeviceInfo> GetListOfChannels()
         {
-            List<string> list = new List<string>();
+            List<VectorDeviceInfo> list = new();
             for (int i = 0; i < driverConfig.channelCount; i++)
             {
-                list.Add($"{driverConfig.channel[i].name} - Channel mask: {driverConfig.channel[i].channelMask} - Transceiver name: {driverConfig.channel[i].transceiverName} - Serial number: {driverConfig.channel[i].serialNumber}");
+                list.Add(new VectorDeviceInfo()
+                {
+                    ChannelName = driverConfig.channel[i].name,
+                    ChannelMask = driverConfig.channel[i].channelMask,
+                    TransceiverName = driverConfig.channel[i].transceiverName,
+                    SerialNumber = driverConfig.channel[i].serialNumber
+                });
             }
             return list;
         }
+
+
+
 
         // -GetAppConfig
 
@@ -137,7 +146,7 @@ namespace VectorController.Processor
 
         private void PrintConfig()
         {
-            Trace.WriteLine("\n\nAPPLICATION CONFIGURATION");
+            Trace.WriteLine("APPLICATION CONFIGURATION");
 
             foreach (int channelIndex in new int[] { txCi, rxCi })
             {
@@ -147,10 +156,10 @@ namespace VectorController.Processor
                 Trace.WriteLine("Used Transceiver            : " + driverConfig.channel[channelIndex].transceiverName);
             }
 
-            Trace.WriteLine("-------------------------------------------------------------------\n");
+            Trace.WriteLine("-------------------------------------------------------------------");
         }
 
-        private void PrintAssignErrorAndPopupHwConf()
+        internal void PrintAssignErrorAndPopupHwConf()
         {
             Trace.WriteLine("\nPlease check application settings of \"" + appName + " CAN1/CAN2\",\nassign them to available hardware channels and press enter.");
             xlDriver.XL_PopupHwConfig();
