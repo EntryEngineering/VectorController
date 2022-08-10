@@ -10,6 +10,9 @@ using vxlapi_NET;
 
 namespace VectorController.Processor
 {
+
+    //Přesunout utot třídu do třídy CommonVector a CanBus
+
     internal class CanMessageProcessor
     {
         private static XLDriver canBusDriver = new();
@@ -33,7 +36,7 @@ namespace VectorController.Processor
         internal static string MessageId = "ALL";
         internal static List<string> msgIdList = new();
         internal static string internalTimeStamp = DateTime.Now.ToString("yyyy_MM_DD HH-mm-ss");
-
+        //
 
         private static BaseCanMessage temporaryCanMessage = new();
 
