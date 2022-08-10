@@ -12,10 +12,13 @@ namespace VectorController.Processor
     {
 
         public XLDriver driver { get; set; }
+        public XLDefine.XL_HardwareType hardwareType { get; set; }
 
-        public CanBus(XLDriver xLDriver) : base(xLDriver)
+
+        public CanBus(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType)
         {
             driver = xLDriver;
+            hardwareType = xL_HardwareType;
         }
 
         public void Test() 
@@ -39,20 +42,26 @@ namespace VectorController.Processor
 
             CheckVCANCONF();
 
+            GetAccesMask();
+            PrintAccessMask();
+            OpenPort();
+            CheckPort();
+            SetNotification();
+            ResetClock();
+            ActivateChannel();
+
         }
 
-        internal void CheckVCANCONF() 
+
+        internal XLDefine.XL_Status ActivateChannel() 
         {
-            // If the application name cannot be found in VCANCONF..
-            if ((driver.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS) ||
-                (driver.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN) != XLDefine.XL_Status.XL_SUCCESS))
-            {
-                //...create the item with two CAN channels
-                driver.XL_SetApplConfig(appName, 0, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                driver.XL_SetApplConfig(appName, 1, XLDefine.XL_HardwareType.XL_HWTYPE_NONE, 0, 0, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-                PrintAssignErrorAndPopupHwConf();
-            }
+            XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
+            Trace.WriteLine("Activate Channel      : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("ActivateChannel");
+
+            return status;
         }
+
 
 
 
