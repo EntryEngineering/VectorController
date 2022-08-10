@@ -23,6 +23,12 @@ namespace VectorController.Processor
 
         public void Test() 
         {
+            Trace.WriteLine("-------------------------------------------------------------------");
+            Trace.WriteLine("                     VectorController                       ");
+            Trace.WriteLine("");
+            Trace.WriteLine("-------------------------------------------------------------------");
+            Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
+
             OpenDriver();
             GetDriverConfig();
 
@@ -36,12 +42,12 @@ namespace VectorController.Processor
                 Trace.WriteLine($"Channel mask: {item.ChannelMask}");
                 Trace.WriteLine($"Transceiver name: {item.TransceiverName}");
                 Trace.WriteLine($"Serial number: {item.SerialNumber}");
-                
+
                 Trace.WriteLine("---------------------");
             }
 
             CheckVCANCONF();
-
+            RequestTheUserToAssignChannels();
             GetAccesMask();
             PrintAccessMask();
             OpenPort();

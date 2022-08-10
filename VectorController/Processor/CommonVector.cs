@@ -16,7 +16,7 @@ namespace VectorController.Processor
         // Driver access through XLDriver (wrapper)
 
         internal XLDriver xlDriver { get; set; }
-        protected static String appName = "newVectorController";
+        protected static String appName = "testCanApp";
 
         // Driver configuration
         private static XLClass.xl_driver_config driverConfig = new XLClass.xl_driver_config();
@@ -63,7 +63,6 @@ namespace VectorController.Processor
             XLDefine.XL_Status status = xlDriver.XL_OpenDriver();
             Trace.WriteLine("Open Driver       : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenDriver");
-
             return status;
         }
 
@@ -76,7 +75,6 @@ namespace VectorController.Processor
             XLDefine.XL_Status status = xlDriver.XL_GetDriverConfig(ref driverConfig);
             Trace.WriteLine("Get Driver Config : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("GetDriverConfig");
-
             return status;
         }
 
@@ -141,10 +139,49 @@ namespace VectorController.Processor
             permissionMask = accessMask;
         }
 
+        /// <summary>
+        /// Request the user to assign channels until both CAN1 (Tx) and CAN2 (Rx) are assigned to usable channels
+        /// </summary>
+        internal void RequestTheUserToAssignChannels() 
+        {
+            while (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
+            {
+                PrintAssignErrorAndPopupHwConf();
+            }
+        }
+
+
+        // -----------------------------------------------------------------------------------------------
+        /// <summary>
+        /// Retrieve the application channel assignment and test if this channel can be opened
+        /// </summary>
+        // -----------------------------------------------------------------------------------------------
+        internal bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
+        {
+            XLDefine.XL_Status status = xlDriver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
+            if (status != XLDefine.XL_Status.XL_SUCCESS)
+            {
+                Trace.WriteLine("XL_GetApplConfig      : " + status);
+                PrintFunctionError("GetAppChannelAndTestIsOk");
+            }
+
+            chMask = xlDriver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
+            chIdx = xlDriver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
+            Trace.WriteLine($"***************** TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} (GetAppChannelAndTestIsOk)");
+            if (chIdx < 0 || chIdx >= driverConfig.channelCount)
+            {
+                // the (hwType, hwIndex, hwChannel) triplet stored in the application configuration does not refer to any available channel.
+                return false;
+            }
+
+            // test if CAN is available on this channel
+            return (driverConfig.channel[chIdx].channelBusCapabilities & XLDefine.XL_BusCapabilities.XL_BUS_ACTIVE_CAP_CAN) != 0;
+        }
+
 
         internal void PrintAccessMask()
         {
-            Trace.WriteLine($"***************** TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} po accessMask = txMask | rxMask");
+            Trace.WriteLine($"PrintAccessMask >> TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} po accessMask = txMask | rxMask");
         }
 
         /// <summary>
