@@ -35,8 +35,8 @@ namespace VectorController.Processor
         protected static EventWaitHandle xlEvWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, null);
 
         // RX thread
-        private static Thread rxThreadDDD;
-        private static bool blockRxThread = false;
+        protected static Thread rxThreadDDD;
+        protected static bool blockRxThread = false;
         // -----------------------------------------------------------------------------------------------
 
 
@@ -320,6 +320,98 @@ namespace VectorController.Processor
         {
             Trace.WriteLine("Please check application settings of " + appName + " CAN1/CAN2,assign them to available hardware channels and press enter.");
             xlDriver.XL_PopupHwConfig();
+        }
+
+
+        /// <summary>
+        /// Run Rx Thread
+        /// </summary>
+        internal void RunRxThread() 
+        {
+            Trace.WriteLine("Start Rx thread...");
+            rxThreadDDD = new Thread(new ThreadStart(RXThread));
+            rxThreadDDD.Start();
+        }
+
+        internal void RXThread()
+        {
+            // Create new object containing received data 
+            XLClass.xl_event receivedEvent = new XLClass.xl_event();
+
+            // Result of XL Driver function calls
+            XLDefine.XL_Status xlStatus = XLDefine.XL_Status.XL_SUCCESS;
+
+
+            // Note: this thread will be destroyed by MAIN
+            while (true)
+            {
+                //Console.WriteLine(i + "  Wait for hardware events");
+                //i = i+1;
+                //if (i >= 10)
+                //{
+                //    xlStatus = XLDefine.XL_Status.XL_ERR_CONNECTION_CLOSED;
+                //}
+                // Wait for hardware events
+                if (xlEvWaitHandle.WaitOne(1000))
+                {
+                    // ...init xlStatus first
+                    xlStatus = XLDefine.XL_Status.XL_SUCCESS;
+
+                    // afterwards: while hw queue is not empty...
+                    while (xlStatus != XLDefine.XL_Status.XL_ERR_QUEUE_IS_EMPTY)
+                    {
+                        // ...block RX thread to generate RX-Queue overflows
+                        while (blockRxThread) { Thread.Sleep(1000); }
+
+                        // ...receive data from hardware.
+                        xlStatus = xlDriver.XL_Receive(portHandle, ref receivedEvent);
+
+                        //  If receiving succeed....
+                        if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
+                        {
+                            if ((receivedEvent.flags & XLDefine.XL_MessageFlags.XL_EVENT_FLAG_OVERRUN) != 0)
+                            {
+                                Trace.WriteLine("-- XL_EVENT_FLAG_OVERRUN --");
+                            }
+
+                            // ...and data is a Rx msg...
+                            if (receivedEvent.tag == XLDefine.XL_EventTags.XL_RECEIVE_MSG)
+                            {
+                                string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{xlDriver.XL_GetEventString(receivedEvent)}]";
+
+
+                                Trace.WriteLine(preString);
+
+
+                                if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_OVERRUN) != 0)
+                                {
+                                    Trace.WriteLine("-- XL_CAN_MSG_FLAG_OVERRUN --");
+                                }
+
+                                // ...check various flags
+                                if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+                                    == XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+                                {
+                                    Trace.WriteLine("ERROR FRAME");
+                                }
+
+                                else if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+                                    == XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+                                {
+                                    Trace.WriteLine("REMOTE FRAME");
+                                }
+
+                                else
+                                {
+                                    //Console.WriteLine(CANDemo.XL_GetEventString(receivedEvent));
+                                    Trace.WriteLine("OK MSG");
+                                }
+                            }
+                        }
+                    }
+                }
+                // No event occurred
+            }
         }
     }
 }

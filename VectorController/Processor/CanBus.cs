@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using vxlapi_NET;
 
@@ -55,6 +56,8 @@ namespace VectorController.Processor
             SetNotification();
             ResetClock();
             ActivateChannel();
+            RunRxThread();
+
 
         }
 
@@ -67,10 +70,6 @@ namespace VectorController.Processor
 
             return status;
         }
-
-
-
-
 
 
     }
