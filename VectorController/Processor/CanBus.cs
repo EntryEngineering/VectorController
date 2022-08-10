@@ -47,7 +47,7 @@ namespace VectorController.Processor
                 Trace.WriteLine("---------------------");
             }
 
-            CheckVCANCONF();
+            GetAppConfigAndSetAppConfig();
             RequestTheUserToAssignChannels();
             GetAccesMask();
             PrintAccessMask();
@@ -56,20 +56,32 @@ namespace VectorController.Processor
             SetNotification();
             ResetClock();
             ActivateChannel();
-            RunRxThread();
+            //RunRxThread();
 
 
         }
+        //*******************************
+        //**** Special CAN Bus API below
+        //*******************************
 
 
-        internal XLDefine.XL_Status ActivateChannel() 
+        /// <summary>
+        /// Check port with function XL_CanRequestChipState
+        /// </summary>
+        /// <returns></returns>
+        internal XLDefine.XL_Status CheckPort()
         {
-            XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
-            Trace.WriteLine("Activate Channel      : " + status);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("ActivateChannel");
+            XLDefine.XL_Status status = xlDriver.XL_CanRequestChipState(portHandle, accessMask);
+            Trace.WriteLine("Can Request Chip State: " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("CheckPort");
 
             return status;
         }
+
+
+
+
+
 
 
     }
