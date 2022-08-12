@@ -15,7 +15,7 @@ namespace VectorController.Processor
         public XLDriver driver { get; set; }
         public XLDefine.XL_HardwareType hardwareType { get; set; }
 
-        public CanFdBus(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType)
+        public CanFdBus(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN)
         {
             driver = xLDriver;
             hardwareType = xL_HardwareType;
