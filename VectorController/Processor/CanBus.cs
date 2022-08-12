@@ -22,7 +22,7 @@ namespace VectorController.Processor
             hardwareType = xL_HardwareType;
         }
 
-        public void Test() 
+        public void TestCanBus() 
         {
             Trace.WriteLine("-------------------------------------------------------------------");
             Trace.WriteLine("                     VectorController                       ");
@@ -56,13 +56,29 @@ namespace VectorController.Processor
             SetNotification();
             ResetClock();
             ActivateChannel();
-            //RunRxThread();
+            RunRxThread();
 
 
         }
         //*******************************
         //**** Special CAN Bus API below
         //*******************************
+
+
+        // xlCanSetChannelMode
+        // xlCanSetChannelOutput
+        // xlCanSetReceiveMode
+        // xlCanSetChannelTransceiver
+        // xlCanSetChannelParams
+        // xlCanSetChannelParamsC200
+        // xlCanSetChannelBitrate
+        // xlCanSetChannelAcceptance
+        // xlCanAddAcceptanceRange
+        // xlCanRemoveAcceptanceRange
+        // xlCanResetAcceptance
+        // xlCanRequestChipState - DONE
+        // xlCanTransmit
+        // xlCanFlushTransmitQueue
 
 
         /// <summary>
