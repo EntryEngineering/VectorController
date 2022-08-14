@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Timers;
+using VectorController.Messages;
 using VectorController.Models;
 using vxlapi_NET;
 
@@ -41,6 +42,7 @@ namespace VectorController.Processor
         protected static bool blockRxThread = false;
         private XLDriver xLDriver;
         private XLDefine.XL_HardwareType xL_HardwareType;
+        internal BaseCanMessage canMessage { get; set; } = new BaseCanMessage();
 
         // -----------------------------------------------------------------------------------------------
 
@@ -283,7 +285,6 @@ namespace VectorController.Processor
                             {
                                 string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{driver.XL_GetEventString(receivedEvent)}]";
 
-
                                 Trace.WriteLine(preString);
 
 
@@ -307,7 +308,7 @@ namespace VectorController.Processor
 
                                 else
                                 {
-                                    //Console.WriteLine(CANDemo.XL_GetEventString(receivedEvent));
+                                    Trace.WriteLine(driver.XL_GetEventString(receivedEvent));
                                     Trace.WriteLine("OK MSG");
                                 }
                             }
@@ -387,7 +388,7 @@ namespace VectorController.Processor
         /// </summary>
         /// <returns></returns>
         public string GetDLLVesrion()
-        {
+        { 
             return driver.VersionToString(driverConfig.dllVersion);
         }
 
