@@ -58,6 +58,7 @@ namespace VectorController.Processor
             GetAccesMask();
             PrintAccessMask();
             OpenPort();
+
             //CheckPort();
             //ActivateChannel();
             //SetNotification();
