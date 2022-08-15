@@ -109,9 +109,7 @@ namespace VectorController.Processor
         internal void CanTransmit()
         {
             XLDefine.XL_Status txStatus;
-            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
-
-            // event 1
+            XLClass.xl_event_collection xlEventCollection = new(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 1;
