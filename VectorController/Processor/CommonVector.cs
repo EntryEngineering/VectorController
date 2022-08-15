@@ -411,13 +411,23 @@ namespace VectorController.Processor
             List<VectorDeviceInfo> list = new();
             for (int i = 0; i < driverConfig.channelCount; i++)
             {
-                list.Add(new VectorDeviceInfo()
+                VectorDeviceInfo info = new();
+                info.ChannelName = driverConfig.channel[i].name;
+                info.ChannelMask = driverConfig.channel[i].channelMask;
+                info.TransceiverName = driverConfig.channel[i].transceiverName;
+                info.SerialNumber = driverConfig.channel[i].serialNumber;
+
+
+                if ((driverConfig.channel[i].channelCapabilities & XLDefine.XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_ISO_SUPPORT) == XLDefine.XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_ISO_SUPPORT)
                 {
-                    ChannelName = driverConfig.channel[i].name,
-                    ChannelMask = driverConfig.channel[i].channelMask,
-                    TransceiverName = driverConfig.channel[i].transceiverName,
-                    SerialNumber = driverConfig.channel[i].serialNumber
-                });
+                    info.CanFdCompatible = true;
+                }
+                else
+                {
+                    info.CanFdCompatible = false;
+                }
+
+                list.Add(info);
             }
             return list;
         }
