@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using vxlapi_NET;
+using static vxlapi_NET.XLDefine;
 
 namespace VectorController.Processor
 {
@@ -13,16 +14,16 @@ namespace VectorController.Processor
     {
 
         public XLDriver driver { get; set; }
-        public XLDefine.XL_HardwareType hardwareType { get; set; }
+        public XL_HardwareType hardwareType { get; set; }
 
 
-        public CanBus(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType)
+        public CanBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN)
         {
             driver = xLDriver;
             hardwareType = xL_HardwareType;
         }
 
-        public void Test() 
+        public void TestCanBus() 
         {
             Trace.WriteLine("-------------------------------------------------------------------");
             Trace.WriteLine("                     VectorController                       ");
@@ -53,10 +54,17 @@ namespace VectorController.Processor
             PrintAccessMask();
             OpenPort();
             CheckPort();
+            ActivateChannel();
             SetNotification();
             ResetClock();
-            ActivateChannel();
+
             //RunRxThread();
+            for (int i = 0; i < 20; i++)
+            {
+                CanTransmit();
+
+            }
+            
 
 
         }
@@ -65,13 +73,29 @@ namespace VectorController.Processor
         //*******************************
 
 
+        // xlCanSetChannelMode
+        // xlCanSetChannelOutput
+        // xlCanSetReceiveMode
+        // xlCanSetChannelTransceiver
+        // xlCanSetChannelParams
+        // xlCanSetChannelParamsC200
+        // xlCanSetChannelBitrate
+        // xlCanSetChannelAcceptance
+        // xlCanAddAcceptanceRange
+        // xlCanRemoveAcceptanceRange
+        // xlCanResetAcceptance
+        // xlCanRequestChipState - DONE
+        // xlCanTransmit - DONE
+        // xlCanFlushTransmitQueue
+
+
         /// <summary>
         /// Check port with function XL_CanRequestChipState
         /// </summary>
         /// <returns></returns>
         internal XLDefine.XL_Status CheckPort()
         {
-            XLDefine.XL_Status status = xlDriver.XL_CanRequestChipState(portHandle, accessMask);
+            XLDefine.XL_Status status = base.driver.XL_CanRequestChipState(portHandle, accessMask);
             Trace.WriteLine("Can Request Chip State: " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("CheckPort");
 
@@ -79,9 +103,28 @@ namespace VectorController.Processor
         }
 
 
+        /// <summary>
+        /// Transmit Can Bus message
+        /// </summary>
+        internal void CanTransmit()
+        {
+            XLDefine.XL_Status txStatus;
+            XLClass.xl_event_collection xlEventCollection = new(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 1;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 2;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 3;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = 5;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = 6;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = 7;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = 8;
+            xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
 
-
-
+            txStatus = base.driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+            Trace.WriteLine("Transmit Message      : " + txStatus);
+        }
 
 
     }
