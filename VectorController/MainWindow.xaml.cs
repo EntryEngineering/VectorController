@@ -19,9 +19,12 @@ namespace VectorController
 
         public MainWindow()
         {
-            InitializeComponent();
-            CanBus canBusNew = new CanBus(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
-            canBusNew.TestCanBus();
+            //InitializeComponent();
+            //CanBus canBusNew = new CanBus(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
+            //canBusNew.TestCanBus();
+
+            CanFdBus canFdBus = new CanFdBus(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
+            canFdBus.TestCanFDBus();
 
 
             //backgroundWorker.DoWork += BackgroundWorker_DoWork;

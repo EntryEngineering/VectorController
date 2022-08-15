@@ -22,19 +22,19 @@ namespace VectorController.Processor
         protected static string appName = "TestVectorControllerV1";
 
         // Driver configuration
-        private static XLClass.xl_driver_config driverConfig = new XLClass.xl_driver_config();
+        internal static XLClass.xl_driver_config driverConfig = new XLClass.xl_driver_config();
 
         // Variables required by XLDriver
         protected static XLDefine.XL_HardwareType hwType;
-        protected static uint hwIndex = 1;
-        protected static uint hwChannel = 1;
+        protected static uint hwIndex = 0;
+        protected static uint hwChannel = 0;
         protected static int portHandle = -1;
         protected static UInt64 accessMask = 0;
         protected static UInt64 permissionMask = 0;
         protected static UInt64 txMask = 0;
         protected static UInt64 rxMask = 0;
-        protected static int txCi = -1;
-        protected static int rxCi = -1;
+        protected static int txCi = 0;
+        protected static int rxCi = 0;
         protected static EventWaitHandle xlEvWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, null);
 
         // RX thread
@@ -218,7 +218,8 @@ namespace VectorController.Processor
         /// <returns></returns>
         internal XLDefine.XL_Status ActivateChannel()
         {
-            XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, commonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);
+            //XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, commonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);      // For Can
+            XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, commonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_RESET_CLOCK); // for CanFd
             Trace.WriteLine("Activate Channel      : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("ActivateChannel");
 
@@ -226,98 +227,7 @@ namespace VectorController.Processor
         }
 
 
-        /// <summary>
-        /// Run Rx Thread
-        /// </summary>
-        internal void RunRxThread()
-        {
-            Trace.WriteLine("Start Rx thread...");
-            rxThreadDDD = new Thread(new ThreadStart(RXThread));
-            rxThreadDDD.Start();
-        }
 
-        /// <summary>
-        /// RX thread with funcion xlReceive and xlGetEventString
-        /// </summary>
-        internal void RXThread()
-        {
-            // Create new object containing received data 
-            XLClass.xl_event receivedEvent = new XLClass.xl_event();
-
-            // Result of XL Driver function calls
-            XLDefine.XL_Status xlStatus = XLDefine.XL_Status.XL_SUCCESS;
-
-
-            // Note: this thread will be destroyed by MAIN
-            while (true)
-            {
-                //Console.WriteLine(i + "  Wait for hardware events");
-                //i = i+1;
-                //if (i >= 10)
-                //{
-                //    xlStatus = XLDefine.XL_Status.XL_ERR_CONNECTION_CLOSED;
-                //}
-                // Wait for hardware events
-                if (xlEvWaitHandle.WaitOne(1000))
-                {
-                    // ...init xlStatus first
-                    xlStatus = XLDefine.XL_Status.XL_SUCCESS;
-
-                    // afterwards: while hw queue is not empty...
-                    while (xlStatus != XLDefine.XL_Status.XL_ERR_QUEUE_IS_EMPTY)
-                    {
-                        // ...block RX thread to generate RX-Queue overflows
-                        while (blockRxThread) { Thread.Sleep(1000); }
-
-                        // ...receive data from hardware.
-                        xlStatus = driver.XL_Receive(portHandle, ref receivedEvent);
-
-                        //  If receiving succeed....
-                        if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
-                        {
-                            if ((receivedEvent.flags & XLDefine.XL_MessageFlags.XL_EVENT_FLAG_OVERRUN) != 0)
-                            {
-                                Trace.WriteLine("-- XL_EVENT_FLAG_OVERRUN --");
-                            }
-
-                            // ...and data is a Rx msg...
-                            if (receivedEvent.tag == XLDefine.XL_EventTags.XL_RECEIVE_MSG)
-                            {
-                                string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{driver.XL_GetEventString(receivedEvent)}]";
-
-                                Trace.WriteLine(preString);
-
-
-                                if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_OVERRUN) != 0)
-                                {
-                                    Trace.WriteLine("-- XL_CAN_MSG_FLAG_OVERRUN --");
-                                }
-
-                                // ...check various flags
-                                if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
-                                    == XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
-                                {
-                                    Trace.WriteLine("ERROR FRAME");
-                                }
-
-                                else if ((receivedEvent.tagData.can_Msg.flags & XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
-                                    == XLDefine.XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
-                                {
-                                    Trace.WriteLine("REMOTE FRAME");
-                                }
-
-                                else
-                                {
-                                    Trace.WriteLine(driver.XL_GetEventString(receivedEvent));
-                                    Trace.WriteLine("OK MSG");
-                                }
-                            }
-                        }
-                    }
-                }
-                // No event occurred
-            }
-        }
 
         // xlGetErrorString - not use
         // xlGetSyncTime - TODO
@@ -356,32 +266,7 @@ namespace VectorController.Processor
 
 
 
-        // -----------------------------------------------------------------------------------------------
-        /// <summary>
-        /// Retrieve the application channel assignment and test if this channel can be opened
-        /// </summary>
-        // -----------------------------------------------------------------------------------------------
-        internal bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
-        {
-            XLDefine.XL_Status status = driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, commonBusType);
-            if (status != XLDefine.XL_Status.XL_SUCCESS)
-            {
-                Trace.WriteLine("XL_GetApplConfig      : " + status);
-                PrintFunctionError("GetAppChannelAndTestIsOk");
-            }
 
-            chMask = driver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
-            chIdx = driver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
-            Trace.WriteLine($"***************** TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} (GetAppChannelAndTestIsOk)");
-            if (chIdx < 0 || chIdx >= driverConfig.channelCount)
-            {
-                // the (hwType, hwIndex, hwChannel) triplet stored in the application configuration does not refer to any available channel.
-                return false;
-            }
-
-            // test if CAN is available on this channel
-            return (driverConfig.channel[chIdx].channelBusCapabilities & XLDefine.XL_BusCapabilities.XL_BUS_ACTIVE_CAP_CAN) != 0;
-        }
 
         /// <summary>
         /// Get DLL verion of XL Driver
@@ -442,16 +327,7 @@ namespace VectorController.Processor
             permissionMask = accessMask;
         }
 
-        /// <summary>
-        /// Request the user to assign channels until both CAN1 (Tx) and CAN2 (Rx) are assigned to usable channels
-        /// </summary>
-        internal void RequestTheUserToAssignChannels() 
-        {
-            if (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
-            {
-                PrintAssignErrorAndPopupHwConf();
-            }
-        }
+
 
 
         /// <summary>
@@ -476,7 +352,7 @@ namespace VectorController.Processor
         /// <summary>
         /// Print config
         /// </summary>
-        private void PrintConfig()
+        internal void PrintConfig()
         {
             Trace.WriteLine("APPLICATION CONFIGURATION");
 
