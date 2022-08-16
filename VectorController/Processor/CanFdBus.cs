@@ -17,17 +17,16 @@ namespace VectorController.Processor
         static extern int WaitForSingleObject(int handle, int timeOut);
         // -----------------------------------------------------------------------------------------------
 
-        public XLDriver driver { get; set; }
-        public XLDefine.XL_HardwareType hardwareType { get; set; }
+        public XL_HardwareType HardwareType { get; set; }
 
-        private static uint canFdModeNoIso = 0;      // Global CAN FD ISO (default) / no ISO mode flag
+        private static readonly uint canFdModeNoIso = 0;      // Global CAN FD ISO (default) / no ISO mode flag
 
         private static int eventHandle = -1;
 
         public CanFdBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN)
         {
-            driver = xLDriver;
-            hardwareType = xL_HardwareType;
+            Driver = xLDriver;
+            HardwareType = xL_HardwareType;
         }
 
         [STAThread]
@@ -64,48 +63,39 @@ namespace VectorController.Processor
             GetAccesMask();
             PrintAccessMask();
             OpenPort();
-
             SetCanFdConfiguration();
             SetNotificationCanFdBus();
             ActivateChannel();
             GetXlDriverConfiguration();
 
+            RunRxThread();
 
-            //RunRxThread();
-
-
-            for (int i = 0; i < 20; i++)
-            {
-                CanFdTransmit();
-
-            }
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    CanFdTransmit();
+            //}
         }
 
-
-
-
-        //*******************************
-        //**** Special CAN FD Bus API below
-        //*******************************
-
-        internal XLDefine.XL_Status SetNotificationCanFdBus()
+        /// <summary>
+        /// Set notification CanFd Bus
+        /// </summary>
+        /// <returns></returns>
+        internal XL_Status SetNotificationCanFdBus()
         {
-            // Get RX event handle
-            XL_Status status = driver.XL_SetNotification(portHandle, ref eventHandle, 1);
+            XL_Status status = Driver.XL_SetNotification(portHandle, ref eventHandle, 1);
             Console.WriteLine("Set Notification      : " + status);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
+            if (status != XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
 
             return status;
         }
 
-        // xlCanFdSetConfiguration - DONE
-        // xlCanTransmitEx
-        // xlCanReceive
-        // xlCanGetEventString
-
-        internal XLDefine.XL_Status SetCanFdConfiguration()
+        /// <summary>
+        /// Set CanFd configuration
+        /// </summary>
+        /// <returns></returns>
+        internal XL_Status SetCanFdConfiguration()
         {
-            XLClass.XLcanFdConf canFdConf = new XLClass.XLcanFdConf();
+            XLClass.XLcanFdConf canFdConf = new();
 
             // arbitration bitrate
             canFdConf.arbitrationBitRate = 500000;  //Arbitration CAN bus timing for nominal / arbitration bit rate in bit/s.
@@ -128,18 +118,21 @@ namespace VectorController.Processor
                 canFdConf.options = 0;
             }
 
-            XLDefine.XL_Status status = driver.XL_CanFdSetConfiguration(portHandle, accessMask, canFdConf);
-            Trace.WriteLine("\n\nSet CAN FD Config     : " + status);
+            XL_Status status = Driver.XL_CanFdSetConfiguration(portHandle, accessMask, canFdConf);
+            Trace.WriteLine("Set CAN FD Config     : " + status);
             if (status != XL_Status.XL_SUCCESS) PrintFunctionError("SetCanFdConfiguration");
 
             return status;
         }
 
-
-        internal XLDefine.XL_Status GetXlDriverConfiguration()
+        /// <summary>
+        /// Get XL Driver configuration
+        /// </summary>
+        /// <returns></returns>
+        internal XL_Status GetXlDriverConfiguration()
         {
             // Get XL Driver configuration to get the actual setup parameter
-            XLDefine.XL_Status status = driver.XL_GetDriverConfig(ref driverConfig);
+            XL_Status status = Driver.XL_GetDriverConfig(ref driverConfig);
             if (status != XL_Status.XL_SUCCESS) PrintFunctionError("GetXlDriverConfiguration");
 
             if (canFdModeNoIso > 0)
@@ -167,24 +160,26 @@ namespace VectorController.Processor
             rxThreadDDD.Start();
         }
 
-
+        /// <summary>
+        /// Receive thread
+        /// </summary>
         public void RXThread()
         {
             // Create new object containing received data 
-            XLClass.XLcanRxEvent receivedEvent = new XLClass.XLcanRxEvent();
+            XLClass.XLcanRxEvent receivedEvent = new();
 
             // Result of XL Driver function calls
-            XLDefine.XL_Status xlStatus = XL_Status.XL_SUCCESS;
+            XL_Status xlStatus = XL_Status.XL_SUCCESS;
 
             // Result values of WaitForSingleObject 
-            XLDefine.WaitResults waitResult = new XLDefine.WaitResults();
+            WaitResults waitResult = new();
 
 
             // Note: this thread will be destroyed by MAIN
             while (true)
             {
                 // Wait for hardware events
-                waitResult = (XLDefine.WaitResults)WaitForSingleObject(eventHandle, 1000);
+                waitResult = (WaitResults)WaitForSingleObject(eventHandle, 1000);
 
                 // If event occurred...
                 if (waitResult != WaitResults.WAIT_TIMEOUT)
@@ -199,12 +194,12 @@ namespace VectorController.Processor
                         while (blockRxThread) Thread.Sleep(1000);
 
                         // ...receive data from hardware.
-                        xlStatus = driver.XL_CanReceive(portHandle, ref receivedEvent);
+                        xlStatus = Driver.XL_CanReceive(portHandle, ref receivedEvent);
 
                         //  If receiving succeed....
                         if (xlStatus == XL_Status.XL_SUCCESS)
                         {
-                            Trace.WriteLine(driver.XL_CanGetEventString(receivedEvent));
+                            Trace.WriteLine(Driver.XL_CanGetEventString(receivedEvent));
 
                         }
                     }
@@ -213,11 +208,14 @@ namespace VectorController.Processor
             }
         }
 
+        /// <summary>
+        /// CanFd transmit sample
+        /// </summary>
         public void CanFdTransmit()
         {
-            XLDefine.XL_Status txStatus;
+            XL_Status txStatus;
 
-            XLClass.xl_canfd_event_collection xlEventCollection = new XLClass.xl_canfd_event_collection(1);
+            XLClass.xl_canfd_event_collection xlEventCollection = new(1);
 
             xlEventCollection.xlCANFDEvent[0].tag = XL_CANFD_TX_EventTags.XL_CAN_EV_TAG_TX_MSG;
             xlEventCollection.xlCANFDEvent[0].tagData.canId = 0x100;
@@ -233,7 +231,7 @@ namespace VectorController.Processor
             xlEventCollection.xlCANFDEvent[0].tagData.data[7] = 4;
 
             uint messageCounterSent = 0;
-            txStatus = driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
+            txStatus = Driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
             Trace.WriteLine($"Transmit Message      : {txStatus} {messageCounterSent}");
         }
 
@@ -255,17 +253,17 @@ namespace VectorController.Processor
         /// Retrieve the application channel assignment and test if this channel can be opened
         /// </summary>
         // -----------------------------------------------------------------------------------------------
-        private bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
+        private bool GetAppChannelAndTestIsOk(uint appChIdx, ref ulong chMask, ref int chIdx)
         {
-            XLDefine.XL_Status status = driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XL_BusTypes.XL_BUS_TYPE_CAN);
+            XL_Status status = Driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XL_BusTypes.XL_BUS_TYPE_CAN);
             if (status != XL_Status.XL_SUCCESS)
             {
                 Trace.WriteLine("XL_GetApplConfig      : " + status);
                 PrintFunctionError("GetAppChannelAndTestIsOk");
             }
 
-            chMask = driver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
-            chIdx = driver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
+            chMask = Driver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
+            chIdx = Driver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
             if (chIdx < 0 || chIdx >= driverConfig.channelCount)
             {
                 // the (hwType, hwIndex, hwChannel) triplet stored in the application configuration does not refer to any available channel.

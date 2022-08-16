@@ -12,14 +12,12 @@ namespace VectorController.Processor
 {
     internal class CanBus : CommonVector
     {
-
-        public XLDriver driver { get; set; }
         public XL_HardwareType hardwareType { get; set; }
 
 
         public CanBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN)
         {
-            driver = xLDriver;
+            Driver = xLDriver;
             hardwareType = xL_HardwareType;
         }
 
@@ -65,29 +63,7 @@ namespace VectorController.Processor
 
             //}
             
-
-
         }
-        //*******************************
-        //**** Special CAN Bus API below
-        //*******************************
-
-
-        // xlCanSetChannelMode
-        // xlCanSetChannelOutput
-        // xlCanSetReceiveMode
-        // xlCanSetChannelTransceiver
-        // xlCanSetChannelParams
-        // xlCanSetChannelParamsC200
-        // xlCanSetChannelBitrate
-        // xlCanSetChannelAcceptance
-        // xlCanAddAcceptanceRange
-        // xlCanRemoveAcceptanceRange
-        // xlCanResetAcceptance
-        // xlCanRequestChipState - DONE
-        // xlCanTransmit - DONE
-        // xlCanFlushTransmitQueue
-
 
         /// <summary>
         /// Check port with function XL_CanRequestChipState
@@ -95,7 +71,7 @@ namespace VectorController.Processor
         /// <returns></returns>
         internal XLDefine.XL_Status CheckPort()
         {
-            XLDefine.XL_Status status = base.driver.XL_CanRequestChipState(portHandle, accessMask);
+            XLDefine.XL_Status status = base.Driver.XL_CanRequestChipState(portHandle, accessMask);
             Trace.WriteLine("Can Request Chip State: " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("CheckPort");
 
@@ -122,7 +98,7 @@ namespace VectorController.Processor
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = 8;
             xlEventCollection.xlEvent[0].tag = XLDefine.XL_EventTags.XL_TRANSMIT_MSG;
 
-            txStatus = base.driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+            txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
             Trace.WriteLine("Transmit Message      : " + txStatus);
         }
 
@@ -152,12 +128,6 @@ namespace VectorController.Processor
             // Note: this thread will be destroyed by MAIN
             while (true)
             {
-                //Console.WriteLine(i + "  Wait for hardware events");
-                //i = i+1;
-                //if (i >= 10)
-                //{
-                //    xlStatus = XLDefine.XL_Status.XL_ERR_CONNECTION_CLOSED;
-                //}
                 // Wait for hardware events
                 if (xlEvWaitHandle.WaitOne(1000))
                 {
@@ -171,7 +141,7 @@ namespace VectorController.Processor
                         while (blockRxThread) { Thread.Sleep(1000); }
 
                         // ...receive data from hardware.
-                        xlStatus = driver.XL_Receive(portHandle, ref receivedEvent);
+                        xlStatus = Driver.XL_Receive(portHandle, ref receivedEvent);
 
                         //  If receiving succeed....
                         if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
@@ -184,7 +154,7 @@ namespace VectorController.Processor
                             // ...and data is a Rx msg...
                             if (receivedEvent.tag == XLDefine.XL_EventTags.XL_RECEIVE_MSG)
                             {
-                                string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{driver.XL_GetEventString(receivedEvent)}]";
+                                string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
 
                                 Trace.WriteLine(preString);
 
@@ -209,7 +179,7 @@ namespace VectorController.Processor
 
                                 else
                                 {
-                                    Trace.WriteLine(driver.XL_GetEventString(receivedEvent));
+                                    Trace.WriteLine(Driver.XL_GetEventString(receivedEvent));
                                     Trace.WriteLine("OK MSG");
                                 }
                             }
@@ -230,15 +200,15 @@ namespace VectorController.Processor
         // -----------------------------------------------------------------------------------------------
         internal bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
         {
-            XLDefine.XL_Status status = driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, commonBusType);
+            XLDefine.XL_Status status = Driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, CommonBusType);
             if (status != XLDefine.XL_Status.XL_SUCCESS)
             {
                 Trace.WriteLine("XL_GetApplConfig      : " + status);
                 PrintFunctionError("GetAppChannelAndTestIsOk");
             }
 
-            chMask = driver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
-            chIdx = driver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
+            chMask = Driver.XL_GetChannelMask(hwType, (int)hwIndex, (int)hwChannel);
+            chIdx = Driver.XL_GetChannelIndex(hwType, (int)hwIndex, (int)hwChannel);
             Trace.WriteLine($"***************** TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} (GetAppChannelAndTestIsOk)");
             if (chIdx < 0 || chIdx >= driverConfig.channelCount)
             {
