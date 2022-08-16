@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
@@ -21,7 +17,7 @@ namespace VectorController.Processor
             hardwareType = xL_HardwareType;
         }
 
-        public void TestCanBus() 
+        public void TestCanBus()
         {
             Trace.WriteLine("-------------------------------------------------------------------");
             Trace.WriteLine("                     VectorController                       ");
@@ -62,7 +58,7 @@ namespace VectorController.Processor
             //    CanTransmit();
 
             //}
-            
+
         }
 
         /// <summary>

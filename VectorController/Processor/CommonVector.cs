@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Timers;
 using VectorController.Models;
 using vxlapi_NET;
 
@@ -40,7 +39,7 @@ namespace VectorController.Processor
         internal BaseCanMessage CanMessage { get; set; } = new BaseCanMessage();
 
 
-        public CommonVector(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType,XLDefine.XL_BusTypes busType)
+        public CommonVector(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType, XLDefine.XL_BusTypes busType)
         {
             Driver = xLDriver;
             hwType = xL_HardwareType;
@@ -232,7 +231,7 @@ namespace VectorController.Processor
         /// </summary>
         /// <returns></returns>
         public string GetDLLVesrion()
-        { 
+        {
             return Driver.VersionToString(driverConfig.dllVersion);
         }
 
