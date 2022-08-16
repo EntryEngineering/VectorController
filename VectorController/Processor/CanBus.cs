@@ -55,7 +55,7 @@ namespace VectorController.Processor
             OpenPort();
             CheckPort();
             ActivateChannel();
-            SetNotification();
+            SetNotificationCanBus();
             ResetClock();
 
             RunRxThread();

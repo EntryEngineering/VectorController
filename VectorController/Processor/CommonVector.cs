@@ -183,7 +183,7 @@ namespace VectorController.Processor
         /// Set notification
         /// </summary>
         /// <returns></returns>
-        internal XLDefine.XL_Status SetNotification()
+        internal XLDefine.XL_Status SetNotificationCanBus()
         {
             // Initialize EventWaitHandle object with RX event handle provided by DLL
             int tempInt = -1;

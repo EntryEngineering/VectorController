@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
@@ -35,7 +31,7 @@ namespace VectorController.Processor
         }
 
         [STAThread]
-        public void TestCanFDBus() 
+        public void TestCanFDBus()
         {
             Trace.WriteLine("-------------------------------------------------------------------");
             Trace.WriteLine("                     VectorController                       ");
@@ -63,26 +59,17 @@ namespace VectorController.Processor
             }
 
             GetAppConfigAndSetAppConfig();
-
-
-
             RequestTheUserToAssignChannels();
             PrintConfig();
             GetAccesMask();
             PrintAccessMask();
             OpenPort();
+
             SetCanFdConfiguration();
-            //SetNotification(); - tento jen pro klasicky CanBus
-
-            // Get RX event handle
-            var status = driver.XL_SetNotification(portHandle, ref eventHandle, 1);
-            Console.WriteLine("Set Notification      : " + status);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
-
-
+            SetNotificationCanFdBus();
             ActivateChannel();
-            //ResetClock();
             GetXlDriverConfiguration();
+
 
             RunRxThread();
 
@@ -94,23 +81,29 @@ namespace VectorController.Processor
             //}
         }
 
-        [STAThread]
-        public void DEBUGTestCanFDBus() 
-        {
 
-        }
 
 
         //*******************************
         //**** Special CAN FD Bus API below
         //*******************************
 
+        internal XLDefine.XL_Status SetNotificationCanFdBus()
+        {
+            // Get RX event handle
+            XL_Status status = driver.XL_SetNotification(portHandle, ref eventHandle, 1);
+            Console.WriteLine("Set Notification      : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
+
+            return status;
+        }
+
         // xlCanFdSetConfiguration - DONE
         // xlCanTransmitEx
         // xlCanReceive
         // xlCanGetEventString
 
-        internal XLDefine.XL_Status SetCanFdConfiguration() 
+        internal XLDefine.XL_Status SetCanFdConfiguration()
         {
             XLClass.XLcanFdConf canFdConf = new XLClass.XLcanFdConf();
 
@@ -143,7 +136,7 @@ namespace VectorController.Processor
         }
 
 
-        internal XLDefine.XL_Status GetXlDriverConfiguration() 
+        internal XLDefine.XL_Status GetXlDriverConfiguration()
         {
             // Get XL Driver configuration to get the actual setup parameter
             XLDefine.XL_Status status = driver.XL_GetDriverConfig(ref driverConfig);
@@ -241,7 +234,7 @@ namespace VectorController.Processor
 
             uint messageCounterSent = 0;
             txStatus = driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
-            Trace.WriteLine($"Transmit Message      : {txStatus} { messageCounterSent}");
+            Trace.WriteLine($"Transmit Message      : {txStatus} {messageCounterSent}");
         }
 
 
