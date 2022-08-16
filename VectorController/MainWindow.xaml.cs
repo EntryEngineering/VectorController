@@ -85,7 +85,7 @@ namespace VectorController
 
         //private void sendMessageBtn_Click(object sender, RoutedEventArgs e)
         //{
-            
+
 
         //    uint MessageIdConverted = Convert.ToUInt32(msgIdTxt.Text, 16);
         //    byte MessageDlcConverted = Convert.ToByte(msgDlc.Text, 16);
@@ -112,7 +112,7 @@ namespace VectorController
 
         //private void startPrintingRxMsgToTextBox_Click(object sender, RoutedEventArgs e)
         //{
-            
+
         //}
 
 

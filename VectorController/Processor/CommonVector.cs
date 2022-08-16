@@ -38,7 +38,7 @@ namespace VectorController.Processor
         protected static EventWaitHandle xlEvWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, null);
 
         // RX thread
-        protected static Thread rxThreadDDD;
+        protected static Thread? rxThreadDDD = null;
         protected static bool blockRxThread = false;
         private XLDriver xLDriver;
         private XLDefine.XL_HardwareType xL_HardwareType;
@@ -129,7 +129,7 @@ namespace VectorController.Processor
         /// <returns></returns>
         internal XLDefine.XL_Status OpenPort()
         {
-            XLDefine.XL_Status status = driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, commonBusType);
+            XLDefine.XL_Status status = driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, commonBusType);
             Trace.WriteLine("Open Port             : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
 

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using vxlapi_NET;
+using static vxlapi_NET.XLDefine;
 
 namespace VectorController.Processor
 {
@@ -27,7 +28,7 @@ namespace VectorController.Processor
 
         private static int eventHandle = -1;
 
-        public CanFdBus(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN)
+        public CanFdBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN)
         {
             driver = xLDriver;
             hardwareType = xL_HardwareType;
@@ -45,6 +46,7 @@ namespace VectorController.Processor
             OpenDriver();
             GetDriverConfig();
 
+
             GetDLLVesrion();
             Trace.WriteLine(GetChannelCount());
 
@@ -61,6 +63,9 @@ namespace VectorController.Processor
             }
 
             GetAppConfigAndSetAppConfig();
+
+
+
             RequestTheUserToAssignChannels();
             PrintConfig();
             GetAccesMask();
@@ -68,9 +73,14 @@ namespace VectorController.Processor
             OpenPort();
             SetCanFdConfiguration();
             SetNotification();
+
+
+
+
             ActivateChannel();
             //ResetClock();
             GetXlDriverConfiguration();
+
             RunRxThread();
 
 
@@ -79,6 +89,12 @@ namespace VectorController.Processor
             //    CanFdTransmit();
 
             //}
+        }
+
+        [STAThread]
+        public void DEBUGTestCanFDBus() 
+        {
+
         }
 
 
@@ -109,7 +125,7 @@ namespace VectorController.Processor
 
             if (canFdModeNoIso > 0)
             {
-                canFdConf.options = (byte)XLDefine.XL_CANFD_ConfigOptions.XL_CANFD_CONFOPT_NO_ISO;
+                canFdConf.options = (byte)XL_CANFD_ConfigOptions.XL_CANFD_CONFOPT_NO_ISO;
             }
             else
             {
@@ -118,7 +134,7 @@ namespace VectorController.Processor
 
             XLDefine.XL_Status status = driver.XL_CanFdSetConfiguration(portHandle, accessMask, canFdConf);
             Trace.WriteLine("\n\nSet CAN FD Config     : " + status);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("SetCanFdConfiguration");
+            if (status != XL_Status.XL_SUCCESS) PrintFunctionError("SetCanFdConfiguration");
 
             return status;
         }
@@ -128,7 +144,7 @@ namespace VectorController.Processor
         {
             // Get XL Driver configuration to get the actual setup parameter
             XLDefine.XL_Status status = driver.XL_GetDriverConfig(ref driverConfig);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("GetXlDriverConfiguration");
+            if (status != XL_Status.XL_SUCCESS) PrintFunctionError("GetXlDriverConfiguration");
 
             if (canFdModeNoIso > 0)
             {
@@ -162,7 +178,7 @@ namespace VectorController.Processor
             XLClass.XLcanRxEvent receivedEvent = new XLClass.XLcanRxEvent();
 
             // Result of XL Driver function calls
-            XLDefine.XL_Status xlStatus = XLDefine.XL_Status.XL_SUCCESS;
+            XLDefine.XL_Status xlStatus = XL_Status.XL_SUCCESS;
 
             // Result values of WaitForSingleObject 
             XLDefine.WaitResults waitResult = new XLDefine.WaitResults();
@@ -175,22 +191,22 @@ namespace VectorController.Processor
                 waitResult = (XLDefine.WaitResults)WaitForSingleObject(eventHandle, 1000);
 
                 // If event occurred...
-                if (waitResult != XLDefine.WaitResults.WAIT_TIMEOUT)
+                if (waitResult != WaitResults.WAIT_TIMEOUT)
                 {
                     // ...init xlStatus first
-                    xlStatus = XLDefine.XL_Status.XL_SUCCESS;
+                    xlStatus = XL_Status.XL_SUCCESS;
 
                     // afterwards: while hw queue is not empty...
-                    while (xlStatus != XLDefine.XL_Status.XL_ERR_QUEUE_IS_EMPTY)
+                    while (xlStatus != XL_Status.XL_ERR_QUEUE_IS_EMPTY)
                     {
                         // ...block RX thread to generate RX-Queue overflows
                         while (blockRxThread) Thread.Sleep(1000);
 
                         // ...receive data from hardware.
-                        xlStatus = base.driver.XL_CanReceive(portHandle, ref receivedEvent);
+                        xlStatus = driver.XL_CanReceive(portHandle, ref receivedEvent);
 
                         //  If receiving succeed....
-                        if (xlStatus == XLDefine.XL_Status.XL_SUCCESS)
+                        if (xlStatus == XL_Status.XL_SUCCESS)
                         {
                             Trace.WriteLine(driver.XL_CanGetEventString(receivedEvent));
 
@@ -207,10 +223,10 @@ namespace VectorController.Processor
 
             XLClass.xl_canfd_event_collection xlEventCollection = new XLClass.xl_canfd_event_collection(1);
 
-            xlEventCollection.xlCANFDEvent[0].tag = XLDefine.XL_CANFD_TX_EventTags.XL_CAN_EV_TAG_TX_MSG;
+            xlEventCollection.xlCANFDEvent[0].tag = XL_CANFD_TX_EventTags.XL_CAN_EV_TAG_TX_MSG;
             xlEventCollection.xlCANFDEvent[0].tagData.canId = 0x100;
-            xlEventCollection.xlCANFDEvent[0].tagData.dlc = XLDefine.XL_CANFD_DLC.DLC_CAN_CANFD_8_BYTES;
-            xlEventCollection.xlCANFDEvent[0].tagData.msgFlags = XLDefine.XL_CANFD_TX_MessageFlags.XL_CAN_TXMSG_FLAG_BRS | XLDefine.XL_CANFD_TX_MessageFlags.XL_CAN_TXMSG_FLAG_EDL;
+            xlEventCollection.xlCANFDEvent[0].tagData.dlc = XL_CANFD_DLC.DLC_CAN_CANFD_8_BYTES;
+            xlEventCollection.xlCANFDEvent[0].tagData.msgFlags = XL_CANFD_TX_MessageFlags.XL_CAN_TXMSG_FLAG_BRS | XL_CANFD_TX_MessageFlags.XL_CAN_TXMSG_FLAG_EDL;
             xlEventCollection.xlCANFDEvent[0].tagData.data[0] = 1;
             xlEventCollection.xlCANFDEvent[0].tagData.data[1] = 1;
             xlEventCollection.xlCANFDEvent[0].tagData.data[2] = 2;
@@ -221,7 +237,7 @@ namespace VectorController.Processor
             xlEventCollection.xlCANFDEvent[0].tagData.data[7] = 4;
 
             uint messageCounterSent = 0;
-            txStatus = base.driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
+            txStatus = driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
             Trace.WriteLine($"Transmit Message      : {txStatus} { messageCounterSent}");
         }
 
@@ -245,8 +261,8 @@ namespace VectorController.Processor
         // -----------------------------------------------------------------------------------------------
         private bool GetAppChannelAndTestIsOk(uint appChIdx, ref UInt64 chMask, ref int chIdx)
         {
-            XLDefine.XL_Status status = driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XLDefine.XL_BusTypes.XL_BUS_TYPE_CAN);
-            if (status != XLDefine.XL_Status.XL_SUCCESS)
+            XLDefine.XL_Status status = driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XL_BusTypes.XL_BUS_TYPE_CAN);
+            if (status != XL_Status.XL_SUCCESS)
             {
                 Trace.WriteLine("XL_GetApplConfig      : " + status);
                 PrintFunctionError("GetAppChannelAndTestIsOk");
@@ -260,7 +276,7 @@ namespace VectorController.Processor
                 return false;
             }
 
-            if ((driverConfig.channel[chIdx].channelBusCapabilities & XLDefine.XL_BusCapabilities.XL_BUS_ACTIVE_CAP_CAN) == 0)
+            if ((driverConfig.channel[chIdx].channelBusCapabilities & XL_BusCapabilities.XL_BUS_ACTIVE_CAP_CAN) == 0)
             {
                 // CAN is not available on this channel
                 return false;
@@ -268,7 +284,7 @@ namespace VectorController.Processor
 
             if (canFdModeNoIso > 0)
             {
-                if ((driverConfig.channel[chIdx].channelCapabilities & XLDefine.XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_BOSCH_SUPPORT) == 0)
+                if ((driverConfig.channel[chIdx].channelCapabilities & XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_BOSCH_SUPPORT) == 0)
                 {
                     Trace.WriteLine($"{driverConfig.channel[chIdx].name.TrimEnd(' ', '\0')} {driverConfig.channel[chIdx].transceiverName.TrimEnd(' ', '\0')} does not support CAN FD NO-ISO");
                     return false;
@@ -276,7 +292,7 @@ namespace VectorController.Processor
             }
             else
             {
-                if ((driverConfig.channel[chIdx].channelCapabilities & XLDefine.XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_ISO_SUPPORT) == 0)
+                if ((driverConfig.channel[chIdx].channelCapabilities & XL_ChannelCapabilities.XL_CHANNEL_FLAG_CANFD_ISO_SUPPORT) == 0)
                 {
                     Trace.WriteLine($"{driverConfig.channel[chIdx].name.TrimEnd(' ', '\0')} {driverConfig.channel[chIdx].transceiverName.TrimEnd(' ', '\0')} does not support CAN FD ISO");
                     return false;

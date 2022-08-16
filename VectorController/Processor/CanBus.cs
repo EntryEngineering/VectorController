@@ -58,12 +58,12 @@ namespace VectorController.Processor
             SetNotification();
             ResetClock();
 
-            //RunRxThread();
-            for (int i = 0; i < 20; i++)
-            {
-                CanTransmit();
+            RunRxThread();
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    CanTransmit();
 
-            }
+            //}
             
 
 
