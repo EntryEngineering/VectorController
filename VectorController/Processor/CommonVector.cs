@@ -23,10 +23,10 @@ namespace VectorController.Processor
         protected static uint hwIndex = 0;
         protected static uint hwChannel = 0;
         protected static int portHandle = -1;
-        protected static UInt64 accessMask = 0;
-        protected static UInt64 permissionMask = 0;
-        protected static UInt64 txMask = 0;
-        protected static UInt64 rxMask = 0;
+        protected static ulong accessMask = 0;
+        protected static ulong permissionMask = 0;
+        protected static ulong txMask = 0;
+        protected static ulong rxMask = 0;
         protected static int txCi = 0;
         protected static int rxCi = 0;
         protected static EventWaitHandle xlEvWaitHandle = new(false, EventResetMode.AutoReset, null);
