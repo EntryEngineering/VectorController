@@ -72,9 +72,12 @@ namespace VectorController.Processor
             PrintAccessMask();
             OpenPort();
             SetCanFdConfiguration();
-            SetNotification();
+            //SetNotification(); - tento jen pro klasicky CanBus
 
-
+            // Get RX event handle
+            var status = driver.XL_SetNotification(portHandle, ref eventHandle, 1);
+            Console.WriteLine("Set Notification      : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
 
 
             ActivateChannel();
