@@ -156,8 +156,8 @@ namespace VectorController.Processor
         private void RunRxThread()
         {
             Trace.WriteLine("Start Rx thread...");
-            rxThreadDDD = new Thread(new ThreadStart(RXThread));
-            rxThreadDDD.Start();
+            rxThread = new Thread(new ThreadStart(RXThread));
+            rxThread.Start();
         }
 
         /// <summary>

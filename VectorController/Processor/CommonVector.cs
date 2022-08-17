@@ -32,7 +32,7 @@ namespace VectorController.Processor
         protected static EventWaitHandle xlEvWaitHandle = new(false, EventResetMode.AutoReset, null);
 
         // RX thread
-        protected static Thread? rxThreadDDD = null;
+        protected static Thread? rxThread = null;
         protected static bool blockRxThread = false;
 
 
