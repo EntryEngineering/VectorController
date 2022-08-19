@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Threading;
+using VectorBusLibrary.Processors;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
-namespace VectorController.Processor
+namespace VectorBusLibrary.Processors
 {
-    internal class CanBus : CommonVector
+    public class CanBus : CommonVector
     {
         public XL_HardwareType HardwareType { get; set; }
 

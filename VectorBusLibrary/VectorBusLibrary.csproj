@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="vxlapi_NET">
+			<HintPath>vxlapi_NET.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	
+</Project>
