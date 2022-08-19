@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using VectorController.Models;
+using VectorBusLibrary.Models;
 using vxlapi_NET;
 
-namespace VectorController.Processor
+namespace VectorBusLibrary.Processors
 {
-    internal partial class CommonVector
+    public partial class CommonVector
     {
 
         internal XLDriver Driver { get; set; }
@@ -36,7 +36,7 @@ namespace VectorController.Processor
         protected static bool blockRxThread = false;
 
 
-        internal BaseCanMessage CanMessage { get; set; } = new BaseCanMessage();
+        //internal BaseCanMessage CanMessage { get; set; } = new BaseCanMessage();
 
 
         public CommonVector(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType, XLDefine.XL_BusTypes busType)

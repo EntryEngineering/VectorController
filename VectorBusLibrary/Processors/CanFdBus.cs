@@ -2,10 +2,11 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using VectorBusLibrary.Processors;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
-namespace VectorController.Processor
+namespace VectorBusLibrary.Processors
 {
     internal class CanFdBus : CommonVector
     {

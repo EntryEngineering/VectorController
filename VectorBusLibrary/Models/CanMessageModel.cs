@@ -1,4 +1,4 @@
-﻿namespace VectorController.Models
+﻿namespace VectorBusLibrary.Models
 {
     internal class CanBusRx
     {
