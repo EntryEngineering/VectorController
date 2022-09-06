@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
@@ -60,6 +61,7 @@ namespace VectorController.Processor
 
         }
 
+
         /// <summary>
         /// Check port with function XL_CanRequestChipState
         /// </summary>
@@ -77,7 +79,7 @@ namespace VectorController.Processor
         /// <summary>
         /// Transmit Can Bus message
         /// </summary>
-        internal void CanTransmit()
+        public void CanTransmit()
         {
             XL_Status txStatus;
             XLClass.xl_event_collection xlEventCollection = new(1);
@@ -123,6 +125,7 @@ namespace VectorController.Processor
             // Note: this thread will be destroyed by MAIN
             while (true)
             {
+
                 // Wait for hardware events
                 if (xlEvWaitHandle.WaitOne(1000))
                 {
@@ -150,10 +153,21 @@ namespace VectorController.Processor
                             if (receivedEvent.tag == XL_EventTags.XL_RECEIVE_MSG)
                             {
 
-                                var test = receivedEvent.tagData.can_Msg.data;
-                                string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
+                                //var test = receivedEvent.tagData.can_Msg.data;
+                                //string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
 
-                                Trace.WriteLine(preString);
+
+                                //foreach (var item in test)
+                                //{
+                                //    Trace.Write($"_{item}_");
+                                //}
+                                //Trace.WriteLine("*");
+                                //Trace.WriteLine(preString);
+
+
+
+                                Trace.WriteLine($"{receivedEvent.tagData.can_Msg.data[2]}");
+
 
 
                                 if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_OVERRUN) != 0)

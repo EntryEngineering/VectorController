@@ -200,6 +200,9 @@ namespace VectorController.Processor
                         if (xlStatus == XL_Status.XL_SUCCESS)
                         {
                             Trace.WriteLine(Driver.XL_CanGetEventString(receivedEvent));
+                            string outData = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff")} >> ID:{receivedEvent.tagData.canRxOkMsg.canId}_DLC:{receivedEvent.tagData.canRxOkMsg.dlc}_Lenght:{receivedEvent.tagData.canTxOkMsg.data.Length}_{receivedEvent.tagData.canRxOkMsg.data[1]}";
+
+                            Trace.WriteLine(outData);
 
                         }
                     }
