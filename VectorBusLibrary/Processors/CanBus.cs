@@ -76,6 +76,20 @@ namespace VectorBusLibrary.Processors
             return status;
         }
 
+        /// <summary>
+        /// Open port
+        /// </summary>
+        /// <returns></returns>
+        private XLDefine.XL_Status OpenPort()
+        {
+            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, CommonBusType); // CanBus
+
+            Trace.WriteLine("Open Port             : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
+
+            return status;
+        }
+
 
         /// <summary>
         /// Transmit Can Bus message
