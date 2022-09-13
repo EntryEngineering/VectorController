@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using VectorBusLibrary.Processors;
 using vxlapi_NET;
@@ -28,7 +27,7 @@ namespace WpfDemoCanBus
         {
 
             ZASKI15_stateTxt.Text = "on";
-            testThread = new Thread(new ThreadStart(TxOn));            
+            testThread = new Thread(new ThreadStart(TxOn));
             testThread.Start();
         }
 

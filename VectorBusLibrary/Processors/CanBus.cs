@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
-using VectorBusLibrary.Processors;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
@@ -79,7 +77,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Transmit Can Bus message
         /// </summary>
-        public void  CanTransmit(byte val)
+        public void CanTransmit(byte val)
         {
             XL_Status txStatus;
             XLClass.xl_event_collection xlEventCollection = new(1);
@@ -96,7 +94,7 @@ namespace VectorBusLibrary.Processors
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
-            Trace.WriteLine("Transmit Message["+ val + "]      : " + txStatus);
+            Trace.WriteLine("Transmit Message[" + val + "]      : " + txStatus);
         }
 
 
