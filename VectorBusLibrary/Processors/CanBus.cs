@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
+using System.Diagnostics;
 using System.Threading;
 using VectorBusLibrary.Processors;
 using vxlapi_NET;
@@ -91,6 +93,22 @@ namespace VectorBusLibrary.Processors
             return status;
         }
 
+        /// <summary>
+        /// Set notification
+        /// </summary>
+        /// <returns></returns>
+        public XLDefine.XL_Status SetNotificationCanBus()
+        {
+            // Initialize EventWaitHandle object with RX event handle provided by DLL
+            int tempInt = -1;
+            XLDefine.XL_Status status = Driver.XL_SetNotification(portHandle, ref tempInt, 1);
+            xlEvWaitHandle.SafeWaitHandle = new SafeWaitHandle(new IntPtr(tempInt), true);
+
+            Trace.WriteLine("Set Notification      : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("SetNotification");
+
+            return status;
+        }
 
         /// <summary>
         /// Transmit Can Bus message
