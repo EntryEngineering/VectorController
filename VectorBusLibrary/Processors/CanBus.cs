@@ -113,7 +113,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Transmit Can Bus message
         /// </summary>
-        public void CanTransmit(XLClass.xl_event_collection messageForTransmit)
+        public XL_Status CanTransmit(XLClass.xl_event_collection messageForTransmit)
         {
             XL_Status txStatus;
             XLClass.xl_event_collection xlEventCollection = messageForTransmit;
@@ -131,6 +131,7 @@ namespace VectorBusLibrary.Processors
 
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
             Trace.WriteLine("Transmit Message      : " + txStatus);
+            return txStatus;
         }
 
 

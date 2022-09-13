@@ -237,7 +237,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// CanFd transmit sample
         /// </summary>
-        public void CanFdTransmit(XLClass.xl_canfd_event_collection messageForTransmit)
+        public XL_Status CanFdTransmit(XLClass.xl_canfd_event_collection messageForTransmit)
         {
             XL_Status txStatus;
 
@@ -259,6 +259,8 @@ namespace VectorBusLibrary.Processors
             uint messageCounterSent = 0;
             txStatus = Driver.XL_CanTransmitEx(portHandle, txMask, ref messageCounterSent, xlEventCollection);
             Trace.WriteLine($"Transmit Message      : {txStatus} {messageCounterSent}");
+
+            return txStatus;
         }
 
 
