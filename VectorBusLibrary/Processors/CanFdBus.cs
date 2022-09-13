@@ -8,7 +8,7 @@ using static vxlapi_NET.XLDefine;
 
 namespace VectorBusLibrary.Processors
 {
-    internal class CanFdBus : CommonVector
+    public class CanFdBus : CommonVector
     {
 
         // -----------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace VectorBusLibrary.Processors
         internal XL_Status SetNotificationCanFdBus()
         {
             XL_Status status = Driver.XL_SetNotification(portHandle, ref eventHandle, 1);
-            Console.WriteLine("Set Notification      : " + status);
+            Trace.WriteLine("Set Notification      : " + status);
             if (status != XL_Status.XL_SUCCESS) PrintFunctionError("Get RX event handle");
 
             return status;
