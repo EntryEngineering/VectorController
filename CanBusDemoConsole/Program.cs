@@ -13,9 +13,14 @@ namespace CanBusDemoConsole
             InitCanControloler();
             canBus.RunRxThread();
             Console.WriteLine("RX msg:");
+
             while (true)
             {
-                Console.WriteLine(canBus.OutMsg);
+
+                //Console.WriteLine(canBus.msgTestOut);
+                Console.WriteLine($"{canBus.CanBusMessageRx.RawCanMessage} --- Thread :{Thread.CurrentThread.ManagedThreadId.ToString()}");
+
+
             }
         }
 

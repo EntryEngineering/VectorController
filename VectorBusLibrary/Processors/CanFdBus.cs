@@ -19,7 +19,7 @@ namespace VectorBusLibrary.Processors
         // -----------------------------------------------------------------------------------------------
 
         public XL_HardwareType HardwareType { get; set; }
-        public string OutMsg { get; set; }
+        public VectorBusLibrary.Models.CanFdMessageModelRx CanFdBusMessageRx { get; set; }
         public string appName { get; set; }
 
         private static readonly uint canFdModeNoIso = 0;      // Global CAN FD ISO (default) / no ISO mode flag
@@ -218,7 +218,19 @@ namespace VectorBusLibrary.Processors
                         if (xlStatus == XL_Status.XL_SUCCESS)
                         {
                             Trace.WriteLine(Driver.XL_CanGetEventString(receivedEvent));
-                            OutMsg = Driver.XL_CanGetEventString(receivedEvent);
+                            //OutMsg = Driver.XL_CanGetEventString(receivedEvent);
+
+                            CanFdBusMessageRx = new Models.CanFdMessageModelRx()
+                            {
+                                canId = receivedEvent.tagData.canRxOkMsg.canId,
+                                msgFlags = ((uint)receivedEvent.tagData.canRxOkMsg.msgFlags),
+                                crc = receivedEvent.tagData.canRxOkMsg.crc,
+                                reserved1 = receivedEvent.reserved1,
+                                totalBitCnt = receivedEvent.tagData.canRxOkMsg.totalBitCnt,
+                                dlc = receivedEvent.tagData.canRxOkMsg.dlc,
+                                reserved = receivedEvent.reserved,
+                                data = receivedEvent.tagData.canRxOkMsg.data
+                            };
 
                         }
                     }
