@@ -1,5 +1,6 @@
 ﻿using System;
 using vxlapi_NET;
+using static vxlapi_NET.XLDefine;
 
 namespace VectorBusLibrary.Models
 {
@@ -18,6 +19,9 @@ namespace VectorBusLibrary.Models
 
     public class CanFdMessageModelTx 
     {
+        //public XL_CANFD_TX_EventTags tag { get; set; } = new XL_CANFD_TX_EventTags();
+        //public uint canId { get; set; }
+        //public XL_CANFD_DLC dlc { get; set; }
 
     }
 }

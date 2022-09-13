@@ -237,11 +237,11 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// CanFd transmit sample
         /// </summary>
-        public void CanFdTransmit()
+        public void CanFdTransmit(XLClass.xl_canfd_event_collection messageForTransmit)
         {
             XL_Status txStatus;
 
-            XLClass.xl_canfd_event_collection xlEventCollection = new(1);
+            XLClass.xl_canfd_event_collection xlEventCollection = messageForTransmit;
 
             xlEventCollection.xlCANFDEvent[0].tag = XL_CANFD_TX_EventTags.XL_CAN_EV_TAG_TX_MSG;
             xlEventCollection.xlCANFDEvent[0].tagData.canId = 0x100;
