@@ -13,7 +13,7 @@ namespace VectorBusLibrary.Processors
 
         internal XLDriver Driver { get; set; }
         internal XLDefine.XL_BusTypes CommonBusType { get; set; }
-        protected static string appName = "TestVectorControllerV1";
+        protected static string appName { get; set; } = "DefaultBusApp";
 
         // Driver configuration
         internal static XLClass.xl_driver_config driverConfig = new();
@@ -39,11 +39,12 @@ namespace VectorBusLibrary.Processors
         //internal BaseCanMessage CanMessage { get; set; } = new BaseCanMessage();
 
 
-        public CommonVector(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType, XLDefine.XL_BusTypes busType)
+        public CommonVector(XLDriver xLDriver, XLDefine.XL_HardwareType xL_HardwareType, XLDefine.XL_BusTypes busType, string aplicationName)
         {
             Driver = xLDriver;
             hwType = xL_HardwareType;
             CommonBusType = busType;
+            appName = aplicationName;
         }
 
 
