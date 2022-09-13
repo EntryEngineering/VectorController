@@ -12,7 +12,7 @@ namespace VectorBusLibrary.Models
         public ushort totalBitCnt { get; set; }  //Number of received bits including stuff bit.
         public XLDefine.XL_CANFD_DLC dlc { get; set; }  //4-bit data length code.
         public byte reserved { get; set; }  //Internal use.
-        public byte[] data { get; set; }  //Data that was received.
+        public byte[] data { get; set; } = new byte[64];        //Data that was received.
 
     }
 

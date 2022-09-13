@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
-using VectorBusLibrary.Processors;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
@@ -19,7 +18,7 @@ namespace VectorBusLibrary.Processors
         // -----------------------------------------------------------------------------------------------
 
         public XL_HardwareType HardwareType { get; set; }
-        public VectorBusLibrary.Models.CanFdMessageModelRx CanFdBusMessageRx { get; set; }
+        public Models.CanFdMessageModelRx CanFdBusMessageRx { get; set; } = new Models.CanFdMessageModelRx();
         public string appName { get; set; }
 
         private static readonly uint canFdModeNoIso = 0;      // Global CAN FD ISO (default) / no ISO mode flag
@@ -218,24 +217,20 @@ namespace VectorBusLibrary.Processors
                         if (xlStatus == XL_Status.XL_SUCCESS)
                         {
                             Trace.WriteLine(Driver.XL_CanGetEventString(receivedEvent));
-                            //OutMsg = Driver.XL_CanGetEventString(receivedEvent);
 
-                            CanFdBusMessageRx = new Models.CanFdMessageModelRx()
-                            {
-                                canId = receivedEvent.tagData.canRxOkMsg.canId,
-                                msgFlags = ((uint)receivedEvent.tagData.canRxOkMsg.msgFlags),
-                                crc = receivedEvent.tagData.canRxOkMsg.crc,
-                                reserved1 = receivedEvent.reserved1,
-                                totalBitCnt = receivedEvent.tagData.canRxOkMsg.totalBitCnt,
-                                dlc = receivedEvent.tagData.canRxOkMsg.dlc,
-                                reserved = receivedEvent.reserved,
-                                data = receivedEvent.tagData.canRxOkMsg.data
-                            };
+
+                            CanFdBusMessageRx.canId = receivedEvent.tagData.canRxOkMsg.canId;
+                            CanFdBusMessageRx.msgFlags = ((uint)receivedEvent.tagData.canRxOkMsg.msgFlags);
+                            CanFdBusMessageRx.crc = receivedEvent.tagData.canRxOkMsg.crc;
+                            CanFdBusMessageRx.reserved1 = receivedEvent.reserved1;
+                            CanFdBusMessageRx.totalBitCnt = receivedEvent.tagData.canRxOkMsg.totalBitCnt;
+                            CanFdBusMessageRx.dlc = receivedEvent.tagData.canRxOkMsg.dlc;
+                            CanFdBusMessageRx.reserved = receivedEvent.reserved;
+                            CanFdBusMessageRx.data = receivedEvent.tagData.canRxOkMsg.data;
 
                         }
                     }
                 }
-                // No event occurred
             }
         }
 
