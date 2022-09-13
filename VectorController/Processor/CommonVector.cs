@@ -108,7 +108,8 @@ namespace VectorController.Processor
         /// <returns></returns>
         internal XLDefine.XL_Status OpenPort()
         {
-            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, CommonBusType);
+            //XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, CommonBusType); // CanFD - ok
+            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, CommonBusType); // Can - ok
             Trace.WriteLine("Open Port             : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
 
@@ -193,8 +194,8 @@ namespace VectorController.Processor
         /// <returns></returns>
         internal XLDefine.XL_Status ActivateChannel()
         {
-            //XLDefine.XL_Status status = driver.XL_ActivateChannel(portHandle, accessMask, commonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);      // For Can
-            XLDefine.XL_Status status = Driver.XL_ActivateChannel(portHandle, accessMask, CommonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_RESET_CLOCK); // for CanFd
+            XLDefine.XL_Status status = Driver.XL_ActivateChannel(portHandle, accessMask, CommonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);      // For Can
+            //XLDefine.XL_Status status = Driver.XL_ActivateChannel(portHandle, accessMask, CommonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_RESET_CLOCK); // for CanFd
             Trace.WriteLine("Activate Channel      : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("ActivateChannel");
 

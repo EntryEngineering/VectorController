@@ -108,7 +108,8 @@ namespace VectorBusLibrary.Processors
         /// <returns></returns>
         internal XLDefine.XL_Status OpenPort()
         {
-            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, CommonBusType);
+            //XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, CommonBusType); // CanFD - ok
+            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, CommonBusType); // Can - ok
             Trace.WriteLine("Open Port             : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
 
