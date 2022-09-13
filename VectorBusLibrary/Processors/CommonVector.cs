@@ -77,7 +77,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Get and Set app config
         /// </summary>
-        internal void GetAppConfigAndSetAppConfig()
+        public void GetAppConfigAndSetAppConfig()
         {
             // If the application name cannot be found in VCANCONF..
             if ((Driver.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, CommonBusType) != XLDefine.XL_Status.XL_SUCCESS) ||
@@ -151,7 +151,7 @@ namespace VectorBusLibrary.Processors
         /// Reset time stamp clock 
         /// </summary>
         /// <returns></returns>
-        internal XLDefine.XL_Status ResetClock()
+        public XLDefine.XL_Status ResetClock()
         {
             XLDefine.XL_Status status = Driver.XL_ResetClock(portHandle);
             Trace.WriteLine("Reset Clock           : " + status);
@@ -164,7 +164,7 @@ namespace VectorBusLibrary.Processors
         /// Set notification
         /// </summary>
         /// <returns></returns>
-        internal XLDefine.XL_Status SetNotificationCanBus()
+        public XLDefine.XL_Status SetNotificationCanBus()
         {
             // Initialize EventWaitHandle object with RX event handle provided by DLL
             int tempInt = -1;
@@ -195,7 +195,7 @@ namespace VectorBusLibrary.Processors
         /// Activate channel
         /// </summary>
         /// <returns></returns>
-        internal XLDefine.XL_Status ActivateChannel()
+        public XLDefine.XL_Status ActivateChannel()
         {
             XLDefine.XL_Status status = Driver.XL_ActivateChannel(portHandle, accessMask, CommonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_NONE);      // For Can
             //XLDefine.XL_Status status = Driver.XL_ActivateChannel(portHandle, accessMask, CommonBusType, XLDefine.XL_AC_Flags.XL_ACTIVATE_RESET_CLOCK); // for CanFd
@@ -283,7 +283,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Get access mask
         /// </summary>
-        internal static void GetAccesMask()
+        public static void GetAccesMask()
         {
             accessMask = txMask | rxMask;
             permissionMask = accessMask;
@@ -295,9 +295,9 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Print access mask in debug console
         /// </summary>
-        internal static void PrintAccessMask()
+        public static string PrintAccessMask()
         {
-            Trace.WriteLine($"PrintAccessMask >> TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} po accessMask = txMask | rxMask");
+            return $"PrintAccessMask >> TxMask:{txMask} - RxMask:{rxMask} - AcsMask:{accessMask} po accessMask = txMask | rxMask";
         }
 
         /// <summary>
