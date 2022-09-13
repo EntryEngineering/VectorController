@@ -19,6 +19,7 @@ namespace VectorBusLibrary.Processors
         // -----------------------------------------------------------------------------------------------
 
         public XL_HardwareType HardwareType { get; set; }
+        public string OutMsg { get; set; }
         public string appName { get; set; }
 
         private static readonly uint canFdModeNoIso = 0;      // Global CAN FD ISO (default) / no ISO mode flag
@@ -83,7 +84,7 @@ namespace VectorBusLibrary.Processors
         /// Set notification CanFd Bus
         /// </summary>
         /// <returns></returns>
-        internal XL_Status SetNotificationCanFdBus()
+        public XL_Status SetNotificationCanFdBus()
         {
             XL_Status status = Driver.XL_SetNotification(portHandle, ref eventHandle, 1);
             Trace.WriteLine("Set Notification      : " + status);
@@ -96,7 +97,7 @@ namespace VectorBusLibrary.Processors
         /// Set CanFd configuration
         /// </summary>
         /// <returns></returns>
-        internal XL_Status SetCanFdConfiguration()
+        public XL_Status SetCanFdConfiguration()
         {
             XLClass.XLcanFdConf canFdConf = new();
 
@@ -132,7 +133,7 @@ namespace VectorBusLibrary.Processors
         /// Get XL Driver configuration
         /// </summary>
         /// <returns></returns>
-        internal XL_Status GetXlDriverConfiguration()
+        public XL_Status GetXlDriverConfiguration()
         {
             // Get XL Driver configuration to get the actual setup parameter
             XL_Status status = Driver.XL_GetDriverConfig(ref driverConfig);
@@ -156,12 +157,10 @@ namespace VectorBusLibrary.Processors
         /// Open port
         /// </summary>
         /// <returns></returns>
-        private XLDefine.XL_Status OpenPort()
+        public XLDefine.XL_Status OpenPort()
         {
 
             XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 16000, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION_V4, CommonBusType); //  CanFdBus
-            //XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, CommonBusType); // CanBus
-
             Trace.WriteLine("Open Port             : " + status);
             if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
 
@@ -172,7 +171,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Run Rx Thread
         /// </summary>
-        private void RunRxThread()
+        public void RunRxThread()
         {
             Trace.WriteLine("Start Rx thread...");
             rxThread = new Thread(new ThreadStart(RXThread));
@@ -219,6 +218,7 @@ namespace VectorBusLibrary.Processors
                         if (xlStatus == XL_Status.XL_SUCCESS)
                         {
                             Trace.WriteLine(Driver.XL_CanGetEventString(receivedEvent));
+                            OutMsg = Driver.XL_CanGetEventString(receivedEvent);
 
                         }
                     }
@@ -259,7 +259,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Request the user to assign channels until both CAN1 (Tx) and CAN2 (Rx) are assigned to usable channels
         /// </summary>
-        private void RequestTheUserToAssignChannels()
+        public void RequestTheUserToAssignChannels()
         {
             if (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
             {
@@ -272,7 +272,7 @@ namespace VectorBusLibrary.Processors
         /// Retrieve the application channel assignment and test if this channel can be opened
         /// </summary>
         // -----------------------------------------------------------------------------------------------
-        private bool GetAppChannelAndTestIsOk(uint appChIdx, ref ulong chMask, ref int chIdx)
+        public bool GetAppChannelAndTestIsOk(uint appChIdx, ref ulong chMask, ref int chIdx)
         {
             XL_Status status = Driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, XL_BusTypes.XL_BUS_TYPE_CAN);
             if (status != XL_Status.XL_SUCCESS)
