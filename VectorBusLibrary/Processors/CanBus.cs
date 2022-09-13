@@ -113,10 +113,10 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Transmit Can Bus message
         /// </summary>
-        public void CanTransmit()
+        public void CanTransmit(XLClass.xl_event_collection messageForTransmit)
         {
             XL_Status txStatus;
-            XLClass.xl_event_collection xlEventCollection = new(1);
+            XLClass.xl_event_collection xlEventCollection = messageForTransmit;
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 1;

@@ -11,6 +11,40 @@ namespace CanBusDemoConsole
         {
             canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Can Bus-Test");
             InitCanControloler();
+
+
+            Console.WriteLine("Press key for next step:");
+            Console.WriteLine("Key 'r' for run Rx");
+            Console.WriteLine("Key 't' for run Tx");
+            string? pressedKey = Console.ReadLine();
+            while (true)
+            {
+                if (pressedKey == "r")
+                {
+                    Console.WriteLine("Set count and press enter..");
+                    Int64 count = Int64.Parse(Console.ReadLine());
+                    canBus.RunRxThread();
+                    for (int i = 0; i < count; i++)
+                    {
+                        var data1 = canBus.CanBusMessageRx.data[1];
+                        var data2 = canBus.CanBusMessageRx.data[2];
+                        Console.WriteLine($"Knob_{data1}-Klema_{data2}");
+                    }
+                    Console.WriteLine("Rx end");
+
+                }
+                else if (pressedKey == "t")
+                {
+                    XLClass.xl_event_collection messageForTransmit = new XLClass.xl_event_collection(1);
+                    messageForTransmit.xlEvent[0].tagData.can_Msg.id = 0x3C0;
+                    messageForTransmit.xlEvent[0].tagData.can_Msg.data[1] = 7;
+
+                    canBus.CanTransmit(messageForTransmit);
+
+                }
+            }
+
+
             canBus.RunRxThread();
             Console.WriteLine("RX msg:");
 
