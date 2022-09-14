@@ -38,18 +38,24 @@ namespace CanBusDemoConsole
                     XLClass.xl_event_collection messageForTransmit = new XLClass.xl_event_collection(1);
                     messageForTransmit.xlEvent[0].tagData.can_Msg.id = 0x3C0;
                     messageForTransmit.xlEvent[0].tagData.can_Msg.data[1] = 7;
-                    //Console.WriteLine(canBus.CanTransmit(messageForTransmit));
+
+                    canBus.CanTransmit(messageForTransmit);
+
                 }
             }
 
 
-            //canBus.RunRxThread();
-            //Console.WriteLine("RX msg:");
+            canBus.RunRxThread();
+            Console.WriteLine("RX msg:");
 
-            //while (true)
-            //{
-            //    Console.WriteLine($"{canBus.CanBusMessageRx.RawCanMessage} --- Thread :{Thread.CurrentThread.ManagedThreadId.ToString()}");
-            //}
+            while (true)
+            {
+
+                //Console.WriteLine(canBus.msgTestOut);
+                Console.WriteLine($"{canBus.CanBusMessageRx.RawCanMessage} --- Thread :{Thread.CurrentThread.ManagedThreadId.ToString()}");
+
+
+            }
         }
 
 
