@@ -1,5 +1,4 @@
-﻿using System;
-using VectorBusLibrary.Processors;
+﻿using VectorBusLibrary.Processors;
 using vxlapi_NET;
 
 namespace CanFdBusDemoConsole
@@ -41,11 +40,6 @@ namespace CanFdBusDemoConsole
 
                 }
             }
-
-
-            
-
-
         }
 
         internal static void InitCanControloler()
