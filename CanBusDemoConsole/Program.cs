@@ -16,7 +16,6 @@ namespace CanBusDemoConsole
             Console.WriteLine("Press key for next step:");
             Console.WriteLine("Key 'r' for run Rx");
             Console.WriteLine("Key 't' for run Tx");
-            VectorBusLibrary.Processors.CrcProcessor crc = new();
 
             string? pressedKey = Console.ReadLine();
             while (true)

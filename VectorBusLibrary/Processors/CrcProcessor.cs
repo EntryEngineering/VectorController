@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System;
+using System.Collections;
+using System.Diagnostics;
+using System.Linq;
 
 namespace VectorBusLibrary.Processors
 {
     public class CrcProcessor
     {
-
-
         private int[,] crc8_c2_lookUpTable = new int[32, 8] { {0x00,0x2f,0x5e,0x71,0xbc,0x93,0xe2,0xcd},
                                                                 {0x57,0x78,0x09,0x26,0xeb,0xc4,0xb5,0x9ac},
                                                                 {0xae,0x81,0xf0,0xdf,0x12,0x3d,0x4c,0x63},
@@ -44,20 +44,42 @@ namespace VectorBusLibrary.Processors
         public CrcProcessor()
         {
             // Show all values form table to debug
-            for (int r = 1; r < 32; r++)
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    Trace.Write($"{string.Format("0x{0:x}",GetValueFromTable(r, i))},");
-                }
-                Trace.WriteLine(";");
-            }
+            //for (int r = 1; r < 32; r++)
+            //{
+            //    for (int i = 0; i < 8; i++)
+            //    {
+            //        Trace.Write($"{string.Format("0x{0:x}",GetValueFromTable(r, i))},");
+            //    }
+            //    Trace.WriteLine(";");
+            //}
+
+
+
 
         }
 
-        public int GetValueFromTable(int row,int column) 
+        private int GetValueFromTable(int row, int column)
         {
             return crc8_c2_lookUpTable[row, column];
+        }
+
+        public int GetCrc(string message)
+        {
+            int lenghtMessage = message.Length;
+            var partOfMessage = new ArrayList();
+
+
+            //for (int i = 1; i < lenghtMessage -1; i++)
+            //{
+            //    partOfMessage.Add(message.Substring(i, i + 1));
+            //}
+
+            //foreach (var item in partOfMessage)
+            //{
+            //    Console.WriteLine(item);
+            //}
+
+            return lenghtMessage;
         }
     }
 }
