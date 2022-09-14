@@ -1,6 +1,4 @@
-﻿using vxlapi_NET;
-
-namespace VectorBusLibrary.Models
+﻿namespace VectorBusLibrary.Models
 {
     public class CanBusRx
     {
