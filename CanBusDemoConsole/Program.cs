@@ -67,7 +67,7 @@ namespace CanBusDemoConsole
             Console.WriteLine("****************************");
 
             Console.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-            //canBus.OpenDriver();
+            canBus.OpenDriver();
             canBus.GetDriverConfig();
             canBus.GetAppConfigAndSetAppConfig();
             canBus.RequestTheUserToAssignChannels();

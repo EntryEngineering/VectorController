@@ -50,7 +50,7 @@ namespace CanFdBusDemoConsole
             Console.WriteLine("****************************");
 
             Console.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-            //canFdBus.OpenDriver();
+            canFdBus.OpenDriver();
             canFdBus.GetDriverConfig();
             canFdBus.GetAppConfigAndSetAppConfig();
             canFdBus.RequestTheUserToAssignChannels();
