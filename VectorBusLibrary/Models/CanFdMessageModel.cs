@@ -17,9 +17,7 @@ namespace VectorBusLibrary.Models
 
     public class CanFdMessageModelTx
     {
-        //public XL_CANFD_TX_EventTags tag { get; set; } = new XL_CANFD_TX_EventTags();
-        //public uint canId { get; set; }
-        //public XL_CANFD_DLC dlc { get; set; }
+
 
     }
 }
