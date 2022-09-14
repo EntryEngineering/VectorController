@@ -36,7 +36,8 @@ namespace CanFdBusDemoConsole
                     XLClass.xl_canfd_event_collection messageForTransmit = new XLClass.xl_canfd_event_collection(1);
                     messageForTransmit.xlCANFDEvent[0].tagData.canId = 0x3C0;
                     messageForTransmit.xlCANFDEvent[0].tagData.data[1] = 5;
-                    Console.WriteLine(canFdBus.CanFdTransmit(messageForTransmit));
+
+                    canFdBus.CanFdTransmit(messageForTransmit);
 
                 }
             }
