@@ -38,7 +38,7 @@ namespace CanBusDemoConsole
                     XLClass.xl_event_collection messageForTransmit = new XLClass.xl_event_collection(1);
                     messageForTransmit.xlEvent[0].tagData.can_Msg.id = 0x3C0;
                     messageForTransmit.xlEvent[0].tagData.can_Msg.data[1] = 7;
-                    Console.WriteLine(canBus.CanTransmit(messageForTransmit));
+                    //Console.WriteLine(canBus.CanTransmit(messageForTransmit));
                 }
             }
 
@@ -61,7 +61,7 @@ namespace CanBusDemoConsole
             Console.WriteLine("****************************");
 
             Console.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-            canBus.OpenDriver();
+            //canBus.OpenDriver();
             canBus.GetDriverConfig();
             canBus.GetAppConfigAndSetAppConfig();
             canBus.RequestTheUserToAssignChannels();

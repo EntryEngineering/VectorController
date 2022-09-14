@@ -51,13 +51,13 @@ namespace VectorBusLibrary.Processors
         /// Open driver
         /// </summary>
         /// <returns>XLDefine.XL_Status</returns>
-        public XLDefine.XL_Status OpenDriver()
-        {
-            XLDefine.XL_Status status = Driver.XL_OpenDriver();
-            Trace.WriteLine("Open Driver       : " + status);
-            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenDriver");
-            return status;
-        }
+        //public XLDefine.XL_Status OpenDriver()
+        //{
+        //    XLDefine.XL_Status status = Driver.XL_OpenDriver();
+        //    Trace.WriteLine("Open Driver       : " + status);
+        //    if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenDriver");
+        //    return status;
+        //}
 
         /// <summary>
         /// Close driver
