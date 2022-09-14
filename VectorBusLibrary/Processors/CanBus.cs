@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32.SafeHandles;
+using System;
+using System.Diagnostics;
 using System.Threading;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
@@ -8,12 +10,15 @@ namespace VectorBusLibrary.Processors
     public class CanBus : CommonVector
     {
         public XL_HardwareType HardwareType { get; set; }
+        public string appName { get; set; }
 
-
-        public CanBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN)
+        public Models.CanBusRx CanBusMessageRx { get; set; } = new Models.CanBusRx();
+        public string msgTestOut { get; set; }
+        public CanBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType, string aplicationName) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN, aplicationName)
         {
             Driver = xLDriver;
             HardwareType = xL_HardwareType;
+            appName = aplicationName;
         }
 
         public void TestCanBus()
@@ -24,7 +29,7 @@ namespace VectorBusLibrary.Processors
             Trace.WriteLine("-------------------------------------------------------------------");
             Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
 
-            OpenDriver();
+            //OpenDriver();
             GetDriverConfig();
 
             GetDLLVesrion();
@@ -44,7 +49,7 @@ namespace VectorBusLibrary.Processors
             GetAppConfigAndSetAppConfig();
             RequestTheUserToAssignChannels();
             GetAccesMask();
-            PrintAccessMask();
+            Trace.WriteLine(PrintAccessMask());
             OpenPort();
             CheckPort();
             ActivateChannel();
@@ -73,14 +78,43 @@ namespace VectorBusLibrary.Processors
             return status;
         }
 
+        /// <summary>
+        /// Open port
+        /// </summary>
+        /// <returns></returns>
+        public XLDefine.XL_Status OpenPort()
+        {
+            XLDefine.XL_Status status = Driver.XL_OpenPort(ref portHandle, appName, accessMask, ref permissionMask, 1024, XLDefine.XL_InterfaceVersion.XL_INTERFACE_VERSION, CommonBusType); // CanBus
+
+            Trace.WriteLine("Open Port             : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("OpenPort");
+
+            return status;
+        }
 
         /// <summary>
-        /// Transmit Can Bus message
+        /// Set notification
         /// </summary>
-        public void CanTransmit(byte val)
+
+        /// <returns></returns>
+        public XLDefine.XL_Status SetNotificationCanBus()
+        {
+            // Initialize EventWaitHandle object with RX event handle provided by DLL
+            int tempInt = -1;
+            XLDefine.XL_Status status = Driver.XL_SetNotification(portHandle, ref tempInt, 1);
+            xlEvWaitHandle.SafeWaitHandle = new SafeWaitHandle(new IntPtr(tempInt), true);
+
+            Trace.WriteLine("Set Notification      : " + status);
+            if (status != XLDefine.XL_Status.XL_SUCCESS) PrintFunctionError("SetNotification");
+
+            return status;
+        }
+
+        public XL_Status CanTransmit(XLClass.xl_event_collection messageForTransmit)
+
         {
             XL_Status txStatus;
-            XLClass.xl_event_collection xlEventCollection = new(1);
+            XLClass.xl_event_collection xlEventCollection = messageForTransmit;
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 0;
@@ -94,17 +128,20 @@ namespace VectorBusLibrary.Processors
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+
             Trace.WriteLine("Transmit Message[" + val + "]      : " + txStatus);
+
         }
 
 
         /// <summary>
         /// Run Rx Thread
         /// </summary>
-        private void RunRxThread()
+        public void RunRxThread()
         {
             Trace.WriteLine("Start Rx thread...");
             rxThread = new Thread(new ThreadStart(RXThread));
+            rxThread.Name = "CanBusRxThread";
             rxThread.Start();
         }
 
@@ -118,7 +155,6 @@ namespace VectorBusLibrary.Processors
 
             // Result of XL Driver function calls
             XL_Status xlStatus = XL_Status.XL_SUCCESS;
-
 
             // Note: this thread will be destroyed by MAIN
             while (true)
@@ -149,8 +185,6 @@ namespace VectorBusLibrary.Processors
                             // ...and data is a Rx msg...
                             if (receivedEvent.tag == XL_EventTags.XL_RECEIVE_MSG)
                             {
-
-                                var test = receivedEvent.tagData.can_Msg.data;
                                 string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
 
                                 Trace.WriteLine(preString);
@@ -176,8 +210,14 @@ namespace VectorBusLibrary.Processors
 
                                 else
                                 {
-                                    Trace.WriteLine(Driver.XL_GetEventString(receivedEvent));
+                                    CanBusMessageRx.TimeStamp = receivedEvent.timeStamp;
+                                    CanBusMessageRx.MessageId = receivedEvent.tagData.can_Msg.id;
+                                    CanBusMessageRx.DLC = receivedEvent.tagData.can_Msg.dlc;
+                                    CanBusMessageRx.data = receivedEvent.tagData.can_Msg.data;
+                                    CanBusMessageRx.RawCanMessage = Driver.XL_GetEventString(receivedEvent);
+
                                     Trace.WriteLine("OK MSG");
+
                                 }
                             }
                         }
@@ -195,7 +235,7 @@ namespace VectorBusLibrary.Processors
         /// Retrieve the application channel assignment and test if this channel can be opened
         /// </summary>
         // -----------------------------------------------------------------------------------------------
-        internal bool GetAppChannelAndTestIsOk(uint appChIdx, ref ulong chMask, ref int chIdx)
+        public bool GetAppChannelAndTestIsOk(uint appChIdx, ref ulong chMask, ref int chIdx)
         {
             XL_Status status = Driver.XL_GetApplConfig(appName, appChIdx, ref hwType, ref hwIndex, ref hwChannel, CommonBusType);
             if (status != XL_Status.XL_SUCCESS)
@@ -220,7 +260,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Request the user to assign channels until both CAN1 (Tx) and CAN2 (Rx) are assigned to usable channels
         /// </summary>
-        internal void RequestTheUserToAssignChannels()
+        public void RequestTheUserToAssignChannels()
         {
             if (!GetAppChannelAndTestIsOk(0, ref txMask, ref txCi) || !GetAppChannelAndTestIsOk(1, ref rxMask, ref rxCi))
             {
