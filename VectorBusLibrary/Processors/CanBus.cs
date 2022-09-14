@@ -119,7 +119,7 @@ namespace VectorBusLibrary.Processors
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = val;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = 0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = 0;
@@ -129,8 +129,9 @@ namespace VectorBusLibrary.Processors
 
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
 
-            Trace.WriteLine("Transmit Message[" + val + "]      : " + txStatus);
+            Trace.WriteLine("Transmit Message      : " + txStatus);
 
+            return txStatus;
         }
 
 
