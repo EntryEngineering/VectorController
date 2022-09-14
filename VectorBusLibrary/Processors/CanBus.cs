@@ -56,7 +56,7 @@ namespace VectorBusLibrary.Processors
             SetNotificationCanBus();
             ResetClock();
 
-            RunRxThread();
+            //RunRxThread();
             //for (int i = 0; i < 20; i++)
             //{
             //    CanTransmit();
@@ -95,6 +95,7 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Set notification
         /// </summary>
+
         /// <returns></returns>
         public XLDefine.XL_Status SetNotificationCanBus()
         {
@@ -110,24 +111,26 @@ namespace VectorBusLibrary.Processors
         }
 
         public XL_Status CanTransmit(XLClass.xl_event_collection messageForTransmit)
+
         {
             XL_Status txStatus;
             XLClass.xl_event_collection xlEventCollection = messageForTransmit;
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 1;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 2;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 3;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 4;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = 5;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = 6;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = 7;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = 8;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = val;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = 0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = 0;
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
-            Trace.WriteLine("Transmit Message      : " + txStatus);
-            return txStatus;
+
+            Trace.WriteLine("Transmit Message[" + val + "]      : " + txStatus);
+
         }
 
 
