@@ -13,6 +13,7 @@ namespace VectorBusLibrary.Processors
 
 
         int s_pdu_kennung = 0x86;
+        int crc_init_wert = 0xff;
 
         public CrcProcessor()
         {
@@ -29,8 +30,9 @@ namespace VectorBusLibrary.Processors
 
 
 
-        public long GetCrc(string message)
+        public string GetCrc(string message)
         {
+            string finalCrc;
             List<int> partOfmessageInDecimal = new List<int>();
             List<string> partOfmessageInHex = new List<string>();
 
@@ -41,16 +43,22 @@ namespace VectorBusLibrary.Processors
                 partOfmessageInHex.Add(message.Substring(i, 2));
 
 
-                Trace.WriteLine(i);
-
             }
 
 
+            int tempDataByte1 = crc_init_wert ^ partOfmessageInDecimal[6];  // vezme inicializační hodnotu "0xff"(255) a provede XOR s první částí zprávy(čte se z prava) "C1"(193) a výsledek je "3E"(62), číslo 62 je pozice hodnoty v tabulce.
+            int finalDataByte1 = GetValueFromTable(tempDataByte1);  // zde se vybere z tabulky hodnota na pozici 62, kterou je 0x68
 
 
 
+            //int dataByte1Next = crc8_c2_lookUpTable1dArray[dataByte1]
+            finalCrc = "0x" + finalDataByte1.ToString("x2");
 
-            return 555;
+
+            // 0xCC == 204
+
+
+            return finalCrc;
         }
     }
 }

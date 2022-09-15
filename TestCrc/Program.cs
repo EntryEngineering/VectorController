@@ -10,7 +10,7 @@
             //Console.WriteLine(crc.GetCrc("0x1AFFD4FF16FFC1"));
 
             Console.WriteLine($"{crc.GetCrc("1AFFD4FF16FFC1")}");
-
+            TestTable();
             Console.ReadLine();
         }
 
