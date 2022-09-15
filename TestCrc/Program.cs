@@ -2,11 +2,20 @@
 {
     internal class Program
     {
+        static VectorBusLibrary.Processors.CrcProcessor crc;
+
         static void Main(string[] args)
         {
-            VectorBusLibrary.Processors.CrcProcessor crc = new();
+            crc = new();
             //Console.WriteLine(crc.GetCrc("0x1AFFD4FF16FFC1"));
 
+            Console.WriteLine($"{crc.GetCrc("1AFFD4FF16FFC1")}");
+
+            Console.ReadLine();
+        }
+
+        private static void TestTable() 
+        {
             while (true)
             {
                 int indexFromConsole = Int32.Parse(Console.ReadLine());
@@ -20,7 +29,6 @@
                     Console.WriteLine("Out of range");
                 }
             }
-
         }
     }
 }
