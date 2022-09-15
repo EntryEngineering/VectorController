@@ -32,7 +32,7 @@ namespace VectorBusLibrary.Processors
 
         public string GetCrc(string message)
         {
-            string finalCrc;
+            string finalCrcString;
             List<int> partOfmessageInDecimal = new List<int>();
             List<string> partOfmessageInHex = new List<string>();
 
@@ -45,20 +45,48 @@ namespace VectorBusLibrary.Processors
 
             }
 
-
+            // 1)
             int tempDataByte1 = crc_init_wert ^ partOfmessageInDecimal[6];  // vezme inicializační hodnotu "0xff"(255) a provede XOR s první částí zprávy(čte se z prava) "C1"(193) a výsledek je "3E"(62), číslo 62 je pozice hodnoty v tabulce.
             int finalDataByte1 = GetValueFromTable(tempDataByte1);  // zde se vybere z tabulky hodnota na pozici 62, kterou je 0x68
 
 
+            // 2)
+            int tempDataByte2 = finalDataByte1 ^ partOfmessageInDecimal[5];
+            int finalDataByte2 = GetValueFromTable(tempDataByte2);
 
-            //int dataByte1Next = crc8_c2_lookUpTable1dArray[dataByte1]
-            finalCrc = "0x" + finalDataByte1.ToString("x2");
+            // 3)
+            int tempDataByte3 = finalDataByte2 ^ partOfmessageInDecimal[4];
+            int finalDataByte3 = GetValueFromTable(tempDataByte3);
+
+            // 4)
+            int tempDataByte4 = finalDataByte3 ^ partOfmessageInDecimal[3];
+            int finalDataByte4 = GetValueFromTable(tempDataByte4);
+
+            // 5)
+            int tempDataByte5 = finalDataByte4 ^ partOfmessageInDecimal[2];
+            int finalDataByte5 = GetValueFromTable(tempDataByte5);
+
+            // 6)
+            int tempDataByte6 = finalDataByte5 ^ partOfmessageInDecimal[1];
+            int finalDataByte6 = GetValueFromTable(tempDataByte6);
+
+            // 7)
+            int tempDataByte7 = finalDataByte6 ^ partOfmessageInDecimal[0];
+            int finalDataByte7 = GetValueFromTable(tempDataByte7);
+
+            // 8) - S-PDU Kennung
+            int tempDataByte8 = finalDataByte7 ^ s_pdu_kennung;
+            int finalDataByte8 = GetValueFromTable(tempDataByte8);
+
+            // FINAL
+            int finalCrc = 255 - finalDataByte8;
 
 
-            // 0xCC == 204
+            finalCrcString = "0x" + finalCrc.ToString("x2");
 
 
-            return finalCrc;
+
+            return finalCrcString;
         }
     }
 }
