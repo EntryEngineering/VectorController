@@ -79,7 +79,7 @@ namespace VectorBusLibrary.Processors
             int finalDataByte8 = GetValueFromTable(tempDataByte8);
 
             // FINAL
-            int finalCrc = 255 - finalDataByte8;
+            int finalCrc = crc_init_wert - finalDataByte8;
 
 
             finalCrcString = "0x" + finalCrc.ToString("x2");
