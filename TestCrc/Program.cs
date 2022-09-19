@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace TestCrc
+﻿namespace TestCrc
 {
     internal class Program
     {
@@ -11,8 +9,6 @@ namespace TestCrc
             crc = new();
             //Console.WriteLine(crc.GetCrc("0x1AFFD4FF16FFC1"));
 
-
-
             for (int i = 0; i < 30; i++)
             {
                 Random random = new Random();
@@ -21,7 +17,7 @@ namespace TestCrc
 
             }
 
-            
+
             TestCrc();
             Console.ReadLine();
         }

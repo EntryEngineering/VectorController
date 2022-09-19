@@ -26,7 +26,7 @@ namespace CanFdBusDemoConsole
                     {
                         var data1 = canFdBus.CanFdBusMessageRx.data[1];
                         var data2 = canFdBus.CanFdBusMessageRx.data[2];
-                        Console.WriteLine($"Knob_{data1}-Klema_{data2} CRC: {canFdBus.CanFdBusMessageRx.crc} RAW: {canFdBus.CanFdBusMessageRx.RawDataString }");
+                        Console.WriteLine($"Knob_{data1}-Klema_{data2} CRC: {canFdBus.CanFdBusMessageRx.crc} RAW: {canFdBus.CanFdBusMessageRx.RawDataString}");
                     }
                     Console.WriteLine("Rx end");
 

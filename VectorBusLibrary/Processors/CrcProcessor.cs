@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace VectorBusLibrary.Processors
 {
@@ -36,7 +34,7 @@ namespace VectorBusLibrary.Processors
             List<int> partOfmessageInDecimal = new List<int>();
             List<string> partOfmessageInHex = new List<string>();
 
-            for (int i = 0; i < message.Length; i = i +2)
+            for (int i = 0; i < message.Length; i = i + 2)
             {
 
                 partOfmessageInDecimal.Add(Int32.Parse(message.Substring(i, 2), System.Globalization.NumberStyles.HexNumber));
@@ -46,8 +44,8 @@ namespace VectorBusLibrary.Processors
             }
 
             // 1)
-            int tempDataByte1 = crc_init_wert ^ partOfmessageInDecimal[6];  // vezme inicializační hodnotu "0xff"(255) a provede XOR s první částí zprávy(čte se z prava) "C1"(193) a výsledek je "3E"(62), číslo 62 je pozice hodnoty v tabulce.
-            int finalDataByte1 = GetValueFromTable(tempDataByte1);  // zde se vybere z tabulky hodnota na pozici 62, kterou je 0x68
+            int tempDataByte1 = crc_init_wert ^ partOfmessageInDecimal[6];
+            int finalDataByte1 = GetValueFromTable(tempDataByte1);
 
 
             // 2)

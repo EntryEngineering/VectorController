@@ -34,7 +34,7 @@ namespace CanBusDemoConsole
                         FileProcessor.SaveTextToFileAsync(stringToPrint);
 
                         //Console.WriteLine($"Raw: {canBus.CanBusMessageRx.RawCanMessage}");
-                        
+
                     }
                     Console.WriteLine("Rx end");
 
