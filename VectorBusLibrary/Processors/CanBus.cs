@@ -208,7 +208,6 @@ namespace VectorBusLibrary.Processors
                                 {
                                     Trace.WriteLine("REMOTE FRAME");
                                 }
-
                                 else
                                 {
                                     CanBusMessageRx.TimeStamp = receivedEvent.timeStamp;

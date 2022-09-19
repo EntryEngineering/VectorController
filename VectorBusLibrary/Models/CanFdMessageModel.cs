@@ -13,6 +13,8 @@ namespace VectorBusLibrary.Models
         public byte reserved { get; set; }  //Internal use.
         public byte[] data { get; set; } = new byte[64];        //Data that was received.
 
+        public string RawDataString { get; set; }
+
     }
 
     public class CanFdMessageModelTx

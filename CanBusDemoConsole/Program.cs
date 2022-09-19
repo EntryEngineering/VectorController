@@ -27,9 +27,14 @@ namespace CanBusDemoConsole
                     canBus.RunRxThread();
                     for (int i = 0; i < count; i++)
                     {
-                        var data1 = canBus.CanBusMessageRx.data[1];
-                        var data2 = canBus.CanBusMessageRx.data[2];
-                        Console.WriteLine($"Knob_{data1}-Klema_{data2}");
+                        byte data1 = canBus.CanBusMessageRx.data[1];
+                        byte data2 = canBus.CanBusMessageRx.data[2];
+                        string stringToPrint = $"Knob_{data1}-Klema_{data2}";
+                        Console.WriteLine(stringToPrint);
+                        FileProcessor.SaveTextToFileAsync(stringToPrint);
+
+                        //Console.WriteLine($"Raw: {canBus.CanBusMessageRx.RawCanMessage}");
+                        
                     }
                     Console.WriteLine("Rx end");
 
@@ -41,7 +46,23 @@ namespace CanBusDemoConsole
                     messageForTransmit.xlEvent[0].tagData.can_Msg.data[1] = 7;
 
                     canBus.CanTransmit(messageForTransmit);
+                }
+                else if (pressedKey == "x")
+                {
+                    canBus.RunRxThread();
+                    while (true)
+                    {
 
+                        for (int i = 0; i < canBus.CanBusMessageRx.DLC; i++)
+                        {
+                            Console.Write(canBus.CanBusMessageRx.data[i].ToString("x"));
+
+                        }
+                        Console.WriteLine("*");
+
+                        //Console.Write($"{canBus.CanBusMessageRx.RawCanMessage}");
+                        //Console.WriteLine("*");
+                    }
                 }
             }
 

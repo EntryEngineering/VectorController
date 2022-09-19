@@ -1,4 +1,6 @@
-﻿namespace TestCrc
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace TestCrc
 {
     internal class Program
     {
@@ -9,6 +11,17 @@
             crc = new();
             //Console.WriteLine(crc.GetCrc("0x1AFFD4FF16FFC1"));
 
+
+
+            for (int i = 0; i < 30; i++)
+            {
+                Random random = new Random();
+                Int64 randomNumber = random.NextInt64(5000000000000000, 9999999999999999);
+                Console.WriteLine($"Random number {randomNumber.ToString("X")} CRC is:{crc.GetCrc(randomNumber.ToString("X"))}");
+
+            }
+
+            
             TestCrc();
             Console.ReadLine();
         }
@@ -23,7 +36,6 @@
                 if (message.Length == 14)
                 {
                     Console.WriteLine($"CRC is: {crc.GetCrc(message)}");
-
                 }
                 else
                 {

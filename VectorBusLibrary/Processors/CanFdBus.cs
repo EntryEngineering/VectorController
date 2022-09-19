@@ -223,7 +223,9 @@ namespace VectorBusLibrary.Processors
                             CanFdBusMessageRx.dlc = receivedEvent.tagData.canRxOkMsg.dlc;
                             CanFdBusMessageRx.reserved = receivedEvent.reserved;
                             CanFdBusMessageRx.data = receivedEvent.tagData.canRxOkMsg.data;
-
+                            CanFdBusMessageRx.RawDataString = Driver.XL_CanGetEventString(receivedEvent);
+                            
+                            
                         }
                     }
                 }
