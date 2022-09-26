@@ -30,21 +30,21 @@
                     <Expander Header="Can Bus parameters" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5" >
                         <StackPanel >
                             <DockPanel LastChildFill="True">
-                                <TextBlock Text="App name:" MinWidth="100"/>
-                                <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="Transparent"/>
+                                <TextBlock Text="App name:" MinWidth="100" Foreground="#E7F6F2"/>
+                                <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="#E7F6F2" Foreground="#2C3333"/>
                             </DockPanel>
 
-                            <DockPanel LastChildFill="True">
-                                <TextBlock Text="Boudrate:" MinWidth="100"/>
-                                <TextBox x:Name="txtBoxBoudrate" Text="100" Background="Transparent"/>
-                            </DockPanel>
+
                         </StackPanel>
                     </Expander>
                 </Border>
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
-                    <Expander Header="Receive log" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
-                    <TextBox x:Name="txtBoxReceiveMsg" Background="DarkGray" Height="250"/>
-                </Expander>
+                    <Expander Header="Receive log" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                        <StackPanel >
+                            <TextBox x:Name="txtBoxReceiveMsg" Background="DarkGray" Height="250" Width="750"/>
+                            <Button x:Name="btnStartRx" HorizontalAlignment="Right" Content="Start RX" Width="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnStartRx_Click"/>
+                        </StackPanel>
+                    </Expander>
                 </Border>
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
                 <Expander Header="Transmit" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
@@ -77,7 +77,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <TextBox x:Name="txtBoxLogApp" Grid.Column="0" Grid.Row="0" Text="" Margin="10" Background="#E7F6F2" Foreground="#2C3333" MinHeight="80" Width="900" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="NoWrap"/>
+            <TextBox x:Name="txtBoxLogApp" Grid.Column="0" Grid.Row="0" Text="" Margin="2" Background="#E7F6F2" Foreground="#2C3333" MinHeight="80" MinWidth="900" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="NoWrap"/>
         </Grid>
     </StackPanel>
 </Window>

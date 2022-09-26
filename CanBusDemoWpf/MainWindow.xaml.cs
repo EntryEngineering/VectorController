@@ -29,7 +29,7 @@ namespace CanBusDemoWpf
             else
             {
                 canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
-                Helelper.WriteLogToTextBox("Driver init - Ok", txtBoxLogApp);
+                Helelper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
 
             }
         }
@@ -37,9 +37,29 @@ namespace CanBusDemoWpf
         private void btnOpenDriver_Click(object sender, RoutedEventArgs e)
         {
 
+            Helelper.WriteLogToTextBox($"Open driver: {canBus.OpenDriver()}",txtBoxLogApp);
         }
 
         private void btnOpenPort_Click(object sender, RoutedEventArgs e)
+        {
+            Helelper.WriteLogToTextBox($"Get driver config: {canBus.GetDriverConfig()}", txtBoxLogApp);
+            canBus.GetAppConfigAndSetAppConfig();
+
+            Helelper.WriteLogToTextBox($"Get app config and set appConfig: OK", txtBoxLogApp);
+            canBus.RequestTheUserToAssignChannels();
+
+            CommonVector.GetAccesMask();
+            Helelper.WriteLogToTextBox($"Get acces mask: OK", txtBoxLogApp);
+
+            Helelper.WriteLogToTextBox($"Open port: {canBus.OpenPort()}", txtBoxLogApp);
+            Helelper.WriteLogToTextBox($"Activate channel: {canBus.ActivateChannel()}", txtBoxLogApp);
+            Helelper.WriteLogToTextBox($"Set notification CanBus: {canBus.SetNotificationCanBus()}", txtBoxLogApp);
+            Helelper.WriteLogToTextBox($"Reset clock: {canBus.ResetClock()}", txtBoxLogApp);
+
+
+        }
+
+        private void btnStartRx_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -54,5 +74,25 @@ namespace CanBusDemoWpf
             Trace.WriteLine(outString);
             uiElement.AppendText(outString);
         }
+        
+        internal static void InitCanControloler(CanBus context)
+        {
+            Trace.WriteLine("****************************");
+            Trace.WriteLine("CanBus - Vector");
+            Trace.WriteLine("****************************");
+
+            Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
+            context.OpenDriver();
+            context.GetDriverConfig();
+            context.GetAppConfigAndSetAppConfig();
+            context.RequestTheUserToAssignChannels();
+            CommonVector.GetAccesMask();
+            Trace.WriteLine(CommonVector.PrintAccessMask());
+            context.OpenPort();
+            context.ActivateChannel();
+            context.SetNotificationCanBus();
+            context.ResetClock();
+        }
+
     }
 }
