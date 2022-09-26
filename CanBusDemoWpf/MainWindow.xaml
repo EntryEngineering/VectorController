@@ -5,70 +5,79 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CanBusDemoWpf"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1000">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="5*"/>
-        </Grid.ColumnDefinitions>
+        Title="MainWindow"
+        SizeToContent="WidthAndHeight"
+        Background="#2C3333">
+    <StackPanel Orientation="Vertical">
+        <!--main-->
+        <Grid MinHeight="400">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <!--left menu-->
+            <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" MinWidth="150" Background="#395B64" Margin="5">
+                <Button x:Name="btnIntitDriver" Content="Init driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
+                <Button x:Name="btnOpenDriver" Content="Open driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
+                <Button x:Name="btnOpenPort" Content="Open port" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
+            </StackPanel>
+            <!--right content-->
+            <StackPanel Grid.Column="1" Margin="5" Background="#395B64" MinWidth="700">
+                <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
+                    <Expander Header="Can Bus parameters" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5" >
+                        <StackPanel >
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="App name:" MinWidth="100"/>
+                                <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="Transparent"/>
+                            </DockPanel>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="1*"/>
-
-        </Grid.RowDefinitions>
-
-        <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" MinWidth="150">
-            <Button x:Name="btnIntitDriver" Content="Init driver" MinWidth="100" Margin="5" Background="SlateGray"/>
-            <Button x:Name="btnOpenDriver" Content="Open driver" MinWidth="100" Margin="5" Background="SlateGray"/>
-            <Button x:Name="btnOpenPort" Content="Open port" MinWidth="100" Margin="5" Background="SlateGray"/>
-        </StackPanel>
-
-
-        <StackPanel Grid.Column="1">
-            <Border BorderBrush="Black" BorderThickness="1" CornerRadius="8 8 0 0">
-                <Expander Header="Can Bus parameters" IsExpanded="True">
-                    <StackPanel Background="LightSteelBlue">
-                        <DockPanel LastChildFill="True">
-                            <TextBlock Text="App name:" MinWidth="100"/>
-                            <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="Transparent"/>
-                        </DockPanel>
-
-                        <DockPanel LastChildFill="True">
-                            <TextBlock Text="Boudrate:" MinWidth="100"/>
-                            <TextBox x:Name="txtBoxBoudrate" Text="100" Background="Transparent"/>
-                        </DockPanel>
-
-
-
-                    </StackPanel>
-                </Expander>
-            </Border>
-
-            <Border BorderBrush="Black" BorderThickness="1" >
-                
-            <Expander Header="Receive log" IsExpanded="False">
+                            <DockPanel LastChildFill="True">
+                                <TextBlock Text="Boudrate:" MinWidth="100"/>
+                                <TextBox x:Name="txtBoxBoudrate" Text="100" Background="Transparent"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Expander>
+                </Border>
+                <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
+                    <Expander Header="Receive log" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
                     <TextBox x:Name="txtBoxReceiveMsg" Background="DarkGray" Height="250"/>
                 </Expander>
-            </Border>
-            <Expander Header="Transmit" IsExpanded="True">
-                <StackPanel Orientation="Vertical">
-                    <TextBlock Text="msgBitn0 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn1 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn2 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn3 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn4 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn5 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn6 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgBitn7 > 0" FontSize="8" Margin="3"/>
-                    <TextBlock Text="msgDlc > 0xC1" FontSize="8" Margin="3"/>
+                </Border>
+                <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
+                <Expander Header="Transmit" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="msgBitn0 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn1 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn2 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn3 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn4 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn5 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn6 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgBitn7 > 0" FontSize="8" Margin="3"/>
+                        <TextBlock Text="msgDlc > 0xC1" FontSize="8" Margin="3"/>
 
-                    <Button x:Name="btnTransmit" Content="Send in loop"/>
-                </StackPanel>
-            </Expander>
-
-            <Expander Header="Test - debung">
-                
-            </Expander>
-        </StackPanel>
-    </Grid>
+                        <Button x:Name="btnTransmit" Content="Send in loop"/>
+                    </StackPanel>
+                </Expander>
+                </Border>
+                <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
+                    <Expander Header="Test - debung" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                    </Expander>
+                </Border>
+            </StackPanel>
+        </Grid>
+        <!--app log-->
+        <Grid MaxHeight="100">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Column="0" Grid.Row="0" Text="log....." Margin="10"/>
+        </Grid>
+    </StackPanel>
 </Window>
