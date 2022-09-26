@@ -20,9 +20,9 @@
             </Grid.RowDefinitions>
             <!--left menu-->
             <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" MinWidth="150" Background="#395B64" Margin="5">
-                <Button x:Name="btnIntitDriver" Content="Init driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
-                <Button x:Name="btnOpenDriver" Content="Open driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
-                <Button x:Name="btnOpenPort" Content="Open port" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333"/>
+                <Button x:Name="btnIntitDriver" Content="Init driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnIntitDriver_Click"/>
+                <Button x:Name="btnOpenDriver" Content="Open driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnOpenDriver_Click"/>
+                <Button x:Name="btnOpenPort" Content="Open port" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnOpenPort_Click"/>
             </StackPanel>
             <!--right content-->
             <StackPanel Grid.Column="1" Margin="5" Background="#395B64" MinWidth="700">
@@ -47,7 +47,7 @@
                 </Expander>
                 </Border>
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
-                <Expander Header="Transmit" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                <Expander Header="Transmit" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
                     <StackPanel Orientation="Vertical">
                         <TextBlock Text="msgBitn0 > 0" FontSize="8" Margin="3"/>
                         <TextBlock Text="msgBitn1 > 0" FontSize="8" Margin="3"/>
@@ -59,7 +59,7 @@
                         <TextBlock Text="msgBitn7 > 0" FontSize="8" Margin="3"/>
                         <TextBlock Text="msgDlc > 0xC1" FontSize="8" Margin="3"/>
 
-                        <Button x:Name="btnTransmit" Content="Send in loop"/>
+                            <Button x:Name="btnTransmit" Content="Send in loop" Margin="10" Width="100" Background="#E7F6F2"/>
                     </StackPanel>
                 </Expander>
                 </Border>
@@ -77,7 +77,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <TextBox Grid.Column="0" Grid.Row="0" Text="log....." Margin="10"/>
+            <TextBox x:Name="txtBoxLogApp" Grid.Column="0" Grid.Row="0" Text="" Margin="10" Background="#E7F6F2" Foreground="#2C3333" MinHeight="80" Width="900" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="NoWrap"/>
         </Grid>
     </StackPanel>
 </Window>
