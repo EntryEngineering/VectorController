@@ -18,6 +18,7 @@ namespace CanBusDemoWpf
     public partial class MainWindow : Window
     {
         private static CanBus? canBus = null;
+        //localhost:4757/GURM04BSNNNN0015/1/canview/960
 
         public MainWindow()
         {
@@ -117,6 +118,8 @@ namespace CanBusDemoWpf
 
 
         }
+        System.Timers.Timer rxTimer;
+
 
         private async void btnStartRx_Click(object sender, RoutedEventArgs e)
         {
@@ -124,18 +127,21 @@ namespace CanBusDemoWpf
 
             if (canBus != null)
             {
-
-                while (true)
-                {
-                    txtBoxReceiveMsg.Text = canBus.RxAsync();
-
-                }
-
-
-
+                rxTimer = new System.Timers.Timer(200);
+                rxTimer.Elapsed += RxTimer_Elapsed;
+                rxTimer.AutoReset = true;
+                rxTimer.Enabled = true;
+                rxTimer.Start();
             }
         }
 
+        private void RxTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            
+            string temp = canBus.RxAsync();
+            txtBoxReceiveMsg.Text = temp;
+
+        }
 
         private void btnTransmitSingle_Click(object sender, RoutedEventArgs e)
         {
@@ -159,11 +165,8 @@ namespace CanBusDemoWpf
         }
 
 
-        System.Timers.Timer timer;
+        System.Timers.Timer txTimer;
         XLClass.xl_event_collection xlEventCollection;
-
-
-
 
 
         private void TxMessageInit(bool enabled = false,double interval = 100)
@@ -182,10 +185,10 @@ namespace CanBusDemoWpf
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
 
-            timer = new System.Timers.Timer(interval);
-            timer.Elapsed += Timer_Elapsed;
-            timer.AutoReset = true;
-            timer.Enabled = enabled;
+            txTimer = new System.Timers.Timer(interval);
+            txTimer.Elapsed += Timer_Elapsed;
+            txTimer.AutoReset = true;
+            txTimer.Enabled = enabled;
         }
 
 
@@ -206,7 +209,7 @@ namespace CanBusDemoWpf
         {
             double cycleTime = double.Parse(txtBoxCycleTime.Text);
             TxMessageInit(true, cycleTime);
-            timer.Start();
+            txTimer.Start();
             string ourLogInfo = $"Tx start with Cycle time: {cycleTime}ms";
 
             Trace.WriteLine(ourLogInfo);
@@ -221,7 +224,7 @@ namespace CanBusDemoWpf
 
         private void StopTxLoop() 
         {
-            timer.Stop();
+            txTimer.Stop();
             Trace.WriteLine($"Tx stop");
             Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
         }
@@ -278,14 +281,26 @@ namespace CanBusDemoWpf
 
         private void toggleBtn_Checked(object sender, RoutedEventArgs e)
         {
-            txtBoxData2.Text = "2";
-            RestartTxLoop();
+            if (txTimer != null)
+            {
+                txtBoxData2.Text = "2";
+                RestartTxLoop();
+                checkBoxTrnasmitMessageInLoop.IsEnabled = false;
+            }
+            else
+            {
+                txtBoxData2.Text = "2";
+                StartTxLoop();
+                checkBoxTrnasmitMessageInLoop.IsEnabled = false;  
+            }
+
         }
 
         private void toggleBtn_Unchecked(object sender, RoutedEventArgs e)
         {
             txtBoxData2.Text = "0";
             RestartTxLoop();
+            checkBoxTrnasmitMessageInLoop.IsEnabled = true;
         }
     }
 }

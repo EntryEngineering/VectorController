@@ -111,11 +111,12 @@ namespace VectorBusLibrary.Processors
             return status;
         }
 
-        public XL_Status CanTransmit(XLClass.xl_event_collection messageForTransmit)
+        Random random = new Random();
 
+        public XL_Status CanTransmit(XLClass.xl_event_collection messageForTransmit)
         {
             XL_Status txStatus;
-
+            messageForTransmit.xlEvent[0].tagData.can_Msg.data[2] = Convert.ToByte(random.Next(0, 3));
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, messageForTransmit);
 
             Trace.WriteLine($"Transmit Message:  [msgId:" +

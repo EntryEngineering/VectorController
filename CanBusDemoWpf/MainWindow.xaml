@@ -113,70 +113,70 @@
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="msg_id" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxMsgId" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxMsgId" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="msg_dlc" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxDlc" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxDlc" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[0]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData0" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData0" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[1]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData1" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData1" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[2]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData2" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData2" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[3]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData3" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData3" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[4]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData4" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData4" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[5]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData5" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData5" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[6]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData6" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData6" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="data[7]" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxData7" FontSize="9"/>
+                                    <TextBox x:Name="txtBoxData7" FontSize="12"/>
                                 </DockPanel>
                             </Border>
                             <Border Margin="5" BorderThickness="1" BorderBrush="LightBlue" CornerRadius="10" Width="120">
