@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,42 @@ namespace CanBusDemoWpf
             //Helelper.SetLogoToWindow(logoEntry);
             SetDefaultValuesForTransmit();
 
+            InitVector();
+
+
+        }
+
+        private void InitVector()
+        {
+            // Init driver
+            string appName = txtBoxAppName.Text;
+            if (string.IsNullOrEmpty(appName))
+            {
+                MessageBox.Show("Please enter app name");
+            }
+            else
+            {
+                canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
+                Helper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
+
+            }
+            // Open driver
+            Helper.WriteLogToTextBox($"Open driver: {canBus.OpenDriver()}", txtBoxLogApp);
+
+            // Open port
+            Helper.WriteLogToTextBox($"Get driver config: {canBus.GetDriverConfig()}", txtBoxLogApp);
+            canBus.GetAppConfigAndSetAppConfig();
+
+            Helper.WriteLogToTextBox($"Get app config and set appConfig: OK", txtBoxLogApp);
+            canBus.RequestTheUserToAssignChannels();
+
+            CommonVector.GetAccesMask();
+            Helper.WriteLogToTextBox($"Get acces mask: OK", txtBoxLogApp);
+
+            Helper.WriteLogToTextBox($"Open port: {canBus.OpenPort()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Activate channel: {canBus.ActivateChannel()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Set notification CanBus: {canBus.SetNotificationCanBus()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Reset clock: {canBus.ResetClock()}", txtBoxLogApp);
         }
 
         private void SetDefaultValuesForTransmit()
@@ -50,7 +87,7 @@ namespace CanBusDemoWpf
             else
             {
                 canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
-                Helelper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
+                Helper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
 
             }
         }
@@ -58,31 +95,31 @@ namespace CanBusDemoWpf
         private void btnOpenDriver_Click(object sender, RoutedEventArgs e)
         {
 
-            Helelper.WriteLogToTextBox($"Open driver: {canBus.OpenDriver()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Open driver: {canBus.OpenDriver()}", txtBoxLogApp);
         }
 
         private void btnOpenPort_Click(object sender, RoutedEventArgs e)
         {
-            Helelper.WriteLogToTextBox($"Get driver config: {canBus.GetDriverConfig()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Get driver config: {canBus.GetDriverConfig()}", txtBoxLogApp);
             canBus.GetAppConfigAndSetAppConfig();
 
-            Helelper.WriteLogToTextBox($"Get app config and set appConfig: OK", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Get app config and set appConfig: OK", txtBoxLogApp);
             canBus.RequestTheUserToAssignChannels();
 
             CommonVector.GetAccesMask();
-            Helelper.WriteLogToTextBox($"Get acces mask: OK", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Get acces mask: OK", txtBoxLogApp);
 
-            Helelper.WriteLogToTextBox($"Open port: {canBus.OpenPort()}", txtBoxLogApp);
-            Helelper.WriteLogToTextBox($"Activate channel: {canBus.ActivateChannel()}", txtBoxLogApp);
-            Helelper.WriteLogToTextBox($"Set notification CanBus: {canBus.SetNotificationCanBus()}", txtBoxLogApp);
-            Helelper.WriteLogToTextBox($"Reset clock: {canBus.ResetClock()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Open port: {canBus.OpenPort()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Activate channel: {canBus.ActivateChannel()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Set notification CanBus: {canBus.SetNotificationCanBus()}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Reset clock: {canBus.ResetClock()}", txtBoxLogApp);
 
 
         }
 
         private async void btnStartRx_Click(object sender, RoutedEventArgs e)
         {
-            Helelper.WriteLogToTextBox($"Rx start", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Rx start", txtBoxLogApp);
 
             if (canBus != null)
             {
@@ -116,56 +153,68 @@ namespace CanBusDemoWpf
 
             XL_Status status = canBus.CanTransmit(xlEventCollection);
 
-            Helelper.WriteLogToTextBox($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - {status}", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - {status}", txtBoxLogApp);
 
         }
 
-        bool txLoopEnable = true;
 
-        private async void btnTransmitInLoop_Click(object sender, RoutedEventArgs e)
+        System.Timers.Timer timer;
+        XLClass.xl_event_collection xlEventCollection;
+
+
+
+
+
+        private void TxMessageInit(bool enabled = false,long interval = 100) 
         {
-            await TxLoop();
+            xlEventCollection = new XLClass.xl_event_collection(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = byte.Parse(txtBoxData0.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = byte.Parse(txtBoxData1.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(txtBoxData2.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(txtBoxData3.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(txtBoxData4.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(txtBoxData5.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(txtBoxData6.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(txtBoxData7.Text);
+            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
+
+
+            timer = new System.Timers.Timer(interval);
+            timer.Elapsed += Timer_Elapsed;
+            timer.AutoReset = true;
+            timer.Enabled = enabled;
         }
 
-        private async Task TxLoop()
+
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            while (txLoopEnable)
-            {
-                XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
-                xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
-                xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = byte.Parse(txtBoxData0.Text);
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = byte.Parse(txtBoxData1.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(txtBoxData2.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(txtBoxData3.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(txtBoxData4.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(txtBoxData5.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(txtBoxData6.Text); ;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(txtBoxData7.Text); ;
-                xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
-
-                XL_Status status = canBus.CanTransmit(xlEventCollection);
-
-                //Helelper.WriteLogToTextBox($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - {status}", txtBoxLogApp);
-            }
+            Trace.WriteLine(e.SignalTime.ToString());
+            XL_Status status = canBus.CanTransmit(xlEventCollection);
+            Helper.WriteLogToTextBox($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - ", txtBoxLogApp);
         }
+
         private void checkBoxTrnasmitMessageInLoop_Checked(object sender, RoutedEventArgs e)
         {
+            TxMessageInit(true, 100);
+            timer.Start();
+            Trace.WriteLine("Tx START");
+            Helper.WriteLogToTextBox($"Tx start", txtBoxLogApp);
 
-            //if (checkBoxTrnasmitMessageInLoop.IsChecked == true)
-            //{
-            //    txLoopEnable = true;
-            //    checkBoxTrnasmitMessageInLoop.IsChecked = true;
-            //}
-            //else
-            //{
-            //    txLoopEnable = false;
-            //    checkBoxTrnasmitMessageInLoop.IsChecked = false;
-            //}
         }
 
 
-        public static class Helelper
+        private void checkBoxTrnasmitMessageInLoop_Unchecked(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
+            Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
+        }
+
+
+        public static class Helper
         {
             public static void WriteLogToTextBox(string text, TextBox uiElement)
             {
@@ -207,5 +256,7 @@ namespace CanBusDemoWpf
             }
 
         }
+
+
     }
 }

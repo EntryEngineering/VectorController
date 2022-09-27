@@ -128,11 +128,11 @@
                         
 
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Border Background="#2C3333" Margin="2" Width="150" CornerRadius="5">
+                                <!--<Border Background="#2C3333" Margin="2" Width="150" CornerRadius="5">
                                     <Button x:Name="btnTransmitInLoop" Click="btnTransmitInLoop_Click" Content="Send message in loop" Margin="5" />
-                                </Border>
+                                </Border>-->
                                 <Border Background="#2C3333" Margin="2" CornerRadius="5">
-                                        <CheckBox x:Name="checkBoxTrnasmitMessageInLoop" Content="on/off" Foreground="White" Checked="checkBoxTrnasmitMessageInLoop_Checked"   Margin="8" />
+                                        <CheckBox x:Name="checkBoxTrnasmitMessageInLoop" Content="Send message in loop [on/off]" Foreground="White" Unchecked="checkBoxTrnasmitMessageInLoop_Unchecked"  Checked="checkBoxTrnasmitMessageInLoop_Checked"  Margin="8" />
                                 </Border>
                             </StackPanel>
 
