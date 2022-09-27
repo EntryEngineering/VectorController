@@ -75,6 +75,7 @@ namespace CanBusDemoWpf
             txtBoxData5.Text = "0";
             txtBoxData6.Text = "0";
             txtBoxData7.Text = "0";
+            txtBoxCycleTime.Text = "100";
         }
 
         private void btnIntitDriver_Click(object sender, RoutedEventArgs e)
@@ -165,7 +166,7 @@ namespace CanBusDemoWpf
 
 
 
-        private void TxMessageInit(bool enabled = false,long interval = 100) 
+        private void TxMessageInit(bool enabled = false,double interval = 100)
         {
             xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
@@ -193,15 +194,18 @@ namespace CanBusDemoWpf
         {
             Trace.WriteLine(e.SignalTime.ToString());
             XL_Status status = canBus.CanTransmit(xlEventCollection);
-            Helper.WriteLogToTextBox($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - ", txtBoxLogApp);
+            Trace.WriteLine($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - ");
         }
 
         private void checkBoxTrnasmitMessageInLoop_Checked(object sender, RoutedEventArgs e)
         {
-            TxMessageInit(true, 100);
+            double cycleTime = double.Parse(txtBoxCycleTime.Text);
+            TxMessageInit(true, cycleTime);
             timer.Start();
-            Trace.WriteLine("Tx START");
-            Helper.WriteLogToTextBox($"Tx start", txtBoxLogApp);
+            string ourLogInfo = $"Tx start with Cycle time: {cycleTime}ms";
+
+            Trace.WriteLine(ourLogInfo);
+            Helper.WriteLogToTextBox(ourLogInfo, txtBoxLogApp);
 
         }
 
@@ -209,7 +213,7 @@ namespace CanBusDemoWpf
         private void checkBoxTrnasmitMessageInLoop_Unchecked(object sender, RoutedEventArgs e)
         {
             timer.Stop();
-            Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
+            Trace.WriteLine($"Tx stop");
             Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
         }
 

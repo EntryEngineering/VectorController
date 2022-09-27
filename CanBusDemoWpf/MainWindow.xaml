@@ -128,9 +128,13 @@
                         
 
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <!--<Border Background="#2C3333" Margin="2" Width="150" CornerRadius="5">
-                                    <Button x:Name="btnTransmitInLoop" Click="btnTransmitInLoop_Click" Content="Send message in loop" Margin="5" />
-                                </Border>-->
+                                <Border Background="#2C3333" Margin="2" Width="200" CornerRadius="5">
+                                    <DockPanel>
+                                        <TextBlock Text="Cycle time [ms]" Margin="5"/>
+                                        <TextBox x:Name="txtBoxCycleTime"  Margin="5" Width="80" />
+                                    </DockPanel>
+
+                                </Border>
                                 <Border Background="#2C3333" Margin="2" CornerRadius="5">
                                         <CheckBox x:Name="checkBoxTrnasmitMessageInLoop" Content="Send message in loop [on/off]" Foreground="White" Unchecked="checkBoxTrnasmitMessageInLoop_Unchecked"  Checked="checkBoxTrnasmitMessageInLoop_Checked"  Margin="8" />
                                 </Border>

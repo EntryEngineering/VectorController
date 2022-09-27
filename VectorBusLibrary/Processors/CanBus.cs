@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using vxlapi_NET;
+using static vxlapi_NET.XLClass;
 using static vxlapi_NET.XLDefine;
 
 namespace VectorBusLibrary.Processors
@@ -114,22 +115,20 @@ namespace VectorBusLibrary.Processors
 
         {
             XL_Status txStatus;
-            XLClass.xl_event_collection xlEventCollection = messageForTransmit;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = 0;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = 0;
-            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
-            txStatus = Driver.XL_CanTransmit(portHandle, txMask, xlEventCollection);
+            txStatus = Driver.XL_CanTransmit(portHandle, txMask, messageForTransmit);
 
-            Trace.WriteLine("Transmit Message      : " + txStatus);
+            Trace.WriteLine($"Transmit Message:  [msgId:" +
+                $"{messageForTransmit.xlEvent[0].tagData.can_Msg.id}" +
+                $" DLC:{messageForTransmit.xlEvent[0].tagData.can_Msg.dlc}" +
+                $" data[0]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[0]}" +
+                $" data[1]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[1]}" +
+                $" data[2]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[2]}" +
+                $" data[3]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[3]}" +
+                $" data[4]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[4]}" +
+                $" data[5]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[5]}" +
+                $" data[6]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[6]}" +
+                $" data[7]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[7]}] - ");
 
             return txStatus;
         }
