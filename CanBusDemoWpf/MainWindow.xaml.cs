@@ -199,6 +199,11 @@ namespace CanBusDemoWpf
 
         private void checkBoxTrnasmitMessageInLoop_Checked(object sender, RoutedEventArgs e)
         {
+            StartTxLoop();
+        }
+
+        private void StartTxLoop() 
+        {
             double cycleTime = double.Parse(txtBoxCycleTime.Text);
             TxMessageInit(true, cycleTime);
             timer.Start();
@@ -206,11 +211,15 @@ namespace CanBusDemoWpf
 
             Trace.WriteLine(ourLogInfo);
             Helper.WriteLogToTextBox(ourLogInfo, txtBoxLogApp);
-
         }
 
 
         private void checkBoxTrnasmitMessageInLoop_Unchecked(object sender, RoutedEventArgs e)
+        {
+            StopTxLoop();
+        }
+
+        private void StopTxLoop() 
         {
             timer.Stop();
             Trace.WriteLine($"Tx stop");
@@ -261,6 +270,22 @@ namespace CanBusDemoWpf
 
         }
 
+        private void RestartTxLoop() 
+        {
+            StopTxLoop();
+            StartTxLoop();
+        }
 
+        private void toggleBtn_Checked(object sender, RoutedEventArgs e)
+        {
+            txtBoxData2.Text = "2";
+            RestartTxLoop();
+        }
+
+        private void toggleBtn_Unchecked(object sender, RoutedEventArgs e)
+        {
+            txtBoxData2.Text = "0";
+            RestartTxLoop();
+        }
     }
 }
