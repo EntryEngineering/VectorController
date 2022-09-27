@@ -74,7 +74,7 @@ namespace CanBusDemoConsole
             {
 
                 //Console.WriteLine(canBus.msgTestOut);
-                Console.WriteLine($"{canBus.CanBusMessageRx.RawCanMessage} --- Thread :{Thread.CurrentThread.ManagedThreadId.ToString()}");
+                Console.WriteLine($"{canBus.CanBusMessageRx.RawCanMessage} --- Thread :{Thread.CurrentThread.ManagedThreadId}");
 
 
             }

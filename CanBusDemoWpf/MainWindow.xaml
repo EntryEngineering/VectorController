@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow"
         SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
         Background="#2C3333">
     <StackPanel Orientation="Vertical">
         <!--main-->
@@ -20,6 +21,7 @@
             </Grid.RowDefinitions>
             <!--left menu-->
             <StackPanel Grid.Column="0"  Orientation="Vertical" HorizontalAlignment="Center" MinWidth="150" Background="#395B64" Margin="5">
+                <!--<Image Name="logoEntry" VerticalAlignment="Bottom" MaxWidth="80" />-->
                 <Button x:Name="btnIntitDriver" Content="Init driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnIntitDriver_Click"/>
                 <Button x:Name="btnOpenDriver" Content="Open driver" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnOpenDriver_Click"/>
                 <Button x:Name="btnOpenPort" Content="Open port" MinWidth="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnOpenPort_Click"/>
@@ -38,29 +40,105 @@
                         </StackPanel>
                     </Expander>
                 </Border>
+                <!--rx-->
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
-                    <Expander Header="Receive log" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                    <Expander Header="Receive log" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
                         <StackPanel >
                             <TextBox x:Name="txtBoxReceiveMsg" Background="DarkGray" Height="250" Width="750"/>
                             <Button x:Name="btnStartRx" HorizontalAlignment="Right" Content="Start RX" Width="100" Margin="5" Background="#A5C9CA" Foreground="#2C3333" Click="btnStartRx_Click"/>
                         </StackPanel>
                     </Expander>
                 </Border>
+                <!--tx-->
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
-                <Expander Header="Transmit" IsExpanded="False" Foreground="#E7F6F2" Background="#395B64" Margin="5">
+                <Expander Header="Transmit" IsExpanded="True" Foreground="#E7F6F2" Background="#395B64" Margin="5">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="msgBitn0 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn1 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn2 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn3 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn4 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn5 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn6 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgBitn7 > 0" FontSize="8" Margin="3"/>
-                        <TextBlock Text="msgDlc > 0xC1" FontSize="8" Margin="3"/>
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="msg_id" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxMsgId" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
 
-                            <Button x:Name="btnTransmit" Content="Send in loop" Margin="10" Width="100" Background="#E7F6F2"/>
-                    </StackPanel>
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="msg_dlc" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxDlc" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[0]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData0" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[1]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData1" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[2]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData2" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[3]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData3" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[4]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData4" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[5]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData5" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[6]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData6" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
+                                <DockPanel LastChildFill="True" Margin="5">
+                                    <TextBlock Text="data[7]" FontSize="9" Width="100"/>
+                                    <TextBox x:Name="txtBoxData7" FontSize="9"/>
+                                </DockPanel>
+                            </Border>
+                            <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5">
+                                <Button x:Name="btnTransmitSingle" Click="btnTransmitSingle_Click" Content="Send single message" Margin="5" />
+                            </Border>
+                        
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Border Background="#2C3333" Margin="2" Width="150" CornerRadius="5">
+                                    <Button x:Name="btnTransmitInLoop" Click="btnTransmitInLoop_Click" Content="Send message in loop" Margin="5" />
+                                </Border>
+                                <Border Background="#2C3333" Margin="2" CornerRadius="5">
+                                        <CheckBox x:Name="checkBoxTrnasmitMessageInLoop" Content="on/off" Foreground="White" Checked="checkBoxTrnasmitMessageInLoop_Checked"   Margin="8" />
+                                </Border>
+                            </StackPanel>
+
+
+
+                        </StackPanel>
                 </Expander>
                 </Border>
                 <Border BorderBrush="#2C3333" BorderThickness="1" CornerRadius="3" Margin="5">
@@ -77,7 +155,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <TextBox x:Name="txtBoxLogApp" Grid.Column="0" Grid.Row="0" Text="" Margin="2" Background="#E7F6F2" Foreground="#2C3333" MinHeight="80" MinWidth="900" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="NoWrap"/>
+            <TextBox x:Name="txtBoxLogApp" Grid.Column="0" Grid.Row="0" Text="" Margin="2" Background="#E7F6F2" Foreground="#2C3333" Height="80" MinWidth="900" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="NoWrap"/>
         </Grid>
     </StackPanel>
 </Window>

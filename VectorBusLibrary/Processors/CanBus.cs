@@ -138,13 +138,99 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Run Rx Thread
         /// </summary>
-        public void RunRxThread()
+        public async void RunRxThread()
         {
             Trace.WriteLine("Start Rx thread...");
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Name = "CanBusRxThread";
             rxThread.Start();
+
         }
+
+
+        public string RxAsync()
+        {
+
+            string temp = "";
+            // Create new object containing received data 
+            XLClass.xl_event receivedEvent = new();
+
+            // Result of XL Driver function calls
+            XL_Status xlStatus = XL_Status.XL_SUCCESS;
+
+            // Note: this thread will be destroyed by MAIN
+
+            // Wait for hardware events
+            if (xlEvWaitHandle.WaitOne(1000))
+            {
+                // ...init xlStatus first
+                xlStatus = XL_Status.XL_SUCCESS;
+
+                // afterwards: while hw queue is not empty...
+                while (xlStatus != XL_Status.XL_ERR_QUEUE_IS_EMPTY)
+                {
+                    // ...block RX thread to generate RX-Queue overflows
+                    while (blockRxThread) { Thread.Sleep(1000); }
+
+                    // ...receive data from hardware.
+                    xlStatus = Driver.XL_Receive(portHandle, ref receivedEvent);
+
+                    //  If receiving succeed....
+                    if (xlStatus == XL_Status.XL_SUCCESS)
+                    {
+                        if ((receivedEvent.flags & XL_MessageFlags.XL_EVENT_FLAG_OVERRUN) != 0)
+                        {
+                            Trace.WriteLine("-- XL_EVENT_FLAG_OVERRUN --");
+                        }
+
+                        // ...and data is a Rx msg...
+                        if (receivedEvent.tag == XL_EventTags.XL_RECEIVE_MSG)
+                        {
+                            string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
+
+                            Trace.WriteLine(preString);
+
+
+                            if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_OVERRUN) != 0)
+                            {
+                                Trace.WriteLine("-- XL_CAN_MSG_FLAG_OVERRUN --");
+                            }
+
+                            // ...check various flags
+                            if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+                                == XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+                            {
+                                Trace.WriteLine("ERROR FRAME");
+                                
+                            }
+
+                            else if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+                                == XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+                            {
+                                Trace.WriteLine("REMOTE FRAME");
+
+                            }
+                            else
+                            {
+                                CanBusMessageRx.TimeStamp = receivedEvent.timeStamp;
+                                CanBusMessageRx.MessageId = receivedEvent.tagData.can_Msg.id;
+                                CanBusMessageRx.DLC = receivedEvent.tagData.can_Msg.dlc;
+                                CanBusMessageRx.data = receivedEvent.tagData.can_Msg.data;
+                                CanBusMessageRx.RawCanMessage = Driver.XL_GetEventString(receivedEvent);
+                                temp = Driver.XL_GetEventString(receivedEvent);
+                                Trace.WriteLine("OK MSG");
+
+                                
+                            }
+                        }
+                    }
+                }
+
+                // No event occurred
+            }
+            return temp;
+        }
+
 
         /// <summary>
         /// RX thread with funcion xlReceive and xlGetEventString
@@ -229,7 +315,6 @@ namespace VectorBusLibrary.Processors
 
 
 
-
         // -----------------------------------------------------------------------------------------------
         /// <summary>
         /// Retrieve the application channel assignment and test if this channel can be opened
@@ -268,5 +353,102 @@ namespace VectorBusLibrary.Processors
             }
         }
 
+
     }
+    public delegate void RxMessageCallback(Models.CanBusRx message);
+    public class RxProcessor
+    {
+        private Models.CanBusRx rxMessage;
+
+        private RxMessageCallback callback;
+
+        public RxProcessor(RxMessageCallback rxMessageCallbackDelegate)
+        {
+            callback = rxMessageCallbackDelegate;
+        }
+
+        //public void RxJob() 
+        //{
+        //    if (callback != null)
+        //    {
+
+        //        Models.CanBusRx message;
+        //        // Create new object containing received data 
+        //        XLClass.xl_event receivedEvent = new();
+
+        //        // Result of XL Driver function calls
+        //        XL_Status xlStatus = XL_Status.XL_SUCCESS;
+
+
+        //            // Wait for hardware events
+        //            if (xlEvWaitHandle.WaitOne(1000))
+        //            {
+        //                // ...init xlStatus first
+        //                xlStatus = XL_Status.XL_SUCCESS;
+
+        //                // afterwards: while hw queue is not empty...
+        //                while (xlStatus != XL_Status.XL_ERR_QUEUE_IS_EMPTY)
+        //                {
+        //                    // ...block RX thread to generate RX-Queue overflows
+        //                    while (blockRxThread) { Thread.Sleep(1000); }
+
+        //                    // ...receive data from hardware.
+        //                    xlStatus = Driver.XL_Receive(portHandle, ref receivedEvent);
+
+        //                    //  If receiving succeed....
+        //                    if (xlStatus == XL_Status.XL_SUCCESS)
+        //                    {
+        //                        if ((receivedEvent.flags & XL_MessageFlags.XL_EVENT_FLAG_OVERRUN) != 0)
+        //                        {
+        //                            Trace.WriteLine("-- XL_EVENT_FLAG_OVERRUN --");
+        //                        }
+
+        //                        // ...and data is a Rx msg...
+        //                        if (receivedEvent.tag == XL_EventTags.XL_RECEIVE_MSG)
+        //                        {
+        //                            string preString = $"Flags: {receivedEvent.flags} - ID: {receivedEvent.tagData.can_Msg.id} - Data: {receivedEvent.tagData.can_Msg.data[0]}*{receivedEvent.tagData.can_Msg.data[1]}*{receivedEvent.tagData.can_Msg.data[2]} -- ROW[{Driver.XL_GetEventString(receivedEvent)}]";
+
+        //                            Trace.WriteLine(preString);
+
+
+        //                            if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_OVERRUN) != 0)
+        //                            {
+        //                                Trace.WriteLine("-- XL_CAN_MSG_FLAG_OVERRUN --");
+        //                            }
+
+        //                            // ...check various flags
+        //                            if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+        //                                == XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
+        //                            {
+        //                                Trace.WriteLine("ERROR FRAME");
+        //                            }
+
+        //                            else if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+        //                                == XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
+        //                            {
+        //                                Trace.WriteLine("REMOTE FRAME");
+        //                            }
+        //                            else
+        //                            {
+        //                                message.TimeStamp = receivedEvent.timeStamp;
+        //                                CanBusMessageRx.MessageId = receivedEvent.tagData.can_Msg.id;
+        //                                CanBusMessageRx.DLC = receivedEvent.tagData.can_Msg.dlc;
+        //                                CanBusMessageRx.data = receivedEvent.tagData.can_Msg.data;
+        //                                CanBusMessageRx.RawCanMessage = Driver.XL_GetEventString(receivedEvent);
+
+        //                            callback();
+        //                                Trace.WriteLine("OK MSG");
+
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //            // No event occurred
+
+        //    }
+        //}
+    }
+
+
 }
