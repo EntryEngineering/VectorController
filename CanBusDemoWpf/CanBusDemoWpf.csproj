@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VectorBusLibrary\VectorBusLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="vxlapi_NET">
+      <HintPath>..\VectorBusLibrary\vxlapi_NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

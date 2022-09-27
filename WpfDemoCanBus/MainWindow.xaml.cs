@@ -16,10 +16,8 @@ namespace WpfDemoCanBus
         public MainWindow()
         {
             InitializeComponent();
-            bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
+            bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610,"Demo_WPF_CanBusOld");
             bus.TestCanBus();
-
-
 
         }
 
@@ -45,7 +43,7 @@ namespace WpfDemoCanBus
 
         internal static void TxOn()
         {
-            CanBus bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
+            CanBus bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Demo_WPF_CanBusOld");
             for (int i = 0; i < 20000; i++)
             {
                 bus.CanTransmit(2);
@@ -54,7 +52,7 @@ namespace WpfDemoCanBus
 
         internal static void TxOff()
         {
-            CanBus bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610);
+            CanBus bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Demo_WPF_CanBusOld");
             for (int i = 0; i < 20000; i++)
             {
                 bus.CanTransmit(0);
