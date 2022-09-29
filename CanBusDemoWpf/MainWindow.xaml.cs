@@ -171,18 +171,26 @@ namespace CanBusDemoWpf
 
         private void TxMessageInit(bool enabled = false,double interval = 100)
         {
-            xlEventCollection = new XLClass.xl_event_collection(1);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = byte.Parse(txtBoxData0.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = byte.Parse(txtBoxData1.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(txtBoxData2.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(txtBoxData3.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(txtBoxData4.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(txtBoxData5.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(txtBoxData6.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(txtBoxData7.Text);
-            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
+            uint numberOfMessages = 500;
+            xlEventCollection = new XLClass.xl_event_collection(numberOfMessages);
+
+            for (int i = 0; i < numberOfMessages; i++)
+            {
+                xlEventCollection.xlEvent[i].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[0] = byte.Parse(txtBoxData0.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[1] = byte.Parse(txtBoxData1.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[2] = byte.Parse(txtBoxData2.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[3] = byte.Parse(txtBoxData3.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[4] = byte.Parse(txtBoxData4.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[5] = byte.Parse(txtBoxData5.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[6] = byte.Parse(txtBoxData6.Text);
+                xlEventCollection.xlEvent[i].tagData.can_Msg.data[7] = byte.Parse(txtBoxData7.Text);
+                xlEventCollection.xlEvent[i].tag = XL_EventTags.XL_TRANSMIT_MSG;
+            }
+
+
+
 
 
             txTimer = new System.Timers.Timer(interval);
@@ -197,7 +205,8 @@ namespace CanBusDemoWpf
         {
             Trace.WriteLine(e.SignalTime.ToString());
             XL_Status status = canBus.CanTransmit(xlEventCollection);
-            Trace.WriteLine($"Message[msgId:{txtBoxMsgId.Text} DLC:{txtBoxDlc.Text} data[0]:{txtBoxData0.Text} data[1]:{txtBoxData1.Text} data[2]:{txtBoxData2.Text} data[3]:{txtBoxData3.Text} data[4]:{txtBoxData4.Text} data[5]:{txtBoxData5.Text} data[6]:{txtBoxData6.Text} data[7]:{txtBoxData7.Text}] - ");
+            Helper.WriteLogToTextBox(status.ToString(), txtBoxLogApp);
+           
         }
 
         private void checkBoxTrnasmitMessageInLoop_Checked(object sender, RoutedEventArgs e)
@@ -226,7 +235,6 @@ namespace CanBusDemoWpf
         {
             txTimer.Stop();
             Trace.WriteLine($"Tx stop");
-            Helper.WriteLogToTextBox($"Tx stop", txtBoxLogApp);
         }
 
 

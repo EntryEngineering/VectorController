@@ -10,6 +10,8 @@
         WindowStartupLocation="CenterScreen"
         Background="#2C3333">
     <Window.Resources>
+        <local:Model x:Key="mujModel"/>
+        
         <Style TargetType="{x:Type ToggleButton}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -66,6 +68,9 @@
             </Setter>
         </Style>
     </Window.Resources>
+    <Window.DataContext>
+        <Binding Source="{StaticResource mujModel}"/>
+    </Window.DataContext>
     <StackPanel Orientation="Vertical">
         <!--main-->
         <Grid MinHeight="400">
@@ -113,7 +118,7 @@
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="msg_id" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxMsgId" FontSize="12"/>
+                                    <TextBox x:Name="txtBoxMsgId" Text="{Binding PersonName,UpdateSourceTrigger=PropertyChanged}" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
