@@ -3,12 +3,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using VectorBusLibrary.Processors;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
-using Image = System.Windows.Controls.Image;
 
 namespace CanBusDemoWpf
 {
@@ -27,8 +24,6 @@ namespace CanBusDemoWpf
             SetDefaultValuesForTransmit();
 
             InitVector();
-
-
         }
 
         private void InitVector()
@@ -169,9 +164,9 @@ namespace CanBusDemoWpf
         XLClass.xl_event_collection xlEventCollection;
 
 
-        private void TxMessageInit(bool enabled = false,double interval = 100)
+        private void TxMessageInit(bool enabled = false,double interval = 10)
         {
-            uint numberOfMessages = 500;
+            uint numberOfMessages = 10;
             xlEventCollection = new XLClass.xl_event_collection(numberOfMessages);
 
             for (int i = 0; i < numberOfMessages; i++)
@@ -199,13 +194,13 @@ namespace CanBusDemoWpf
             txTimer.Enabled = enabled;
         }
 
-
+   
 
         private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             Trace.WriteLine(e.SignalTime.ToString());
             XL_Status status = canBus.CanTransmit(xlEventCollection);
-            Helper.WriteLogToTextBox(status.ToString(), txtBoxLogApp);
+            //Helper.WriteLogToTextBox(status.ToString(), txtBoxLogApp);
            
         }
 
@@ -235,50 +230,6 @@ namespace CanBusDemoWpf
         {
             txTimer.Stop();
             Trace.WriteLine($"Tx stop");
-        }
-
-
-        public static class Helper
-        {
-            public static void WriteLogToTextBox(string text, TextBox uiElement)
-            {
-                string outString = $"{DateTime.Now:G}>>{text}{Environment.NewLine}";
-
-                Trace.WriteLine(outString);
-                uiElement.AppendText(outString);
-                uiElement.ScrollToEnd();
-            }
-
-            internal static void InitCanControloler(CanBus context)
-            {
-                Trace.WriteLine("****************************");
-                Trace.WriteLine("CanBus - Vector");
-                Trace.WriteLine("****************************");
-
-                Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-                context.OpenDriver();
-                context.GetDriverConfig();
-                context.GetAppConfigAndSetAppConfig();
-                context.RequestTheUserToAssignChannels();
-                CommonVector.GetAccesMask();
-                Trace.WriteLine(CommonVector.PrintAccessMask());
-                context.OpenPort();
-                context.ActivateChannel();
-                context.SetNotificationCanBus();
-                context.ResetClock();
-            }
-
-            public static void SetLogoToWindow(Image image)
-            {
-                BitmapImage bitmapEntry = new BitmapImage();
-                bitmapEntry.BeginInit();
-                bitmapEntry.UriSource = new Uri(@"https://media-exp1.licdn.com/dms/image/C4D0BAQEv19f-dd628g/company-logo_200_200/0/1639729805598?e=1672272000&v=beta&t=9EMTnAOx1Ml5KDyZx5pD336FXQtnMwsHZX5wNxu_ADI", UriKind.Absolute);
-
-                bitmapEntry.EndInit();
-
-                image.Source = bitmapEntry;
-            }
-
         }
 
         private void RestartTxLoop() 

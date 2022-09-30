@@ -12,6 +12,7 @@ namespace CanBusDemoWpf
     public class Model : INotifyPropertyChanged
     {
         private string name;
+        private string testValue;
         // Declare the event
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -31,7 +32,19 @@ namespace CanBusDemoWpf
             {
                 name = value;
                 // Call OnPropertyChanged whenever the property is updated
-                Trace.WriteLine("sdsdsd");
+                OnPropertyChanged();
+            }
+        }
+
+        
+        public string TestValue
+        {
+            get { return testValue; }
+            set
+            {
+                testValue = value;
+                // Call OnPropertyChanged whenever the property is updated
+                
                 OnPropertyChanged();
             }
         }
