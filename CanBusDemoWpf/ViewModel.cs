@@ -18,9 +18,9 @@ namespace CanBusDemoWpf
         public ViewModel()
         {
             DecimalRadioButton = true;
+            BinaryTextBoxEnable = true;
             DecimalTextBoxEnable = true;
-
-
+            HexTextBoxEnable = true;
 
         }
 
@@ -51,8 +51,8 @@ namespace CanBusDemoWpf
             set
             {
                 decimalNumber = value;
-                HexNumber = ConverterBinDecHex.DecimalToHex(value);
-                BinaryNumber = ConverterBinDecHex.DecimalToBinary(value);
+                //HexNumber = ConverterBinDecHex.DecimalToHex(value);
+                //BinaryNumber = ConverterBinDecHex.DecimalToBinary(value);
                 OnPropertyChanged();
             }
         }
@@ -66,7 +66,8 @@ namespace CanBusDemoWpf
             set
             {
                 hexNumber = value;
-                //DecimalNumber = ConverterBinDecHex.HexToDecimal(value);
+                DecimalNumber = ConverterBinDecHex.HexToDecimal(value);
+                BinaryNumber = ConverterBinDecHex.HexToBinary(value);
                 OnPropertyChanged();
             }
         }
