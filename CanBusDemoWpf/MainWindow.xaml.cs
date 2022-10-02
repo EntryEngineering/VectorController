@@ -15,7 +15,6 @@ namespace CanBusDemoWpf
     public partial class MainWindow : Window
     {
         private static CanBus? canBus = null;
-        //localhost:4757/GURM04BSNNNN0015/1/canview/960
 
         public MainWindow()
         {
