@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using VectorBusLibrary.Processors;
 using vxlapi_NET;
@@ -120,7 +118,7 @@ namespace CanBusDemoWpf
 
         // Timer event for RX
         private void RxTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
-        {       
+        {
             //string temp = canBus.RxAsync();
             //txtBoxReceiveMsg.Text = temp;
         }
@@ -149,44 +147,44 @@ namespace CanBusDemoWpf
 
 
         // asi odebrat
-        private void TxMessageInit(bool enabled = false,double interval = 10)
+        private void TxMessageInit(bool enabled = false,long interval = 100)
         {
-            //uint numberOfMessages = 10;
-            //xlEventCollection = new XLClass.xl_event_collection(numberOfMessages);
-
-            //for (int i = 0; i < numberOfMessages; i++)
-            //{
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[0] = byte.Parse(txtBoxData0.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[1] = byte.Parse(txtBoxData1.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[2] = byte.Parse(txtBoxData2.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[3] = byte.Parse(txtBoxData3.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[4] = byte.Parse(txtBoxData4.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[5] = byte.Parse(txtBoxData5.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[6] = byte.Parse(txtBoxData6.Text);
-            //    xlEventCollection.xlEvent[i].tagData.can_Msg.data[7] = byte.Parse(txtBoxData7.Text);
-            //    xlEventCollection.xlEvent[i].tag = XL_EventTags.XL_TRANSMIT_MSG;
-            //}
+            xlEventCollection = new XLClass.xl_event_collection(1);
 
 
-            
-           
 
-            txTimer = new System.Timers.Timer(interval);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(textBoxMessageId.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(textBoxDlc.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = byte.Parse(textByte0.Text);//crc
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = byte.Parse(textByte1.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(textByte2.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(textByte3.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(textByte4.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(textByte5.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(textByte6.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(textByte7.Text);
+            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
+
+
+
+
+
+
+            txTimer = new System.Timers.Timer();
             txTimer.Elapsed += TimerForTx_Elapsed;
             txTimer.AutoReset = true;
+            txTimer.Interval = interval;
             txTimer.Enabled = enabled;
         }
 
-   
+
 
         private void TimerForTx_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
             Trace.WriteLine(e.SignalTime.ToString());
             XL_Status status = canBus.CanTransmit(xlEventCollection);
             //Helper.WriteLogToTextBox(status.ToString(), txtBoxLogApp);
-           
+
         }
 
         private void checkBoxTrnasmitMessageInLoop_Checked(object sender, RoutedEventArgs e)
@@ -199,9 +197,9 @@ namespace CanBusDemoWpf
             StopTxLoop();
         }
 
-        private void StartTxLoop() 
+        private void StartTxLoop()
         {
-            double cycleTime = double.Parse(txtBoxCycleTime.Text);
+            long cycleTime = long.Parse(txtBoxCycleTime.Text);
             TxMessageInit(true, cycleTime);
             txTimer.Start();
             string ourLogInfo = $"Tx start with Cycle time: {cycleTime}ms";
@@ -211,14 +209,14 @@ namespace CanBusDemoWpf
         }
 
 
-        private void StopTxLoop() 
+        private void StopTxLoop()
         {
             txTimer.Stop();
             Trace.WriteLine($"Tx stop");
         }
 
 
-        private void RestartTxLoop() 
+        private void RestartTxLoop()
         {
             StopTxLoop();
             StartTxLoop();

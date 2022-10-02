@@ -18,8 +18,8 @@ namespace CanBusDemoWpf
         public ViewModel()
         {
             DecimalRadioButton = true;
-            BinaryTextBoxEnable = false;
-            DecimalTextBoxEnable = false;
+            BinaryTextBoxEnable = true;
+            DecimalTextBoxEnable = true;
             HexTextBoxEnable = true;
 
         }

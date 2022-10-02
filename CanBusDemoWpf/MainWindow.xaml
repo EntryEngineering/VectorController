@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow"
 ResizeMode="NoResize"
-        Height="650"
+        MinHeight="650"
         Width="1000"
         WindowStartupLocation="CenterScreen"
         Background="#2C3333">
@@ -136,44 +136,130 @@ ResizeMode="NoResize"
                                     </StackPanel>
                                 </Border>-->
 
+                                
+                                <!--message header-->
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="10" Background="Black" MaxWidth="350" HorizontalAlignment="Left">
+                                    <StackPanel>
+                                        <TextBlock Text="Message header" Margin="5" HorizontalAlignment="Center"/>
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540" MaxWidth="350" HorizontalAlignment="Left">
+                                            <DockPanel Width="300" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Message Id" FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textBoxMessageId" Margin="2" MinWidth="100" FontSize="15" Text="0x3C0" />
+                                            </DockPanel>
+                                        </Border>
+
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540" MaxWidth="350" HorizontalAlignment="Left">
+                                            <DockPanel Width="300" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="DLC" FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textBoxDlc" Margin="2" MinWidth="100" FontSize="15" Text="4" />
+                                            </DockPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                                
+                                
+                                
+                                <!--message data-->
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="10" Background="Black" MaxWidth="350" HorizontalAlignment="Left">
+                                    <StackPanel>
+                                        <TextBlock Text="Message data" Margin="5" HorizontalAlignment="Center"/>
+                                        
+                                        <!--textByte0 - CRC-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 0"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte0" Margin="2" MinWidth="100" FontSize="15" Text="00"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte1-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 1"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte1" Margin="2" MinWidth="100" FontSize="15" Text="01"/>
+                                            </DockPanel>
+                                        </Border>
 
 
-                                <!--textBoxy-->
-                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540" MaxWidth="350" HorizontalAlignment="Left">
-                                    <DockPanel Width="300" LastChildFill="True" HorizontalAlignment="Left">
-                                        <TextBlock Text="Message Id" FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
-                                        <TextBox x:Name="textBoxMessageId" Margin="2" MinWidth="100" FontSize="15" Text="" />
-                                    </DockPanel>
+                                        <!--textByte2-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 2"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte2" Margin="2" MinWidth="100" FontSize="15" Text="02"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte3-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 3"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte3" Margin="2" MinWidth="100" FontSize="15" Text="03"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte4-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 4"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte4" Margin="2" MinWidth="100" FontSize="15" Text="04"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte5-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 5"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte5" Margin="2" MinWidth="100" FontSize="15" Text="05"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte6-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 6"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte6" Margin="2" MinWidth="100" FontSize="15" Text="06"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte7-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 7"  FontSize="10" Margin="8" Width="100" TextAlignment="Right"/>
+                                                <TextBox x:Name="textByte7" Margin="2" MinWidth="100" FontSize="15" Text="07"/>
+                                            </DockPanel>
+                                        </Border>
+
+
+                                    </StackPanel>
                                 </Border>
 
-                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540" MaxWidth="350" HorizontalAlignment="Left">
-                                    <DockPanel Width="300" LastChildFill="True" HorizontalAlignment="Left">
-                                        <TextBlock Text="DLC" FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
-                                        <TextBox x:Name="textBoxDlc" Margin="2" MinWidth="100" FontSize="15" Text="" />
-                                    </DockPanel>
-                                </Border>
 
-                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
-                                    <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
-                                        <TextBlock Text="Binary"  FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
-                                        <TextBox x:Name="textBoxBinary" Margin="2" MinWidth="100" FontSize="15" Text="{Binding BinaryNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding BinaryTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </DockPanel>
-                                </Border>
 
-                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
-                                    <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
-                                        <TextBlock Text="Decimal"  FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
-                                        <TextBox x:Name="textBoxDecimal" Margin="2" MinWidth="100" FontSize="15" Text="{Binding DecimalNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding DecimalTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </DockPanel>
-                                </Border>
 
-                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
-                                    <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
-                                        <TextBlock Text="Hexadecimal"  FontSize="15" Margin="8" Width="100" TextAlignment="Right"/>
-                                        <TextBox x:Name="textBoxHex" Margin="2" MinWidth="100" FontSize="15" Text="{Binding HexNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding HexTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
-                                    </DockPanel>
+                                    <!--converter-->
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="10" Background="Black" MaxWidth="350" HorizontalAlignment="Left">
+                                    <StackPanel>
+                                        <TextBlock Text="Converter" Margin="5" HorizontalAlignment="Center"/>
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Binary"  FontSize="10" Margin="8" Width="70" TextAlignment="Right"/>
+                                                <TextBox x:Name="textBoxBinary" Margin="2" MinWidth="100" Background="Gray" FontSize="15" Text="{Binding BinaryNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding BinaryTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DockPanel>
+                                        </Border>
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Decimal"  FontSize="10" Margin="8" Width="70" TextAlignment="Right"/>
+                                                <TextBox x:Name="textBoxDecimal" Margin="2" MinWidth="100" Background="Gray" FontSize="15" Text="{Binding DecimalNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding DecimalTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DockPanel>
+                                        </Border>
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540">
+                                            <DockPanel Width="800" LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Hexadecimal"  FontSize="10" Margin="8" Width="70" TextAlignment="Right"/>
+                                                <TextBox x:Name="textBoxHex" Margin="2" MinWidth="100" FontSize="15" Text="{Binding HexNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding HexTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DockPanel>
+                                        </Border>
+                                    </StackPanel>
                                 </Border>
-
                             </StackPanel>
                             
                             
@@ -181,13 +267,13 @@ ResizeMode="NoResize"
                             
                             <!--send buttons-->
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20">
-                                <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5">
+                                <!--<Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5">
                                     <Button x:Name="btnTransmitSingle" Click="btnTransmitSingle_Click" Content="Send single message" Margin="5" />
-                                </Border>
+                                </Border>-->
                                 <Border Background="#2C3333" Margin="2" Width="200" CornerRadius="5">
                                     <DockPanel>
                                         <TextBlock Text="Cycle time [ms]" Margin="5"/>
-                                        <TextBox x:Name="txtBoxCycleTime"  Margin="5" Width="80" />
+                                        <TextBox x:Name="txtBoxCycleTime" Text="100"  Margin="5" Width="80" />
                                     </DockPanel>
 
                                 </Border>
