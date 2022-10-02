@@ -10,7 +10,7 @@
         WindowStartupLocation="CenterScreen"
         Background="#2C3333">
     <Window.Resources>
-        <local:Model x:Key="mujModel"/>
+        <local:ViewModel x:Key="mujModel"/>
         
         <Style TargetType="{x:Type ToggleButton}">
             <Setter Property="Template">
@@ -97,8 +97,6 @@
                                 <TextBlock Text="App name:" MinWidth="100" Foreground="#E7F6F2"/>
                                 <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="#E7F6F2" Foreground="#2C3333"/>
                             </DockPanel>
-
-
                         </StackPanel>
                     </Expander>
                 </Border>
@@ -118,7 +116,7 @@
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5" HorizontalAlignment="Left">
                                 <DockPanel LastChildFill="True" Margin="5">
                                     <TextBlock Text="msg_id" FontSize="9" Width="100"/>
-                                    <TextBox x:Name="txtBoxMsgId" Text="{Binding PersonName,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" FontSize="12"/>
+                                    <TextBox x:Name="txtBoxMsgId" FontSize="12"/>
                                 </DockPanel>
                             </Border>
 
@@ -194,9 +192,54 @@
                             <Border Background="#2C3333" Margin="5" Width="200" CornerRadius="5">
                                 <Button x:Name="btnTransmitSingle" Click="btnTransmitSingle_Click" Content="Send single message" Margin="5" />
                             </Border>
-                        
 
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+
+                                <!--popisek a rb-->
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Grid.Row="0" Grid.Column="0" Margin="2" Background="#2d3540">
+                                    <StackPanel Orientation="Horizontal" Width="300" >
+                                        <RadioButton Content="Binary" FontSize="15" Foreground="#ecf0da"  Margin="8" IsChecked="{Binding BinaryRadioButton}" />
+                                        <RadioButton Content="Decimal" FontSize="15" Foreground="#ecf0da"  Margin="8" IsChecked="{Binding DecimalRadioButton}"/>
+                                        <RadioButton Content="Hex" FontSize="15" Foreground="#ecf0da"  Margin="8" IsChecked="{Binding HexRadioButton}"/>
+                                    </StackPanel>
+                                </Border>
+
+
+
+                                <!--textBoxy-->
+
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Grid.Row="1" Grid.Column="0" Margin="2" Background="#2d3540">
+                                    <DockPanel Width="300" LastChildFill="True">
+                                        <TextBox x:Name="textBoxBinary" Margin="2" MinWidth="100" FontSize="15" Text="{Binding BinaryNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding BinaryTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DockPanel>
+                                </Border>
+
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Grid.Row="1" Grid.Column="1" Margin="2" Background="#2d3540">
+                                    <DockPanel Width="150" LastChildFill="True">
+                                        <TextBox x:Name="textBoxDecimal" Margin="2" MinWidth="100" FontSize="15" Text="{Binding DecimalNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding DecimalTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DockPanel>
+                                </Border>
+
+                                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Grid.Row="1" Grid.Column="2" Margin="2" Background="#2d3540">
+                                    <DockPanel Width="150" LastChildFill="True">
+                                        <TextBox x:Name="textBoxHex" Margin="2" MinWidth="100" FontSize="15" Text="{Binding HexNumber,UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding HexTextBoxEnable,UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DockPanel>
+                                </Border>
+
+                            </Grid>
+
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Border Background="#2C3333" Margin="2" Width="200" CornerRadius="5">
                                     <DockPanel>
                                         <TextBlock Text="Cycle time [ms]" Margin="5"/>
