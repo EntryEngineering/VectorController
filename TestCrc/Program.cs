@@ -7,18 +7,18 @@
         static void Main(string[] args)
         {
             crc = new();
-            //Console.WriteLine(crc.GetCrc("0x1AFFD4FF16FFC1"));
+            Console.WriteLine(crc.GetCrc("1AFFD4FF16FFC1", VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
 
-            for (int i = 0; i < 30; i++)
-            {
-                Random random = new Random();
-                Int64 randomNumber = random.NextInt64(5000000000000000, 9999999999999999);
-                Console.WriteLine($"Random number {randomNumber.ToString("X")} CRC is:{crc.GetCrc(randomNumber.ToString("X"))}");
+            //for (int i = 0; i < 30; i++)
+            //{
+            //    Random random = new Random();
+            //    Int64 randomNumber = random.NextInt64(5000000000000000, 9999999999999999);
+            //    Console.WriteLine($"Random number {randomNumber.ToString("X")} CRC is:{crc.GetCrc(randomNumber.ToString("X"))}");
 
-            }
+            //}
 
 
-            TestCrc();
+            //TestCrc();
             Console.ReadLine();
         }
 
@@ -31,7 +31,7 @@
                 string message = Console.ReadLine();
                 if (message.Length == 14)
                 {
-                    Console.WriteLine($"CRC is: {crc.GetCrc(message)}");
+                    Console.WriteLine($"CRC is: {crc.GetCrc(message, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian)}");
                 }
                 else
                 {
@@ -46,7 +46,7 @@
             while (true)
             {
 
-                int indexFromConsole = Int32.Parse(Console.ReadLine());
+                UInt32 indexFromConsole = uint.Parse(Console.ReadLine());
                 if (indexFromConsole <= 255)
                 {
                     Console.WriteLine($"Result is {string.Format("0x{0:x}", crc.GetValueFromTable(indexFromConsole))}");
