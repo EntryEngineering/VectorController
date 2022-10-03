@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace VectorBusLibrary.Processors
@@ -11,7 +12,7 @@ namespace VectorBusLibrary.Processors
 0x1f,0x30,0x41,0x6e,0xa3,0x8c,0xfd,0xd2,0x95,0xba,0xcb,0xe4,0x29,0x06,0x77,0x58,0xc2,0xed,0x9c,0xb3,0x7e,0x51,0x20,0x0f,0x3b,0x14,0x65,0x4a,0x87,0xa8,0xd9,0xf6,0x6c,0x43,0x32,0x1d,0xd0,0xff,0x8e,0xa1,0xe3,0xcc,0xbd,0x92,0x5f,0x70,0x01,0x2e,0xb4,0x9b,0xea,0xc5,0x08,0x27,0x56,0x79,0x4d,0x62,0x13,0x3c,0xf1,0xde,0xaf,0x80,0x1a,0x35,0x44,0x6b,0xa6,0x89,0xf8,0xd7,0x90,0xbf,0xce,0xe1,0x2c,0x03,0x72,0x5d,0xc7,0xe8,0x99,0xb6,0x7b,0x54,0x25,0x0a,0x3e,0x11,0x60,0x4f,0x82,0xad,0xdc,0xf3,0x69,0x46,0x37,0x18,0xd5,0xfa,0x8b,0xa4,0x05,0x2a,0x5b,0x74,0xb9,0x96,0xe7,0xc8,0x52,0x7d,0x0c,0x23,0xee,0xc1,0xb0,0x9f,0xab,0x84,0xf5,0xda,0x17,0x38,0x49,0x66,0xfc,0xd3,0xa2,0x8d,0x40,0x6f,0x1e,0x31,0x76,0x59,0x28,0x07,0xca,0xe5,0x94,0xbb,0x21,0x0e,0x7f,0x50,0x9d,0xb2,0xc3,0xec,0xd8,0xf7,0x86,0xa9,0x64,0x4b,0x3a,0x15,0x8f,0xa0,0xd1,0xfe,0x33,0x1c,0x6d,0x42};
 
 
-        UInt32 s_pdu_kennung = 0x86;
+        UInt32 s_pdu_kennung = 0xc3;
         UInt32 crc_init_wert = 0xff;
 
         public CrcProcessor()
@@ -58,41 +59,29 @@ namespace VectorBusLibrary.Processors
         public string GetCrc(string hexMessage, Endianness byteOrder)
         {
             List<byte> messageBytes;
+            List<UInt32> tempPartsOfMessage = new List<uint>();
             messageBytes = ConvertHexstringToByte(hexMessage, byteOrder);
-            string finalCrcString;
 
-            //1A FF   D4 FF  16 FF C1
+            //1A  FF  D4  FF 16  FF C1
             //26 255 212 255 22 255 193
+            int endPosition = new int();
+            tempPartsOfMessage.Add(GetValueFromTable(crc_init_wert ^ messageBytes[0])); // START    tempPartsOfMessage index is 0
+            for (int i = 0; i < messageBytes.Count-1; i++)
+            {
+                endPosition = i;
+                tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[i] ^ messageBytes[i+1]));
+            }
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[0] ^ messageBytes[1])); // index is 1
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[1] ^ messageBytes[2])); // index is 2
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[2] ^ messageBytes[3])); // index is 3
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[3] ^ messageBytes[4])); // index is 4
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[4] ^ messageBytes[5])); // index is 5
+            //tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[5] ^ messageBytes[6])); // index is 6
 
+            tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[endPosition+1] ^ s_pdu_kennung));// END S-PDU Kennung index is 7
+            UInt32 finalCrc = crc_init_wert - tempPartsOfMessage[endPosition+2];   // FINAL
 
-            UInt32 finalDataByte1 = GetValueFromTable(crc_init_wert ^ messageBytes[6]);       // START
-
-
-            UInt32 finalDataByte2 = GetValueFromTable(finalDataByte1 ^ messageBytes[5]);
-
-            UInt32 finalDataByte3 = GetValueFromTable(finalDataByte2 ^ messageBytes[4]);
-
-            UInt32 finalDataByte4 = GetValueFromTable(finalDataByte3 ^ messageBytes[3]);
-
-            UInt32 finalDataByte5 = GetValueFromTable(finalDataByte4 ^ messageBytes[2]);
-
-            UInt32 finalDataByte6 = GetValueFromTable(finalDataByte5 ^ messageBytes[1]);
-
-            UInt32 finalDataByte7 = GetValueFromTable(finalDataByte6 ^ messageBytes[0]);
-
-
-
-
-
-
-            UInt32 finalDataByte8 = GetValueFromTable(finalDataByte7 ^ s_pdu_kennung);// END S-PDU Kennung
-
-
-            UInt32 finalCrc = crc_init_wert - finalDataByte8;   // FINAL
-
-            finalCrcString = "0x" + finalCrc.ToString("x2");
-
-            return finalCrcString;
+            return "0x" + finalCrc.ToString("x2");
         }
     }
 }

@@ -7,8 +7,8 @@
         static void Main(string[] args)
         {
             crc = new();
-            Console.WriteLine(crc.GetCrc("1AFFD4FF16FFC1", VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
-
+            Console.WriteLine(crc.GetCrc("000300", VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
+            //1AFFD4FF16FFC1
             //for (int i = 0; i < 30; i++)
             //{
             //    Random random = new Random();
