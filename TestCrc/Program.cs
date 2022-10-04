@@ -7,7 +7,14 @@
         static void Main(string[] args)
         {
             crc = new();
-            Console.WriteLine(crc.GetCrc("000300", VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
+            
+            Console.WriteLine(crc.GetCrc("050300", 0xC3, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
+            //Console.WriteLine(crc.GetCrc());
+
+
+
+
+
             //1AFFD4FF16FFC1
             //for (int i = 0; i < 30; i++)
             //{
@@ -19,6 +26,7 @@
 
 
             //TestCrc();
+            //TestTable();
             Console.ReadLine();
         }
 
@@ -29,15 +37,13 @@
             {
                 Console.Write($"Enter message: ");
                 string message = Console.ReadLine();
-                if (message.Length == 14)
-                {
-                    Console.WriteLine($"CRC is: {crc.GetCrc(message, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian)}");
-                }
-                else
-                {
-                    Console.WriteLine($"Out of range");
-                }
+                Console.Write($"Enter s_pdu_kennung: ");
+                string s_pdu_kennung = Console.ReadLine();
 
+
+                string crcResult = $"{crc.GetCrc(message, int.Parse(s_pdu_kennung), VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian)}";
+                Console.WriteLine($"CRC is: {crcResult}");
+                Console.WriteLine($"Final MSG is: {crcResult}{message}");
             }
         }
 
@@ -46,7 +52,7 @@
             while (true)
             {
 
-                UInt32 indexFromConsole = uint.Parse(Console.ReadLine());
+                int indexFromConsole = int.Parse(Console.ReadLine());
                 if (indexFromConsole <= 255)
                 {
                     Console.WriteLine($"Result is {string.Format("0x{0:x}", crc.GetValueFromTable(indexFromConsole))}");
