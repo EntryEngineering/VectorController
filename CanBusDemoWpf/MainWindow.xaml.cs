@@ -16,12 +16,14 @@ namespace CanBusDemoWpf
         System.Timers.Timer rxTimer;
         System.Timers.Timer txTimer;
         XLClass.xl_event_collection xlEventCollection;
+        
+
 
         public MainWindow()
         {
             InitializeComponent();
             //Helelper.SetLogoToWindow(logoEntry);
-
+            
             InitVector();
         }
 
@@ -123,9 +125,12 @@ namespace CanBusDemoWpf
             //txtBoxReceiveMsg.Text = temp;
         }
 
+        
         // Button - Tx single message
         private void btnTransmitSingle_Click(object sender, RoutedEventArgs e)
         {
+            
+
             //XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             //xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(txtBoxMsgId.Text, 16);
             //xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(txtBoxDlc.Text);
@@ -152,20 +157,19 @@ namespace CanBusDemoWpf
             xlEventCollection = new XLClass.xl_event_collection(1);
 
 
-
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(textBoxMessageId.Text, 16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(textBoxDlc.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = byte.Parse(textByte0.Text);//crc
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = byte.Parse(textByte1.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(textByte2.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(textByte3.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(textByte4.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(textByte5.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(textByte6.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(textByte7.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = Convert.ToByte(txtBoxByte0Hex.Text,16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = Convert.ToByte(txtBoxByte1Hex.Text, 16);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(textByte2.Text);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(textByte3.Text);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(textByte4.Text);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(textByte5.Text);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(textByte6.Text);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(textByte7.Text);
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
-
+            Trace.WriteLine(xlEventCollection.xlEvent[0].tagData.can_Msg.data[0]);
 
 
 
@@ -220,6 +224,7 @@ namespace CanBusDemoWpf
         {
             StopTxLoop();
             StartTxLoop();
+
         }
 
         //private void toggleBtn_Checked(object sender, RoutedEventArgs e)
@@ -246,4 +251,6 @@ namespace CanBusDemoWpf
         //    checkBoxTrnasmitMessageInLoop.IsEnabled = true;
         //}
     }
+
+
 }

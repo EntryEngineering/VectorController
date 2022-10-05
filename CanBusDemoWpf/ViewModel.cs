@@ -37,7 +37,6 @@ namespace CanBusDemoWpf
             set
             {
                 binaryNumber = value;
-
                 OnPropertyChanged();
             }
         }
