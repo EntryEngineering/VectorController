@@ -161,8 +161,8 @@ ResizeMode="NoResize"
                                         <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
                                             <DockPanel LastChildFill="True" HorizontalAlignment="Left">
                                                 <TextBlock Text="Byte 0"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
-                                                <TextBox x:Name="txtBoxByte0Binary" Margin="2" Width="400" FontSize="15" Text="{Binding Byte0Binary,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
-                                                <TextBox x:Name="txtBoxByte0Hex" Margin="2" Width="200" FontSize="15" Text="{Binding Byte0Hex,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte0Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte0Binary,UpdateSourceTrigger=PropertyChanged}"  PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte0Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte0Hex,UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
                                             </DockPanel>
                                         </Border>
                                         
@@ -170,8 +170,63 @@ ResizeMode="NoResize"
                                         <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
                                             <DockPanel LastChildFill="True" HorizontalAlignment="Left">
                                                 <TextBlock Text="Byte 1"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
-                                                <TextBox x:Name="txtBoxByte1Binary" Margin="2" Width="400" FontSize="15" Text="{Binding Byte1Binary, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
-                                                <TextBox x:Name="txtBoxByte1Hex" Margin="2" Width="200" FontSize="15" Text="{Binding Byte1Hex, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte1Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte1Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte1Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte1Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte2-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 2"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte2Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte2Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte2Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte2Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte3-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 3"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte3Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte3Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte3Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte3Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte4-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 4"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte4Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte4Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte4Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte4Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte5-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 5"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte5Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte5Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte5Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte5Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+
+                                        <!--textByte6-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 6"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte6Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte6Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte6Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte6Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                            </DockPanel>
+                                        </Border>
+
+                                        <!--textByte7-->
+                                        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3"  Margin="2" Background="#2d3540"  HorizontalAlignment="Center">
+                                            <DockPanel LastChildFill="True" HorizontalAlignment="Left">
+                                                <TextBlock Text="Byte 7"  FontSize="15" Margin="8" Width="100" TextAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte7Binary" MaxLength="8" Margin="2" Width="400" FontSize="15" Text="{Binding Byte7Binary, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxBinaryValidator_PreviewTextInput" VerticalAlignment="Center"/>
+                                                <TextBox x:Name="txtBoxByte7Hex" MaxLength="2" Margin="2" Width="200" FontSize="15" Text="{Binding Byte7Hex, UpdateSourceTrigger=PropertyChanged}" PreviewTextInput="txtBoxHExValidator_PreviewTextInput" VerticalAlignment="Center"/>
                                             </DockPanel>
                                         </Border>
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Windows;
 using VectorBusLibrary.Processors;
 using vxlapi_NET;
@@ -155,24 +156,17 @@ namespace CanBusDemoWpf
         private void TxMessageInit(bool enabled = false,long interval = 100)
         {
             xlEventCollection = new XLClass.xl_event_collection(1);
-
-
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(textBoxMessageId.Text, 16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(textBoxDlc.Text);
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = Convert.ToByte(txtBoxByte0Hex.Text,16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = Convert.ToByte(txtBoxByte1Hex.Text, 16);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = byte.Parse(textByte2.Text);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = byte.Parse(textByte3.Text);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = byte.Parse(textByte4.Text);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = byte.Parse(textByte5.Text);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = byte.Parse(textByte6.Text);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = byte.Parse(textByte7.Text);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = Convert.ToByte(txtBoxByte2Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = Convert.ToByte(txtBoxByte3Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = Convert.ToByte(txtBoxByte4Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = Convert.ToByte(txtBoxByte5Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = Convert.ToByte(txtBoxByte6Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = Convert.ToByte(txtBoxByte7Hex.Text, 16);
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
-
-            Trace.WriteLine(xlEventCollection.xlEvent[0].tagData.can_Msg.data[0]);
-
-
-
 
             txTimer = new System.Timers.Timer();
             txTimer.Elapsed += TimerForTx_Elapsed;
@@ -225,6 +219,18 @@ namespace CanBusDemoWpf
             StopTxLoop();
             StartTxLoop();
 
+        }
+
+        private void txtBoxBinaryValidator_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[^01]+$");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void txtBoxHExValidator_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex(@"[a-fA-F0-9]{2}");
+            e.Handled = regex.IsMatch(e.Text);
         }
 
         //private void toggleBtn_Checked(object sender, RoutedEventArgs e)
