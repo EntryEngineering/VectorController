@@ -152,14 +152,14 @@ namespace CanBusDemoWpf
         }
 
 
-        // asi odebrat
+        int c = 0;
         private void TxMessageInit(bool enabled = false,long interval = 100)
         {
             xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = Convert.ToUInt32(textBoxMessageId.Text, 16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = ushort.Parse(textBoxDlc.Text);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = Convert.ToByte(txtBoxByte0Hex.Text,16);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = Convert.ToByte(txtBoxByte1Hex.Text, 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = Convert.ToByte(txtBoxByte0Hex.Text,16);      //CRC 8 bites
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = Convert.ToByte(txtBoxByte1Hex.Text, 16);     //BZ 4 bites
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = Convert.ToByte(txtBoxByte2Hex.Text, 16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = Convert.ToByte(txtBoxByte3Hex.Text, 16);
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = Convert.ToByte(txtBoxByte4Hex.Text, 16);
