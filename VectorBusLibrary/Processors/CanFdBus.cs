@@ -25,9 +25,9 @@ namespace VectorBusLibrary.Processors
 
         private static int eventHandle = -1;
 
-        public CanFdBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType, string aplicationName) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN, aplicationName)
+        public CanFdBus(XL_HardwareType xL_HardwareType, string aplicationName) : base(xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN, aplicationName)
         {
-            Driver = xLDriver;
+            Driver = new XLDriver();
             HardwareType = xL_HardwareType;
             appName = aplicationName;
         }

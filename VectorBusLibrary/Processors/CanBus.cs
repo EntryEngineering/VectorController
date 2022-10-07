@@ -15,9 +15,9 @@ namespace VectorBusLibrary.Processors
 
         public Models.CanBusRx CanBusMessageRx { get; set; } = new Models.CanBusRx();
         public string msgTestOut { get; set; }
-        public CanBus(XLDriver xLDriver, XL_HardwareType xL_HardwareType, string aplicationName) : base(xLDriver, xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN, aplicationName)
+        public CanBus(XL_HardwareType xL_HardwareType, string aplicationName) : base(xL_HardwareType, XL_BusTypes.XL_BUS_TYPE_CAN, aplicationName)
         {
-            Driver = xLDriver;
+            Driver = new XLDriver();
             HardwareType = xL_HardwareType;
             appName = aplicationName;
         }

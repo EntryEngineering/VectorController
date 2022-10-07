@@ -38,7 +38,7 @@ namespace CanBusDemoWpf
             }
             else
             {
-                canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
+                canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
                 Helper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
 
             }
@@ -71,7 +71,7 @@ namespace CanBusDemoWpf
             }
             else
             {
-                canBus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
+                canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, appName);
                 Helper.WriteLogToTextBox($"Init driver: OK", txtBoxLogApp);
 
             }
