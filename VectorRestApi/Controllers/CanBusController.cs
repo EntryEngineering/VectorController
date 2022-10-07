@@ -13,7 +13,23 @@ namespace VectorRestApi.Controllers
     [ApiController]
     public class CanBusController : ControllerBase
     {
-        // GET: api/<CanBusController>
+        
+        //TODO:
+        // 1) [POST] inicializace Vector prevodníku s paramtery jako:
+        //      - bus type (Can nebo CanFD)
+        //      - baudrate
+        //      - číslo kanálu
+        // odpveď > úspěšné probedení openDriver,openChannel,openPort atd
+
+        // 2) [POST] Zapnutí odesílání s testovací zprávou
+
+        // 3) [UPDATE] Nastavení nové zprávy (upravené jen některé hodnoty)
+
+        // 4) [GET] Záskání stavu o běhu odesílání
+
+        // 5) [UPDATE] Zastavení odesílání
+
+
         [HttpGet]
         public string Get()
         {
