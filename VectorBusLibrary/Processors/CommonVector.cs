@@ -9,7 +9,7 @@ namespace VectorBusLibrary.Processors
     public partial class CommonVector
     {
 
-        internal XLDriver Driver { get; set; } = new XLDriver();
+        internal XLDriver Driver { get; set; } = null;
         internal XLDefine.XL_BusTypes CommonBusType { get; set; }
         protected static string appName { get; set; } = "DefaultBusApp";
 
