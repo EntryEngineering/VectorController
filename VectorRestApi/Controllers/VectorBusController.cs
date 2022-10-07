@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using VectorBusLibrary.Processors;
+using vxlapi_NET;
+using static vxlapi_NET.XLDefine;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -41,6 +45,8 @@ namespace VectorRestApi.Controllers
         {
             // všechny akce pro nastavení
 
+            InitCanControloler();
+
             return Ok($"CanBus setup is done");
         }
 
@@ -49,13 +55,17 @@ namespace VectorRestApi.Controllers
         
         [HttpPost]
         [Route("StartTx")]
-        public IActionResult StartTx()
+        public IActionResult StartTx(int interval)
         {
-            
+            txTimer = new Timer();
+            txTimer.Elapsed += TimerForTx_Elapsed;
+            txTimer.AutoReset = true;
+            txTimer.Interval = interval;
+            txTimer.Enabled = true;
             return Ok($"Tx loop start with test message");
         }
 
-
+        
 
         // 3)
         // jako agrument datový model zprávy
@@ -85,7 +95,7 @@ namespace VectorRestApi.Controllers
         [Route("StopTx")]
         public IActionResult Stoptx()
         {
-
+            txTimer.Stop();
             return Ok($"Tx lool stoped");
         }
 
@@ -104,35 +114,57 @@ namespace VectorRestApi.Controllers
 
 
 
-        //[HttpGet]
-        //public string Get()
-        //{
-        //    return "sd";
-        //}
 
-        //// GET api/<CanBusController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
 
-        //// POST api/<CanBusController>
-        ////[HttpPost]
-        ////public void Post([FromBody] string value)
-        ////{
-        ////}
 
-        //// PUT api/<CanBusController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
+        //-------------------------------------------------------------
 
-        //// DELETE api/<CanBusController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+        private XLClass.xl_event_collection GetTestMessgae()
+        {
+            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = 0x3C0;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = Convert.ToByte("7A", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = Convert.ToByte("AA", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = Convert.ToByte("BB", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = Convert.ToByte("CC", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[4] = Convert.ToByte("DD", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[5] = Convert.ToByte("FF", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[6] = Convert.ToByte("15", 16);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[7] = Convert.ToByte("51", 16);
+
+            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
+
+            return xlEventCollection;
+        }
+
+        private void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            XL_Status status = canBus.CanTransmit(GetTestMessgae());
+        }
+
+        Timer txTimer;
+        private static CanBus canBus;
+
+        internal static void InitCanControloler()
+        {
+            canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Can Bus-Test");
+            Trace.WriteLine("****************************");
+            Trace.WriteLine("CanBus - Vector");
+            Trace.WriteLine("****************************");
+
+            Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
+            canBus.OpenDriver();
+            canBus.GetDriverConfig();
+            canBus.GetAppConfigAndSetAppConfig();
+            canBus.RequestTheUserToAssignChannels();
+            CommonVector.GetAccesMask();
+            Trace.WriteLine(CommonVector.PrintAccessMask());
+            canBus.OpenPort();
+            canBus.ActivateChannel();
+            canBus.SetNotificationCanBus();
+            canBus.ResetClock();
+        }
+
     }
 }

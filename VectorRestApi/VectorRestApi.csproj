@@ -17,6 +17,12 @@
     <ProjectReference Include="..\VectorBusLibrary\VectorBusLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="vxlapi_NET">
+      <HintPath>..\VectorBusLibrary\vxlapi_NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
