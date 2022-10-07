@@ -90,8 +90,16 @@ namespace VectorRestApi.Controllers
         }
 
 
+        // API dokumentace
 
+        [HttpGet]
+        [Route("ApiInfo")]
+        public IActionResult ApiInfo()
+        {
+            string info = "Can Bus and CanFD Bus Api";
 
+            return Ok(info);
+        }
 
 
 
