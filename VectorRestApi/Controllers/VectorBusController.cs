@@ -13,6 +13,8 @@ using static vxlapi_NET.XLDefine;
 
 namespace VectorRestApi.Controllers
 {
+    
+
     [Route("api/[controller]")]
     [ApiController]
     public class VectorBusController : ControllerBase
@@ -36,7 +38,7 @@ namespace VectorRestApi.Controllers
         //-------------------------------------------------------------------------------------------------
 
 
-
+        
         // 1)
         // V core vytvořit datový model BusConfig kde budou všechny potřebné parametry jako argument
         [HttpPost]
@@ -46,6 +48,7 @@ namespace VectorRestApi.Controllers
             // všechny akce pro nastavení
 
             InitCanControloler();
+            InitTxLoop();
 
             return Ok($"CanBus setup is done");
         }
@@ -53,15 +56,13 @@ namespace VectorRestApi.Controllers
 
         // 2)
         
+
         [HttpPost]
         [Route("StartTx")]
-        public IActionResult StartTx(int interval)
+        public IActionResult StartTx()
         {
-            txTimer = new Timer();
-            txTimer.Elapsed += TimerForTx_Elapsed;
-            txTimer.AutoReset = true;
-            txTimer.Interval = interval;
-            txTimer.Enabled = true;
+            StartTxLoop();
+            Trace.WriteLine("TX START");
             return Ok($"Tx loop start with test message");
         }
 
@@ -85,7 +86,7 @@ namespace VectorRestApi.Controllers
         public IActionResult GetTxState()
         {
 
-            return Ok($"Tx lool still running");
+            return Ok($"Tx loop state is: ");
         }
 
 
@@ -95,7 +96,9 @@ namespace VectorRestApi.Controllers
         [Route("StopTx")]
         public IActionResult Stoptx()
         {
-            txTimer.Stop();
+
+            StopTxLoop();
+            Trace.WriteLine("TX STOPED");
             return Ok($"Tx lool stoped");
         }
 
@@ -112,7 +115,26 @@ namespace VectorRestApi.Controllers
         }
 
 
+        public Timer txTimer;
 
+        internal void InitTxLoop() 
+        {
+            txTimer = new Timer();
+            txTimer.Elapsed += TimerForTx_Elapsed;
+            txTimer.AutoReset = true;
+            txTimer.Interval = 100;
+            txTimer.Enabled = true;
+        }
+
+        internal void StartTxLoop() 
+        {
+            txTimer.Start();
+        }
+
+        internal void StopTxLoop() 
+        {
+            txTimer.Stop();
+        }
 
 
 
@@ -143,7 +165,7 @@ namespace VectorRestApi.Controllers
             XL_Status status = canBus.CanTransmit(GetTestMessgae());
         }
 
-        Timer txTimer;
+        
         private static CanBus canBus;
 
         internal static void InitCanControloler()
