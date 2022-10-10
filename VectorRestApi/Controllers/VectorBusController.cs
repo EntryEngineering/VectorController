@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using vxlapi_NET;
+using VectorRestApi.Model;
 
 namespace VectorRestApi.Controllers
 {
@@ -64,9 +66,9 @@ namespace VectorRestApi.Controllers
         // jako agrument datový model zprávy
         [HttpPut]
         [Route("SendMessage")]
-        public IActionResult SendMssage()
+        public IActionResult SendMessage(BasicCanBusMessage message)
         {
-
+            VectorBusApiProcessor.SetNewMessage(message);
             return Ok($"Message was send");
         }
 
