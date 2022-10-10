@@ -48,7 +48,6 @@ namespace VectorRestApi.Controllers
             // všechny akce pro nastavení
 
             InitCanControloler();
-            InitTxLoop();
 
             return Ok($"CanBus setup is done");
         }
@@ -128,6 +127,7 @@ namespace VectorRestApi.Controllers
 
         internal void StartTxLoop() 
         {
+            InitTxLoop();
             txTimer.Start();
         }
 
@@ -170,7 +170,7 @@ namespace VectorRestApi.Controllers
 
         internal static void InitCanControloler()
         {
-            canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Can Bus-Test");
+            canBus = new(XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
             Trace.WriteLine("****************************");
             Trace.WriteLine("CanBus - Vector");
             Trace.WriteLine("****************************");
