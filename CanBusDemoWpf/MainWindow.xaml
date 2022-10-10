@@ -99,7 +99,7 @@ ResizeMode="NoResize"
                         <StackPanel >
                             <DockPanel LastChildFill="True">
                                 <TextBlock Text="App name:" MinWidth="100" Foreground="#E7F6F2"/>
-                                <TextBox x:Name="txtBoxAppName" Text="TestCanBusApp" Background="#E7F6F2" Foreground="#2C3333"/>
+                                <TextBox x:Name="txtBoxAppName" Text="VectorCanBus_WPF" Background="#E7F6F2" Foreground="#2C3333"/>
                             </DockPanel>
                         </StackPanel>
                     </Expander>
