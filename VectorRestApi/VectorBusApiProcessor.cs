@@ -22,10 +22,10 @@ namespace VectorRestApi
             BasicCanBusMessage _message = new BasicCanBusMessage();
             _message.MessageId = 0x3C0;
             _message.DLC = 4;
-            _message.data0Byte = "10101010";
-            _message.data1Byte = "11110000";
-            _message.data2Byte = "10010011";
-            _message.data3Byte = "00000000";
+            _message.data[0] = "10101010";
+            _message.data[1] = "11110000";
+            _message.data[2] = "10010011";
+            _message.data[3] = "00000000";
 
 
             return _message;
@@ -78,13 +78,10 @@ namespace VectorRestApi
             XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = message.MessageId;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = message.DLC;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data0Byte);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data1Byte);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data2Byte);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data3Byte);
-
-
-
+            for (int i = 0; i < message.DLC; i++)
+            {
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[i] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data[i]);
+            }
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
             return canBus.CanTransmit(xlEventCollection);
