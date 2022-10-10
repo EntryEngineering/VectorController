@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using VectorBusLibrary.Processors;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace VectorRestApi.Controllers
 {
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class VectorBusController : ControllerBase
@@ -32,7 +31,7 @@ namespace VectorRestApi.Controllers
         //-------------------------------------------------------------------------------------------------
 
 
-
+        
         // 1)
         // V core vytvořit datový model BusConfig kde budou všechny potřebné parametry jako argument
         [HttpPost]
@@ -41,21 +40,25 @@ namespace VectorRestApi.Controllers
         {
             // všechny akce pro nastavení
 
+            VectorBusApiProcessor.InitCanControloler();
+
             return Ok($"CanBus setup is done");
         }
 
 
         // 2)
         
+
         [HttpPost]
         [Route("StartTx")]
         public IActionResult StartTx()
         {
-            
+            VectorBusApiProcessor.StartTxLoop();
+            Trace.WriteLine("TX START");
             return Ok($"Tx loop start with test message");
         }
 
-
+        
 
         // 3)
         // jako agrument datový model zprávy
@@ -75,7 +78,7 @@ namespace VectorRestApi.Controllers
         public IActionResult GetTxState()
         {
 
-            return Ok($"Tx lool still running");
+            return Ok($"Tx loop state is: ");
         }
 
 
@@ -86,6 +89,8 @@ namespace VectorRestApi.Controllers
         public IActionResult Stoptx()
         {
 
+            VectorBusApiProcessor.StopTxLoop();
+            Trace.WriteLine("TX STOPED");
             return Ok($"Tx lool stoped");
         }
 
@@ -102,37 +107,8 @@ namespace VectorRestApi.Controllers
         }
 
 
+       
 
 
-        //[HttpGet]
-        //public string Get()
-        //{
-        //    return "sd";
-        //}
-
-        //// GET api/<CanBusController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //// POST api/<CanBusController>
-        ////[HttpPost]
-        ////public void Post([FromBody] string value)
-        ////{
-        ////}
-
-        //// PUT api/<CanBusController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<CanBusController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

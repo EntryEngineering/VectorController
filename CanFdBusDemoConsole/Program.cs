@@ -8,7 +8,7 @@ namespace CanFdBusDemoConsole
         private static CanFdBus canFdBus;
         static void Main(string[] args)
         {
-            canFdBus = new CanFdBus(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "CanFD Bus-Test");
+            canFdBus = new CanFdBus(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanFDBus_Console");
             InitCanControloler();
 
             Console.WriteLine("Press key for next step:");

@@ -119,7 +119,7 @@ namespace VectorBusLibrary.Processors
             //messageForTransmit.xlEvent[0].tagData.can_Msg.data[2] = Convert.ToByte(random.Next(0, 3));
             txStatus = Driver.XL_CanTransmit(portHandle, txMask, messageForTransmit);
 
-            Trace.WriteLine($"Transmit Message:  [msgId:" +
+            Trace.WriteLine($"[{DateTime.Now}]  Transmit Message:  [msgId:" +
                 $"{messageForTransmit.xlEvent[0].tagData.can_Msg.id}" +
                 $" DLC:{messageForTransmit.xlEvent[0].tagData.can_Msg.dlc}" +
                 $" data[0]:{messageForTransmit.xlEvent[0].tagData.can_Msg.data[0]}" +
