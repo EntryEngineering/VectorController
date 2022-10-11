@@ -6,9 +6,6 @@ using VectorRestApi.Model;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
 
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace VectorRestApi
 {
     public static class VectorBusApiProcessor
