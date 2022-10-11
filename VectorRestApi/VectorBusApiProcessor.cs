@@ -12,24 +12,59 @@ namespace VectorRestApi
     {
         private static CanBus canBus;
 
-        public static void InitCanControloler()
+        public static bool InitCanDone { get; set; } = false;
+
+        public static XLDefine.XL_Status InitCanControloler()
         {
+            XLDefine.XL_Status initStatus;
             canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
+
             Trace.WriteLine("****************************");
             Trace.WriteLine("CanBus - Vector");
             Trace.WriteLine("****************************");
-
             Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-            canBus.OpenDriver();
-            canBus.GetDriverConfig();
+
+            if (canBus.OpenDriver() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+
+
+            if (canBus.GetDriverConfig() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+
+
             canBus.GetAppConfigAndSetAppConfig();
             canBus.RequestTheUserToAssignChannels();
+
             CommonVector.GetAccesMask();
             Trace.WriteLine(CommonVector.PrintAccessMask());
-            canBus.OpenPort();
-            canBus.ActivateChannel();
-            canBus.SetNotificationCanBus();
-            canBus.ResetClock();
+
+            if (canBus.OpenPort() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+
+            if (canBus.ActivateChannel() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+
+            if (canBus.SetNotificationCanBus() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+
+            if (canBus.ResetClock() != XL_Status.XL_SUCCESS)
+            {
+                return XL_Status.XL_ERROR;
+            }
+            InitCanDone = true;
+            return XL_Status.XL_SUCCESS;
+ 
+
         }
 
 

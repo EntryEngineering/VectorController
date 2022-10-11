@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using vxlapi_NET;
 using VectorRestApi.Model;
+using System.Text.RegularExpressions;
 
 namespace VectorRestApi.Controllers
 {
@@ -14,6 +15,7 @@ namespace VectorRestApi.Controllers
     [ApiController]
     public class VectorBusController : ControllerBase
     {
+
 
         //TODO:
         // 1) [POST] inicializace Vector prevodníku s paramtery jako:
@@ -40,11 +42,14 @@ namespace VectorRestApi.Controllers
         [Route("BusSetup")]
         public IActionResult BusSetup() 
         {
-            // všechny akce pro nastavení
-
-            VectorBusApiProcessor.InitCanControloler();
-
-            return Ok($"CanBus setup is done");
+            if (VectorBusApiProcessor.InitCanControloler() == XLDefine.XL_Status.XL_SUCCESS)
+            {
+                return Ok($"CanBus setup is done");
+            }
+            else
+            {
+                return BadRequest("Error CanBus setup");
+            }     
         }
 
 
@@ -79,7 +84,8 @@ namespace VectorRestApi.Controllers
         [Route("GetTxState")]
         public IActionResult GetTxState()
         {
-            return Ok($"Tx loop state is: ");
+
+            return Ok($"Tx loop state is: {VectorBusApiProcessor.InitCanDone}");
         }
 
 
