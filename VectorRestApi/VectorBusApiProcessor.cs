@@ -5,7 +5,7 @@ using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
-using VectorBusLibrary.Processors;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,7 +13,30 @@ namespace VectorRestApi
 {
     public static class VectorBusApiProcessor
     {
-        //-------------------------------------------------------------
+        private static CanBus canBus;
+
+        public static void InitCanControloler()
+        {
+            canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
+            Trace.WriteLine("****************************");
+            Trace.WriteLine("CanBus - Vector");
+            Trace.WriteLine("****************************");
+
+            Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
+            canBus.OpenDriver();
+            canBus.GetDriverConfig();
+            canBus.GetAppConfigAndSetAppConfig();
+            canBus.RequestTheUserToAssignChannels();
+            CommonVector.GetAccesMask();
+            Trace.WriteLine(CommonVector.PrintAccessMask());
+            canBus.OpenPort();
+            canBus.ActivateChannel();
+            canBus.SetNotificationCanBus();
+            canBus.ResetClock();
+        }
+
+
+
 
         private static BasicCanBusMessage tempMessage;
 
@@ -22,9 +45,10 @@ namespace VectorRestApi
             BasicCanBusMessage _message = new BasicCanBusMessage();
             _message.MessageId = 0x3C0;
             _message.DLC = 4;
-            _message.data[0] = "10101010";
-            _message.data[1] = "11110000";
-            _message.data[2] = "10010011";
+            _message.BZ = 0;
+            _message.data[0] = "10101010"; // CRC
+            _message.data[1] = "11110000"; // 4b. > BZ , 4b. Rst
+            _message.data[2] = "10010011";  // 1b. 
             _message.data[3] = "00000000";
 
 
@@ -65,7 +89,6 @@ namespace VectorRestApi
 
         public static void SetNewMessage(BasicCanBusMessage message) 
         {
-            InitTxLoop();
             txTimer.Enabled = true;
             tempMessage = message;
             Trace.WriteLine("SetNewMessage");
@@ -88,26 +111,6 @@ namespace VectorRestApi
         }
 
 
-        private static CanBus canBus;
 
-        public static void InitCanControloler()
-        {
-            canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
-            Trace.WriteLine("****************************");
-            Trace.WriteLine("CanBus - Vector");
-            Trace.WriteLine("****************************");
-
-            Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
-            canBus.OpenDriver();
-            canBus.GetDriverConfig();
-            canBus.GetAppConfigAndSetAppConfig();
-            canBus.RequestTheUserToAssignChannels();
-            CommonVector.GetAccesMask();
-            Trace.WriteLine(CommonVector.PrintAccessMask());
-            canBus.OpenPort();
-            canBus.ActivateChannel();
-            canBus.SetNotificationCanBus();
-            canBus.ResetClock();
-        }
     }
 }

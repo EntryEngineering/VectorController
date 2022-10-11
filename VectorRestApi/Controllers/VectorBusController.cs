@@ -64,7 +64,7 @@ namespace VectorRestApi.Controllers
 
         // 3)
         // jako agrument datový model zprávy
-        [HttpPut]
+        [HttpPost]
         [Route("SendMessage")]
         public IActionResult SendMessage(BasicCanBusMessage message)
         {
@@ -79,34 +79,32 @@ namespace VectorRestApi.Controllers
         [Route("GetTxState")]
         public IActionResult GetTxState()
         {
-
             return Ok($"Tx loop state is: ");
         }
 
 
         // 5)
 
-        [HttpPut]
+        [HttpGet]
         [Route("StopTx")]
-        public IActionResult Stoptx()
+        public IActionResult StopTx()
         {
-
             VectorBusApiProcessor.StopTxLoop();
             Trace.WriteLine("TX STOPED");
             return Ok($"Tx lool stoped");
         }
 
 
-        // API dokumentace
+        //// API dokumentace
 
-        [HttpGet]
-        [Route("ApiInfo")]
-        public IActionResult ApiInfo()
-        {
-            string info = "Can Bus and CanFD Bus Api";
+        //[HttpGet]
+        //[Route("ApiInfo")]
+        //public IActionResult ApiInfo()
+        //{
+        //    string info = "Can Bus and CanFD Bus Api";
 
-            return Ok(info);
-        }
+        //    return Ok(info);
+        //}
 
 
        
