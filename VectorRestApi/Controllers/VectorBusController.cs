@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using vxlapi_NET;
 using VectorRestApi.Model;
-using System.Text.RegularExpressions;
+using vxlapi_NET;
 
 namespace VectorRestApi.Controllers
 {
@@ -35,13 +32,14 @@ namespace VectorRestApi.Controllers
         //-------------------------------------------------------------------------------------------------
 
 
-        
+
         // 1)
         // V core vytvořit datový model BusConfig kde budou všechny potřebné parametry jako argument
         [HttpPost]
         [Route("BusSetup")]
-        public IActionResult BusSetup() 
+        public ActionResult<List<string>> BusSetup()
         {
+
             if (VectorBusApiProcessor.InitCanControloler() == XLDefine.XL_Status.XL_SUCCESS)
             {
                 return Ok($"CanBus setup is done");
@@ -49,12 +47,12 @@ namespace VectorRestApi.Controllers
             else
             {
                 return BadRequest("Error CanBus setup");
-            }     
+            }
         }
 
 
         // 2)
-        
+
 
         [HttpPost]
         [Route("StartTx")]
@@ -65,7 +63,7 @@ namespace VectorRestApi.Controllers
             return Ok($"Tx loop start with test message");
         }
 
-        
+
 
         // 3)
         // jako agrument datový model zprávy
@@ -113,7 +111,7 @@ namespace VectorRestApi.Controllers
         //}
 
 
-       
+
 
 
     }

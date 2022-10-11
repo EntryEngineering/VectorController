@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace VectorBusLibrary.Processors
 {
@@ -41,7 +39,7 @@ namespace VectorBusLibrary.Processors
                 string _subString = hexMessage.Substring(i, 2);
                 int _number = int.Parse(_subString, System.Globalization.NumberStyles.HexNumber);
                 messageBytes.Add(Convert.ToByte(_number));
-                
+
             }
 
             for (int i = 0; i < messageBytes.Count; i++)
@@ -72,17 +70,17 @@ namespace VectorBusLibrary.Processors
             int endPosition = new int();
             tempPartsOfMessage.Add(GetValueFromTable(crc_init_wert ^ messageBytes[0])); // START    tempPartsOfMessage index is 0
             Console.WriteLine($"START_crc_init_wert HEX:{crc_init_wert.ToString("X")} DEC:{crc_init_wert} XOR messageBytes[0] HEX:{messageBytes[0].ToString("X")} DEC:{messageBytes[0]} = (HEX:{(crc_init_wert ^ messageBytes[0]).ToString("X")}) DEC:{crc_init_wert ^ messageBytes[0]} => GetValueFromTable is HEX:{(GetValueFromTable(crc_init_wert ^ messageBytes[0])).ToString("X")} DEC:{GetValueFromTable(crc_init_wert ^ messageBytes[0])} ");
-            for (int i = 0; i < messageBytes.Count-1; i++)
+            for (int i = 0; i < messageBytes.Count - 1; i++)
             {
                 endPosition = i;
-                tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[i] ^ messageBytes[i+1]));
+                tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[i] ^ messageBytes[i + 1]));
                 Console.WriteLine($"tempPartsOfMessage[i] HEX:{(tempPartsOfMessage[i]).ToString("X")} DEC:{tempPartsOfMessage[i]} XOR messageBytes[i+1] HEX:{(messageBytes[i + 1]).ToString("X")} DEC:{messageBytes[i + 1]} = (HEX:{(tempPartsOfMessage[i] ^ messageBytes[i + 1]).ToString("X")}) DEC:{tempPartsOfMessage[i] ^ messageBytes[i + 1]} =>  GetValueFromTable is HEX:{(GetValueFromTable(tempPartsOfMessage[i] ^ messageBytes[i + 1])).ToString("X")} DEC:{GetValueFromTable(tempPartsOfMessage[i] ^ messageBytes[i + 1])}");
             }
 
 
-            tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[endPosition+1] ^ s_pdu_kennung));// END S-PDU Kennung index is 7
+            tempPartsOfMessage.Add(GetValueFromTable(tempPartsOfMessage[endPosition + 1] ^ s_pdu_kennung));// END S-PDU Kennung index is 7
             Console.WriteLine($"END_tempPartsOfMessage[endPosition+1] HEX:{(tempPartsOfMessage[endPosition + 1]).ToString("X")} DEC:{tempPartsOfMessage[endPosition + 1]} XOR s_pdu_kennung HEX:{s_pdu_kennung.ToString("X")} DEC:{s_pdu_kennung} = (HEX:{(tempPartsOfMessage[endPosition + 1] ^ s_pdu_kennung).ToString("X")}) DEC:{tempPartsOfMessage[endPosition + 1] ^ s_pdu_kennung} => GetValueFromTable is HEX:{(GetValueFromTable(tempPartsOfMessage[endPosition + 1] ^ s_pdu_kennung)).ToString("X")} DEC:{GetValueFromTable(tempPartsOfMessage[endPosition + 1] ^ s_pdu_kennung)} ");
-            int finalCrc = ~tempPartsOfMessage[endPosition+2];   // FINAL
+            int finalCrc = ~tempPartsOfMessage[endPosition + 2];   // FINAL
             Console.WriteLine($"FINAL_crc_init_wert ~finalCrc HEX:{finalCrc.ToString("X")} DEC:{finalCrc}");
 
             return "0x" + finalCrc.ToString("x2");

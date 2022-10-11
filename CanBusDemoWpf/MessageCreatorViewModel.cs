@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using VectorBusLibrary.Processors;
 
 namespace CanBusDemoWpf
@@ -50,7 +43,7 @@ namespace CanBusDemoWpf
         public string Byte0Binary
         {
             get { return byte0Binary; }
-            set 
+            set
             {
                 byte0Binary = value;
                 Byte0Hex = ConverterBinDecHex.BinaryToHex(value);
@@ -75,7 +68,7 @@ namespace CanBusDemoWpf
         public string Byte1Binary
         {
             get { return byte1Binary; }
-            set 
+            set
             {
                 byte1Binary = value;
                 Byte1Hex = ConverterBinDecHex.BinaryToHex(value);

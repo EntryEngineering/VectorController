@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
@@ -14,9 +13,13 @@ namespace VectorRestApi
 
         public static bool InitCanDone { get; set; } = false;
 
+        /// <summary>
+        /// Init Can Bus driver, driver config, open port, acvive channel, set notification and reset clock
+        /// </summary>
+        /// <returns></returns>
         public static XLDefine.XL_Status InitCanControloler()
         {
-            XLDefine.XL_Status initStatus;
+            XL_Status initStatus;
             canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
 
             Trace.WriteLine("****************************");
@@ -24,17 +27,10 @@ namespace VectorRestApi
             Trace.WriteLine("****************************");
             Trace.WriteLine("vxlapi_NET        : " + typeof(XLDriver).Assembly.GetName().Version);
 
-            if (canBus.OpenDriver() != XL_Status.XL_SUCCESS)
+            if (canBus.OpenDriver() != XL_Status.XL_SUCCESS || canBus.GetDriverConfig() != XL_Status.XL_SUCCESS)
             {
                 return XL_Status.XL_ERROR;
             }
-
-
-            if (canBus.GetDriverConfig() != XL_Status.XL_SUCCESS)
-            {
-                return XL_Status.XL_ERROR;
-            }
-
 
             canBus.GetAppConfigAndSetAppConfig();
             canBus.RequestTheUserToAssignChannels();
@@ -42,28 +38,13 @@ namespace VectorRestApi
             CommonVector.GetAccesMask();
             Trace.WriteLine(CommonVector.PrintAccessMask());
 
-            if (canBus.OpenPort() != XL_Status.XL_SUCCESS)
+            if (canBus.OpenPort() != XL_Status.XL_SUCCESS || canBus.ActivateChannel() != XL_Status.XL_SUCCESS || canBus.SetNotificationCanBus() != XL_Status.XL_SUCCESS || canBus.ResetClock() != XL_Status.XL_SUCCESS)
             {
                 return XL_Status.XL_ERROR;
             }
 
-            if (canBus.ActivateChannel() != XL_Status.XL_SUCCESS)
-            {
-                return XL_Status.XL_ERROR;
-            }
-
-            if (canBus.SetNotificationCanBus() != XL_Status.XL_SUCCESS)
-            {
-                return XL_Status.XL_ERROR;
-            }
-
-            if (canBus.ResetClock() != XL_Status.XL_SUCCESS)
-            {
-                return XL_Status.XL_ERROR;
-            }
             InitCanDone = true;
             return XL_Status.XL_SUCCESS;
- 
 
         }
 
@@ -97,7 +78,7 @@ namespace VectorRestApi
             {
                 tempMessage = GetTestMessgae();
             }
-            
+
 
         }
 
@@ -119,14 +100,14 @@ namespace VectorRestApi
             SendMessageEvent(tempMessage);
         }
 
-        public static void SetNewMessage(BasicCanBusMessage message) 
+        public static void SetNewMessage(BasicCanBusMessage message)
         {
             txTimer.Enabled = true;
             tempMessage = message;
             Trace.WriteLine("SetNewMessage");
 
         }
-         
+
 
         private static XL_Status SendMessageEvent(BasicCanBusMessage message)
         {

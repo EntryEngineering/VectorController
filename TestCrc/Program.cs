@@ -7,7 +7,7 @@
         static void Main(string[] args)
         {
             crc = new();
-            
+
             Console.WriteLine(crc.GetCrc("050300", 0xC3, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
             //Console.WriteLine(crc.GetCrc());
 
