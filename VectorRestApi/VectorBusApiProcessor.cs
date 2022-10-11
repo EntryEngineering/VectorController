@@ -58,7 +58,6 @@ namespace VectorRestApi
             BasicCanBusMessage _message = new BasicCanBusMessage();
             _message.MessageId = 0x3C0;
             _message.DLC = 4;
-            _message.BZ = 0;
             _message.data[0] = "10101010"; // CRC
             _message.data[1] = "11110000"; // 4b. > BZ , 4b. Rst
             _message.data[2] = "10010011";  // 1b. 

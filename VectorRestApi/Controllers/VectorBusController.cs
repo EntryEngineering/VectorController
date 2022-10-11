@@ -79,7 +79,7 @@ namespace VectorRestApi.Controllers
         // 4)
 
         [HttpGet]
-        [Route("GetTxState")]
+        [Route("GetServerState")]
         public IActionResult GetTxState()
         {
 
