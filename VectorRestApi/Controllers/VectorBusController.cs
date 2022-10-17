@@ -69,7 +69,7 @@ namespace VectorRestApi.Controllers
         // jako agrument datový model zprávy
         [HttpPost]
         [Route("SendMessage")]
-        public IActionResult SendMessage(BasicCanBusMessage message)
+        public IActionResult SendMessage(MessageModel message)
         {
             VectorBusApiProcessor.SetNewMessage(message);
             return Ok($"Message was send");

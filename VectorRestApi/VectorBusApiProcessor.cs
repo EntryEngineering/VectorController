@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
@@ -50,19 +51,19 @@ namespace VectorRestApi
 
 
 
+        private static MessageModel tempMessage;
 
-        private static BasicCanBusMessage tempMessage;
-
-        private static BasicCanBusMessage GetTestMessgae()
+        private static MessageModel GetTestMessgae()
         {
-            BasicCanBusMessage _message = new BasicCanBusMessage();
+             MessageModel _message = new MessageModel();
             _message.MessageId = 0x3C0;
             _message.DLC = 4;
-            _message.data[0] = "10101010"; // CRC
-            _message.data[1] = "11110000"; // 4b. > BZ , 4b. Rst
-            _message.data[2] = "10010011";  // 1b. 
-            _message.data[3] = "00000000";
-
+            
+            List<SignalModel> _signals = new List<SignalModel>();
+            _signals.Add(MessageModel.GetSignal("Klemmen_Status_01_CRC", 0, 8, "11111111"));
+            _signals.Add(MessageModel.GetSignal("Klemmen_Status_01_BZ", 8, 4, "1001"));
+            _signals.Add(MessageModel.GetSignal("RSt_Fahrerhinweise", 12, 4, "1010"));
+            _signals.Add(MessageModel.GetSignal("ZAS_Kl_S", 16, 1, "1"));
 
             return _message;
         }
@@ -99,7 +100,7 @@ namespace VectorRestApi
             SendMessageEvent(tempMessage);
         }
 
-        public static void SetNewMessage(BasicCanBusMessage message)
+        public static void SetNewMessage(MessageModel message)
         {
             txTimer.Enabled = true;
             tempMessage = message;
@@ -108,14 +109,14 @@ namespace VectorRestApi
         }
 
 
-        private static XL_Status SendMessageEvent(BasicCanBusMessage message)
+        private static XL_Status SendMessageEvent(MessageModel message)
         {
             XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = message.MessageId;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = message.DLC;
             for (int i = 0; i < message.DLC; i++)
             {
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[i] = (byte)ConverterBinDecHex.BinaryToDecimal(message.data[i]);
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[i] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Signals[i].binaryData);
             }
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
