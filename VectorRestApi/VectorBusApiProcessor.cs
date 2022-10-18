@@ -157,7 +157,8 @@ namespace VectorRestApi
         {
             crcIncluded = false;
             txTimer.Enabled = true;
-            MessageForSend(message);
+            //MessageForSend(message);
+            MessageForSend(GetTestMessage());
             Trace.WriteLine("SetNewMessage - Non CRC");
 
         }
@@ -183,11 +184,15 @@ namespace VectorRestApi
             else
             {
                 string competeleMsg = "";
+                int count = 0;
                 foreach (var item in message.Signals)
                 {
-                    competeleMsg += item.binaryData;
+                    competeleMsg += string.Join("-",item.binaryData[count]);
+                    count += 1;
 
                 }
+
+                Trace.WriteLine($"competeleMsg: {competeleMsg}");
                 xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
                 
             }
