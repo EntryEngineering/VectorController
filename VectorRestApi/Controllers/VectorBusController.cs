@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
 using VectorRestApi.Model;
 using vxlapi_NET;
 
@@ -42,12 +43,16 @@ namespace VectorRestApi.Controllers
 
             if (VectorBusApiProcessor.InitCanControloler() == XLDefine.XL_Status.XL_SUCCESS)
             {
+                VectorBusApiProcessor.GetTestMessage();
                 return Ok($"CanBus setup is done");
             }
             else
             {
                 return BadRequest("Error CanBus setup");
             }
+
+
+
         }
 
 
@@ -68,10 +73,18 @@ namespace VectorRestApi.Controllers
         // 3)
         // jako agrument datový model zprávy
         [HttpPost]
-        [Route("SendMessage")]
-        public IActionResult SendMessage(MessageModel message)
+        [Route("SendMessageCrc")]
+        public IActionResult SendMessageWithCrc(MessageModel message)
         {
-            VectorBusApiProcessor.SetNewMessage(message);
+            VectorBusApiProcessor.SendCanMessageWithCrc(message);
+            return Ok($"Message was send");
+        }
+
+        [HttpPost]
+        [Route("SendMessageNoCrc")]
+        public IActionResult SendMessageWithoutCrc(MessageModel message)
+        {
+            VectorBusApiProcessor.SendCanMessageWithoutCrc(message);
             return Ok($"Message was send");
         }
 

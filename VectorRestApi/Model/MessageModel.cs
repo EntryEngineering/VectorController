@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using vxlapi_NET;
 
 namespace VectorRestApi.Model
 {
@@ -10,54 +12,50 @@ namespace VectorRestApi.Model
 
         public ushort DLC { get; set; }
 
+
         public List<SignalModel> Signals { get; set; } = new List<SignalModel>();
 
-        public static SignalModel GetSignal(string signalName, ushort startBit, ushort lengh, string binaryData)
-        {
-            SignalModel model = new SignalModel();
-
-            if (binaryData.Length == lengh)
-            {
-                model.SignalName = signalName;
-                model.StartBit = startBit;
-                model.binaryLengh = lengh;
-                model.binaryData = binaryData;
-            }
-            else
-            {
-                throw new Exception($"Worng data lengh - Lengh of binaryData is {binaryData.Length} but signal lengh is {lengh} !!");
-            }
-
-            return model;
-        }
 
 
 
-        public static MessageModel SortSignals(MessageModel model)
-        {
-            List<SignalModel> _sortedSignals = new List<SignalModel>();
+        //public static SignalModel GetSignal(string signalName, ushort startBit, ushort lengh, ushort[] binaryData)
+        //{
+        //    SignalModel model = new SignalModel();
 
-            _sortedSignals = model.Signals.OrderBy(x => x.StartBit).ToList();
+        //    if (binaryData.Length == lengh)
+        //    {
+        //        model.SignalName = signalName;
+        //        model.StartBit = startBit;
+        //        model.binaryLengh = lengh;
+        //        model.binaryData = binaryData;
+        //    }
+        //    else
+        //    {
+        //        throw new Exception($"Worng data lengh - Lengh of binaryData is {binaryData.Length} but signal lengh is {lengh} !!");
+        //    }
 
-            MessageModel _model = new MessageModel();
-            _model.MessageId = model.MessageId;
-            _model.DLC = model.DLC;
-            _model.Signals = _sortedSignals;
-            return _model;
-        }
+        //    return model;
+        //}
 
-        public static MessageModel GetMessage(uint messageId, ushort dlc, List<SignalModel> signals)
-        {
-            List<SignalModel> _sortedSignals = new List<SignalModel>();
 
-            _sortedSignals = signals.OrderBy(x => x.StartBit).ToList();
+        //public static XLClass.xl_event_collection ConvertToTxFormat(MessageModel model) 
+        //{
+        //    if (true)
+        //    {
 
-            MessageModel _model = new MessageModel();
-            _model.MessageId = messageId;
-            _model.DLC = dlc;
-            _model.Signals = _sortedSignals;
-            return _model;
-        }
+        //    }
+
+
+        //    XLClass.xl_event_collection _Event_Collection = new XLClass.xl_event_collection(1);
+        //    _Event_Collection.xlEvent[0].tagData.can_Msg.id = model.MessageId;
+        //    _Event_Collection.xlEvent[0].tagData.can_Msg.dlc = model.DLC;
+        //    _Event_Collection.xlEvent[0].tagData.can_Msg.data = new byte[8];
+
+        //    return _Event_Collection;
+        //}
+
+
+
 
     }
 }

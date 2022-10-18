@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
@@ -50,22 +51,59 @@ namespace VectorRestApi
         }
 
 
+        private static MessageModel? tempMessage = null;
+        private static bool? crcIncluded = null;
 
-        private static MessageModel tempMessage;
-
-        private static MessageModel GetTestMessgae()
+        public static MessageModel GetTestMessage()
         {
-             MessageModel _message = new MessageModel();
-            _message.MessageId = 0x3C0;
-            _message.DLC = 4;
-            
-            List<SignalModel> _signals = new List<SignalModel>();
-            _signals.Add(MessageModel.GetSignal("Klemmen_Status_01_CRC", 0, 8, "11111111"));
-            _signals.Add(MessageModel.GetSignal("Klemmen_Status_01_BZ", 8, 4, "1001"));
-            _signals.Add(MessageModel.GetSignal("RSt_Fahrerhinweise", 12, 4, "1010"));
-            _signals.Add(MessageModel.GetSignal("ZAS_Kl_S", 16, 1, "1"));
 
-            return _message;
+            List<SignalModel> signals = new();
+            signals.Add(new SignalModel()
+            {
+                SignalName = "Crc",
+                StartBit = 0,
+                binaryLengh = 8,
+                binaryData = new ushort[8] { 1, 1, 1, 1, 1, 1, 1, 1 }
+            });
+
+            signals.Add(new SignalModel()
+            {
+                SignalName = "Bz",
+                StartBit = 8,
+                binaryLengh = 4,
+                binaryData = new ushort[4] { 1, 0, 1, 0 }
+            });
+
+            signals.Add(new SignalModel()
+            {
+                SignalName = "Data1",
+                StartBit = 12,
+                binaryLengh = 4,
+                binaryData = new ushort[4] { 1, 1, 1, 0 }
+            });
+
+            signals.Add(new SignalModel()
+            {
+                SignalName = "Data2",
+                StartBit = 16,
+                binaryLengh = 1,
+                binaryData = new ushort[1] { 1 }
+            });
+
+            MessageModel model = new()
+            {
+                MessageId = 0x3c0,
+                DLC = 4,
+                Signals = signals
+            };
+
+
+
+            string testMsgOut = JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true });
+
+            Trace.WriteLine(testMsgOut);
+
+            return model;
         }
 
 
@@ -76,7 +114,7 @@ namespace VectorRestApi
             txTimer.Interval = 100;
             if (tempMessage == null)
             {
-                tempMessage = GetTestMessgae();
+                tempMessage = GetTestMessage();
             }
 
 
@@ -84,46 +122,79 @@ namespace VectorRestApi
 
         public static void StartTxLoop()
         {
+
+            Trace.WriteLine("sss");
             InitTxLoop();
             txTimer.Enabled = true;
+
         }
 
         public static void StopTxLoop()
         {
-            txTimer.Enabled = false;
+            if (txTimer.Enabled != false)
+            {
+                txTimer.Enabled = false;
+            }
         }
 
 
         private static Timer txTimer = new Timer();
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
-            SendMessageEvent(tempMessage);
+            SendMessageEvent();
         }
 
-        public static void SetNewMessage(MessageModel message)
+        public static void SendCanMessageWithCrc(MessageModel message)
         {
+            crcIncluded = true;
             txTimer.Enabled = true;
-            tempMessage = message;
-            Trace.WriteLine("SetNewMessage");
+            MessageForSend(message);
+            Trace.WriteLine("SetNewMessage - CRC");
+
+        }  
+
+        public static void SendCanMessageWithoutCrc(MessageModel message)
+        {
+            crcIncluded = false;
+            txTimer.Enabled = true;
+            MessageForSend(message);
+            Trace.WriteLine("SetNewMessage - Non CRC");
 
         }
 
 
-        private static XL_Status SendMessageEvent(MessageModel message)
+        private static XL_Status SendMessageEvent()
         {
+            return canBus.CanTransmit(MessageForSend(tempMessage));
+        }
+
+
+        private static XLClass.xl_event_collection MessageForSend(MessageModel message) 
+        {
+            tempMessage = message;
             XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = message.MessageId;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = message.DLC;
-            for (int i = 0; i < message.DLC; i++)
+
+            if (crcIncluded == true)
             {
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[i] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Signals[i].binaryData);
+
             }
-            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
+            else
+            {
+                string competeleMsg = "";
+                foreach (var item in message.Signals)
+                {
+                    competeleMsg += item.binaryData;
 
-            return canBus.CanTransmit(xlEventCollection);
+                }
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
+                
+            }
+
+
+            return xlEventCollection;
         }
-
-
 
     }
 }
