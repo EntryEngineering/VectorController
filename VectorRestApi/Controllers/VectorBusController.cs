@@ -73,20 +73,13 @@ namespace VectorRestApi.Controllers
         // 3)
         // jako agrument datový model zprávy
         [HttpPost]
-        [Route("SendMessageCrc")]
-        public IActionResult SendMessageWithCrc(MessageModel message)
+        [Route("SendMessage")]
+        public IActionResult SendMessage(MessageModel message)
         {
-            VectorBusApiProcessor.SendCanMessageWithCrc(message);
+            VectorBusApiProcessor.SetNewMessage(message);
             return Ok($"Message was send");
         }
 
-        [HttpPost]
-        [Route("SendMessageNoCrc")]
-        public IActionResult SendMessageWithoutCrc(MessageModel message)
-        {
-            VectorBusApiProcessor.SendCanMessageWithoutCrc(message);
-            return Ok($"Message was send");
-        }
 
 
         // 4)

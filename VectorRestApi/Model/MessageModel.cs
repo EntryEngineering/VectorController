@@ -12,11 +12,11 @@ namespace VectorRestApi.Model
 
         public ushort DLC { get; set; }
 
+        public string Message { get; set; }
+        
 
-        public List<SignalModel> Signals { get; set; } = new List<SignalModel>();
 
-
-
+        //public List<SignalModel> Signals { get; set; } = new List<SignalModel>();
 
         //public static SignalModel GetSignal(string signalName, ushort startBit, ushort lengh, ushort[] binaryData)
         //{
@@ -37,14 +37,12 @@ namespace VectorRestApi.Model
         //    return model;
         //}
 
-
         //public static XLClass.xl_event_collection ConvertToTxFormat(MessageModel model) 
         //{
         //    if (true)
         //    {
 
         //    }
-
 
         //    XLClass.xl_event_collection _Event_Collection = new XLClass.xl_event_collection(1);
         //    _Event_Collection.xlEvent[0].tagData.can_Msg.id = model.MessageId;
@@ -53,9 +51,5 @@ namespace VectorRestApi.Model
 
         //    return _Event_Collection;
         //}
-
-
-
-
     }
 }

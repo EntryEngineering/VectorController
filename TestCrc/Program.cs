@@ -2,13 +2,13 @@
 {
     internal class Program
     {
-        static VectorBusLibrary.Processors.CrcProcessor crc;
+       
 
         static void Main(string[] args)
         {
-            crc = new();
+      
 
-            Console.WriteLine(crc.GetCrc("050300", 0xC3, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
+            Console.WriteLine(VectorBusLibrary.Processors.CrcProcessor.GetCrc("050300", 0xC3, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
             //Console.WriteLine(crc.GetCrc());
 
 
@@ -41,7 +41,7 @@
                 string s_pdu_kennung = Console.ReadLine();
 
 
-                string crcResult = $"{crc.GetCrc(message, int.Parse(s_pdu_kennung), VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian)}";
+                string crcResult = $"{VectorBusLibrary.Processors.CrcProcessor.GetCrc(message, int.Parse(s_pdu_kennung), VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian)}";
                 Console.WriteLine($"CRC is: {crcResult}");
                 Console.WriteLine($"Final MSG is: {crcResult}{message}");
             }
@@ -55,7 +55,7 @@
                 int indexFromConsole = int.Parse(Console.ReadLine());
                 if (indexFromConsole <= 255)
                 {
-                    Console.WriteLine($"Result is {string.Format("0x{0:x}", crc.GetValueFromTable(indexFromConsole))}");
+                    Console.WriteLine($"Result is {string.Format("0x{0:x}", VectorBusLibrary.Processors.CrcProcessor.GetValueFromTable(indexFromConsole))}");
 
                 }
                 else
