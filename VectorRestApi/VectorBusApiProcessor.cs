@@ -247,7 +247,7 @@ namespace VectorRestApi
             for (int i = 1; i < message.DLC; i++)
             {
                 int index = (i*8)-1;
-                xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(index, 8));
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[i] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(index, 8));
             }
 
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
