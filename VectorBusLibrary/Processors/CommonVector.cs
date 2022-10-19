@@ -74,8 +74,13 @@ namespace VectorBusLibrary.Processors
         /// <summary>
         /// Get and Set app config
         /// </summary>
-        public void GetAppConfigAndSetAppConfig()
+        public void GetAppConfigAndSetAppConfig(string aplicationName = null)
         {
+            if (!string.IsNullOrEmpty(aplicationName))
+            {
+                appName = aplicationName;
+            }
+
             // If the application name cannot be found in VCANCONF..
             if ((Driver.XL_GetApplConfig(appName, 0, ref hwType, ref hwIndex, ref hwChannel, CommonBusType) != XLDefine.XL_Status.XL_SUCCESS) ||
                 (Driver.XL_GetApplConfig(appName, 1, ref hwType, ref hwIndex, ref hwChannel, CommonBusType) != XLDefine.XL_Status.XL_SUCCESS))

@@ -16,7 +16,7 @@ namespace WpfDemoCanBus
         public MainWindow()
         {
             InitializeComponent();
-            bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610,"Demo_WPF_CanBusOld");
+            bus = new(new XLDriver(), XLDefine.XL_HardwareType.XL_HWTYPE_VN1610, "Demo_WPF_CanBusOld");
             bus.TestCanBus();
 
         }

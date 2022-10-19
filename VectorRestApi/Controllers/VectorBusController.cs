@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using vxlapi_NET;
 using VectorRestApi.Model;
+using vxlapi_NET;
 
 namespace VectorRestApi.Controllers
 {
@@ -14,6 +19,12 @@ namespace VectorRestApi.Controllers
     [ApiController]
     public class VectorBusController : ControllerBase
     {
+        private readonly ILogger<VectorBusController> _logger;
+
+        public VectorBusController(ILogger<VectorBusController> logger)
+        {
+            _logger = logger;
+        }
 
         //TODO:
         // 1) [POST] inicializace Vector prevodníku s paramtery jako:
@@ -33,23 +44,31 @@ namespace VectorRestApi.Controllers
         //-------------------------------------------------------------------------------------------------
 
 
-        
+
         // 1)
         // V core vytvořit datový model BusConfig kde budou všechny potřebné parametry jako argument
         [HttpPost]
         [Route("BusSetup")]
-        public IActionResult BusSetup() 
+        public ActionResult<List<string>> BusSetup(CanBusConfiguration? canBusConfiguration)
         {
-            // všechny akce pro nastavení
+            if (canBusConfiguration != null)
+            {
+                if (VectorBusApiProcessor.InitCanControloler(canBusConfiguration) == XLDefine.XL_Status.XL_SUCCESS)
+                {
+                    VectorBusApiProcessor.GetTestMessage();
+                    return Ok($"CanBus setup is done");
+                }
+                else
+                {
+                    return BadRequest("Error CanBus setup");
+                }
+            }
+            else
+            {
+                return BadRequest("Error CanBus setup");
+            }
 
-            VectorBusApiProcessor.InitCanControloler();
-
-            return Ok($"CanBus setup is done");
         }
-
-
-        // 2)
-        
 
         [HttpPost]
         [Route("StartTx")]
@@ -60,26 +79,28 @@ namespace VectorRestApi.Controllers
             return Ok($"Tx loop start with test message");
         }
 
-        
+
 
         // 3)
         // jako agrument datový model zprávy
         [HttpPost]
         [Route("SendMessage")]
-        public IActionResult SendMessage(BasicCanBusMessage message)
+        public IActionResult SendMessage(MessageModel message)
         {
             VectorBusApiProcessor.SetNewMessage(message);
             return Ok($"Message was send");
         }
 
 
+
         // 4)
 
         [HttpGet]
-        [Route("GetTxState")]
+        [Route("GetServerState")]
         public IActionResult GetTxState()
         {
-            return Ok($"Tx loop state is: ");
+
+            return Ok($"Tx loop state is: {VectorBusApiProcessor.InitCanDone}");
         }
 
 
@@ -107,7 +128,40 @@ namespace VectorRestApi.Controllers
         //}
 
 
-       
+        [HttpGet("/ws")]
+        public async Task Get()
+        {
+            if (HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                _logger.Log(LogLevel.Information, "WebSocket connection established");
+                await Echo(webSocket);
+            }
+            else
+            {
+                HttpContext.Response.StatusCode = 400;
+            }
+        }
+
+        private async Task Echo(WebSocket webSocket)
+        {
+            var buffer = new byte[1024 * 4];
+            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            _logger.Log(LogLevel.Information, "Message received from Client");
+
+            while (!result.CloseStatus.HasValue)
+            {
+                var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+                await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+                _logger.Log(LogLevel.Information, "Message sent to Client");
+
+                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                _logger.Log(LogLevel.Information, "Message received from Client");
+
+            }
+            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+            _logger.Log(LogLevel.Information, "WebSocket connection closed");
+        }
 
 
     }

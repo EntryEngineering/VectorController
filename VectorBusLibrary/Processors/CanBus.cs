@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using vxlapi_NET;
-using static vxlapi_NET.XLClass;
 using static vxlapi_NET.XLDefine;
 
 namespace VectorBusLibrary.Processors
@@ -201,7 +200,7 @@ namespace VectorBusLibrary.Processors
                                 == XL_MessageFlags.XL_CAN_MSG_FLAG_ERROR_FRAME)
                             {
                                 Trace.WriteLine("ERROR FRAME");
-                                
+
                             }
 
                             else if ((receivedEvent.tagData.can_Msg.flags & XL_MessageFlags.XL_CAN_MSG_FLAG_REMOTE_FRAME)
@@ -220,7 +219,7 @@ namespace VectorBusLibrary.Processors
                                 temp = Driver.XL_GetEventString(receivedEvent);
                                 Trace.WriteLine("OK MSG");
 
-                                
+
                             }
                         }
                     }
