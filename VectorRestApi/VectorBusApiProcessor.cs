@@ -18,6 +18,8 @@ namespace VectorRestApi
 
         private static bool? crcIncluded = null;
 
+        private static bool txRunning = false;
+
         private static Timer txTimer = new Timer();
 
         private static int bzCounter = 0;
@@ -56,6 +58,7 @@ namespace VectorRestApi
             }
 
             InitCanDone = true;
+            InitTxLoop();
             return XL_Status.XL_SUCCESS;
 
         }
@@ -126,12 +129,13 @@ namespace VectorRestApi
 
         public static void StartTxLoop()
         {
-            InitTxLoop();
             txTimer.Enabled = true;
+            txRunning = true;
         }
 
         public static void StopTxLoop()
         {
+            txRunning = false;
             txTimer.Enabled = false;
         }
 
@@ -145,23 +149,6 @@ namespace VectorRestApi
 
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
-
-            // Test-----------------------
-
-            //XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.id = 960;
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 16;
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 17;
-            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 55;
-            //canBus.CanTransmit(xlEventCollection);
-
-
-
-
-            // Test-----------------------
-
 
 
             bzCounter += 1;
@@ -226,7 +213,7 @@ namespace VectorRestApi
                 {
                     return $"000{_tempBin}";
                 }
-                else if(numberOfZeroToFill == 2) 
+                else if (numberOfZeroToFill == 2)
                 {
                     return $"00{_tempBin}";
                 }
@@ -264,7 +251,7 @@ namespace VectorRestApi
 
         private static XL_Status SendMessageEvent(XLClass.xl_event_collection rawMessage)
         {
-           return canBus.CanTransmit(rawMessage);
+            return canBus.CanTransmit(rawMessage);
         }
 
     }
