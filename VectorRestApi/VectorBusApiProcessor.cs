@@ -22,14 +22,17 @@ namespace VectorRestApi
 
         private static int bzCounter = 0;
 
+        private static CanBusConfiguration busConfiguration = null;
+
         /// <summary>
         /// Init Can Bus driver, driver config, open port, acvive channel, set notification and reset clock
         /// </summary>
         /// <returns></returns>
-        public static XLDefine.XL_Status InitCanControloler()
+        public static XLDefine.XL_Status InitCanControloler(CanBusConfiguration config)
         {
+            busConfiguration = config;
             XL_Status initStatus;
-            canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, "VectorCanBus_RestApi");
+            canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, config.AppName);
 
             Trace.WriteLine("****************************");
             Trace.WriteLine("CanBus - Vector");
@@ -97,7 +100,7 @@ namespace VectorRestApi
             {
                 MessageId = 0x3c0,
                 DLC = 4,
-                Message = "10001101010010"
+                Message = "10101110101011101010"
             };
 
 
@@ -113,9 +116,10 @@ namespace VectorRestApi
         {
             txTimer.Elapsed += TimerForTx_Elapsed;
             txTimer.AutoReset = true;
-            txTimer.Interval = 100;
+            txTimer.Interval = busConfiguration.CycleTime;
             if (tempMessage == null)
             {
+                Trace.WriteLine("InitTxLoop > set default msg");
                 tempMessage = GetTestMessage();
             }
         }
@@ -138,26 +142,46 @@ namespace VectorRestApi
             txTimer.Enabled = true;
         }
 
-        // Loop for TX
+
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
-            // 1) couter Bz
-            bzCounter += 1;
+
+            // Test-----------------------
+
+            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+            xlEventCollection.xlEvent[0].tagData.can_Msg.id = 960;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 16;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 17;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 55;
+            canBus.CanTransmit(xlEventCollection);
 
 
-            // 2) Metoda pro výpočet CRC ze zprávy a Bz
-            MessageModel message = GetFinalMessage(tempMessage, bzCounter);
 
-            XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
 
-            // 3) Metoda pro konečné odeslání zrpávy
+            // Test-----------------------
 
-            SendMessageEvent(_Collection);
 
-            if (bzCounter >= 15)
-            {
-                bzCounter = 0;
-            }
+
+            //bzCounter += 1;
+            //Trace.WriteLine($"bzCounter: {bzCounter}");
+
+            //MessageModel message = GetFinalMessage(tempMessage, bzCounter);
+
+            //if (bzCounter >= 15)
+            //{
+            //    Trace.WriteLine($"bzCounter RESET: {bzCounter}");
+            //    bzCounter = 0;
+            //}
+
+            //Trace.WriteLine($"MSG: {message.Message} -- Lengh: {message.Message.Length}");
+
+            //XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
+
+            //SendMessageEvent(_Collection);
+
+
         }
 
 
@@ -169,13 +193,58 @@ namespace VectorRestApi
             editedMessage.MessageId = originalMessage.MessageId;
             editedMessage.DLC = originalMessage.DLC;
 
-            string addBzToOriginalMsg = $"{ConverterBinDecHex.DecimalToBinary(counter)}{originalMessage.Message}";
+            string addBzToOriginalMsg = $"{ConvertDecToBin4bit(counter)}{originalMessage.Message}";
             Trace.WriteLine($"addBzToOriginalMsg: {addBzToOriginalMsg}");
+            var _tempCrc = "";
 
-            editedMessage.Message = $"{CrcProcessor.GetCrc(ConverterBinDecHex.BinaryToHex(addBzToOriginalMsg), 0xc3, CrcProcessor.Endianness.LittleEndian)}{addBzToOriginalMsg}";
+
+            try
+            {
+                _tempCrc = ConverterBinDecHex.HexToBinary(CrcProcessor.GetCrc(ConverterBinDecHex.BinaryToHex(addBzToOriginalMsg), 0xc3, CrcProcessor.Endianness.LittleEndian));
+            }
+            catch (System.Exception ex)
+            {
+
+                Trace.WriteLine($"GetFinalMessage ERR: {ex.Message}");
+            }
+
+
+            editedMessage.Message = $"{_tempCrc}{addBzToOriginalMsg}";
             Trace.WriteLine($"editedMessage.Message: {editedMessage.Message}");
 
             return editedMessage;
+        }
+
+        private static string ConvertDecToBin4bit(int decimalNumber)
+        {
+            string _tempBin = ConverterBinDecHex.DecimalToBinary(decimalNumber);
+            int numberOfZeroToFill = 4 - _tempBin.Length;
+
+            if (numberOfZeroToFill > 0)
+            {
+                if (numberOfZeroToFill == 3)
+                {
+                    return $"000{_tempBin}";
+                }
+                else if(numberOfZeroToFill == 2) 
+                {
+                    return $"00{_tempBin}";
+                }
+                else if (numberOfZeroToFill == 1)
+                {
+                    return $"0{_tempBin}";
+                }
+                else
+                {
+                    return _tempBin;
+                }
+            }
+            else
+            {
+                return _tempBin;
+            }
+
+
         }
 
 
@@ -184,15 +253,18 @@ namespace VectorRestApi
             XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = message.MessageId;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = message.DLC;
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(0, 8));
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(7, 8));
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(15, 8));
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(23, 8));
 
-
-
+  
             return xlEventCollection;
         }
 
         private static XL_Status SendMessageEvent(XLClass.xl_event_collection rawMessage)
         {
-            return canBus.CanTransmit(rawMessage);
+           return canBus.CanTransmit(rawMessage);
         }
 
     }
