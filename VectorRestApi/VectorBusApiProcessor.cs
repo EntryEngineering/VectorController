@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
@@ -240,12 +241,16 @@ namespace VectorRestApi
             XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
             xlEventCollection.xlEvent[0].tagData.can_Msg.id = message.MessageId;
             xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = message.DLC;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(0, 8));
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(7, 8));
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(15, 8));
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(23, 8));
-            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
+
+            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(0, 8));
+            for (int i = 1; i < message.DLC; i++)
+            {
+                int index = (i*8)-1;
+                xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(index, 8));
+            }
+
+            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
             return xlEventCollection;
         }
 
