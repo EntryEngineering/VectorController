@@ -148,14 +148,14 @@ namespace VectorRestApi
 
             // Test-----------------------
 
-            XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
-            xlEventCollection.xlEvent[0].tagData.can_Msg.id = 960;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 16;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 17;
-            xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 55;
-            canBus.CanTransmit(xlEventCollection);
+            //XLClass.xl_event_collection xlEventCollection = new XLClass.xl_event_collection(1);
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.id = 960;
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.dlc = 4;
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[0] = 15;
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = 16;
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = 17;
+            //xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = 55;
+            //canBus.CanTransmit(xlEventCollection);
 
 
 
@@ -164,22 +164,22 @@ namespace VectorRestApi
 
 
 
-            //bzCounter += 1;
-            //Trace.WriteLine($"bzCounter: {bzCounter}");
+            bzCounter += 1;
+            Trace.WriteLine($"bzCounter: {bzCounter}");
 
-            //MessageModel message = GetFinalMessage(tempMessage, bzCounter);
+            MessageModel message = GetFinalMessage(tempMessage, bzCounter);
 
-            //if (bzCounter >= 15)
-            //{
-            //    Trace.WriteLine($"bzCounter RESET: {bzCounter}");
-            //    bzCounter = 0;
-            //}
+            if (bzCounter >= 15)
+            {
+                Trace.WriteLine($"bzCounter RESET: {bzCounter}");
+                bzCounter = 0;
+            }
 
-            //Trace.WriteLine($"MSG: {message.Message} -- Lengh: {message.Message.Length}");
+            Trace.WriteLine($"MSG: {message.Message} -- Lengh: {message.Message.Length}");
 
-            //XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
+            XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
 
-            //SendMessageEvent(_Collection);
+            SendMessageEvent(_Collection);
 
 
         }
@@ -257,8 +257,8 @@ namespace VectorRestApi
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[1] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(7, 8));
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[2] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(15, 8));
             xlEventCollection.xlEvent[0].tagData.can_Msg.data[3] = (byte)ConverterBinDecHex.BinaryToDecimal(message.Message.Substring(23, 8));
+            xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
 
-  
             return xlEventCollection;
         }
 
