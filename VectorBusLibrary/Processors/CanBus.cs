@@ -143,7 +143,6 @@ namespace VectorBusLibrary.Processors
             rxThread = new Thread(new ThreadStart(RXThread));
             rxThread.Name = "CanBusRxThread";
             rxThread.Start();
-
         }
 
 

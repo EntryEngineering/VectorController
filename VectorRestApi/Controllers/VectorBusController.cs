@@ -14,7 +14,6 @@ using vxlapi_NET;
 namespace VectorRestApi.Controllers
 {
 
-
     [Route("api/[controller]")]
     [ApiController]
     public class VectorBusController : ControllerBase
@@ -26,27 +25,7 @@ namespace VectorRestApi.Controllers
             _logger = logger;
         }
 
-        //TODO:
-        // 1) [POST] inicializace Vector prevodníku s paramtery jako:
-        //      - bus type (Can nebo CanFD)
-        //      - baudrate
-        //      - číslo kanálu
-        // odpveď > úspěšné probedení openDriver,openChannel,openPort atd
 
-        // 2) [POST] Zapnutí odesílání s testovací zprávou
-
-        // 3) [UPDATE] Nastavení nové zprávy (upravené jen některé hodnoty)
-
-        // 4) [GET] Záskání stavu o běhu odesílání
-
-        // 5) [UPDATE] Zastavení odesílání
-
-        //-------------------------------------------------------------------------------------------------
-
-
-
-        // 1)
-        // V core vytvořit datový model BusConfig kde budou všechny potřebné parametry jako argument
         [HttpPost]
         [Route("BusSetup")]
         public ActionResult<List<string>> BusSetup(CanBusConfiguration? canBusConfiguration)
@@ -79,10 +58,6 @@ namespace VectorRestApi.Controllers
             return Ok($"Tx loop start with test message");
         }
 
-
-
-        // 3)
-        // jako agrument datový model zprávy
         [HttpPost]
         [Route("SendMessage")]
         public IActionResult SendMessage(MessageModel message)
@@ -90,10 +65,6 @@ namespace VectorRestApi.Controllers
             VectorBusApiProcessor.SetNewMessage(message);
             return Ok($"Message was send");
         }
-
-
-
-        // 4)
 
         [HttpGet]
         [Route("GetServerState")]
@@ -103,9 +74,6 @@ namespace VectorRestApi.Controllers
             return Ok($"Tx loop state is: {VectorBusApiProcessor.InitCanDone}");
         }
 
-
-        // 5)
-
         [HttpGet]
         [Route("StopTx")]
         public IActionResult StopTx()
@@ -114,19 +82,6 @@ namespace VectorRestApi.Controllers
             Trace.WriteLine("TX STOPED");
             return Ok($"Tx lool stoped");
         }
-
-
-        //// API dokumentace
-
-        //[HttpGet]
-        //[Route("ApiInfo")]
-        //public IActionResult ApiInfo()
-        //{
-        //    string info = "Can Bus and CanFD Bus Api";
-
-        //    return Ok(info);
-        //}
-
 
         [HttpGet("/ws")]
         public async Task Get()
@@ -162,7 +117,6 @@ namespace VectorRestApi.Controllers
             await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
             _logger.Log(LogLevel.Information, "WebSocket connection closed");
         }
-
 
     }
 }
