@@ -2,19 +2,11 @@
 {
     internal class Program
     {
-       
-
         static void Main(string[] args)
         {
       
-
             Console.WriteLine(VectorBusLibrary.Processors.CrcProcessor.GetCrc("050300", 0xC3, VectorBusLibrary.Processors.CrcProcessor.Endianness.LittleEndian));
             //Console.WriteLine(crc.GetCrc());
-
-
-
-
-
             //1AFFD4FF16FFC1
             //for (int i = 0; i < 30; i++)
             //{
@@ -23,8 +15,6 @@
             //    Console.WriteLine($"Random number {randomNumber.ToString("X")} CRC is:{crc.GetCrc(randomNumber.ToString("X"))}");
 
             //}
-
-
             //TestCrc();
             //TestTable();
             Console.ReadLine();

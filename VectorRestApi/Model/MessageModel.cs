@@ -13,7 +13,7 @@ namespace VectorRestApi.Model
         public ushort DLC { get; set; }
 
         public string Message { get; set; }
-        
+
 
 
         //public List<SignalModel> Signals { get; set; } = new List<SignalModel>();
