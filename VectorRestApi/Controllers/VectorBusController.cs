@@ -62,8 +62,9 @@ namespace VectorRestApi.Controllers
         [Route("SendMessage")]
         public IActionResult SendMessage(MessageModel message)
         {
+            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfÏnsertingMessage(message.Message, message.DLC, true);
             VectorBusApiProcessor.SetNewMessage(message);
-            return Ok($"Message was send");
+            return Ok($"Message was send - {result}");
         }
 
         [HttpGet]

@@ -137,7 +137,7 @@ namespace VectorRestApi
                 string crcResult = CrcProcessor.GetCrc(binaryToHex, 0xc3, CrcProcessor.Endianness.LittleEndian);
                 //Trace.WriteLine($"crcResult HEX: {crcResult} and lengh: {crcResult.Length}");
                 _tempResult = ConverterBinDecHex.FillZerosToFull(ConverterBinDecHex.HexToBinary(crcResult));
-                //Trace.WriteLine($"crcResult BINARY: {_tempResult} and lengh: {_tempResult.Length}");
+                //Trace.WriteLine($"crcResult BINARY: {_tempResult} and length: {_tempResult.Length}");
 
             }
             catch (System.Exception ex)
@@ -150,6 +150,44 @@ namespace VectorRestApi
             return editedMessage;
         }
 
+        public static string CheckDlcAndBinaryLenghOfÏnsertingMessage(string messageBinary,int DLC, bool isThisMessageWithCrcAndBz) 
+        {
+            const int crcAndBzLenghBits = 12;
+            string _tempResult;
+            int lengthOfMessage = messageBinary.Length;
+
+            if (lengthOfMessage % 2 == 0)       // check if message length is even or odd
+            {
+                //is even
+                if (isThisMessageWithCrcAndBz == true)
+                {
+                    int fullLengthMessageWithCrcAndBz = crcAndBzLenghBits + lengthOfMessage;
+                    if ((fullLengthMessageWithCrcAndBz % 8 == 0) & (fullLengthMessageWithCrcAndBz/8 == DLC))
+                    {
+                        return "OK";
+                    }
+                    else
+                    {
+                        return $"Error imput message: binary length of message is {lengthOfMessage} and DLC {DLC}-  not for whole BYTEs !";
+                    }
+                }
+                else
+                {
+                    if ((lengthOfMessage % 8 == 0) & (lengthOfMessage/8 == DLC)) 
+                    {
+                        return "OK";
+                    }
+                    else
+                    {
+                        return $"Error imput message: binary length of message is {lengthOfMessage} and DLC {DLC}-  not for whole BYTEs !";
+                    }
+                }
+            }
+            else
+            {
+                return $"Error imput message: binary length of message is odd !";
+            }
+        }
 
 
         private static XLClass.xl_event_collection ConvertMessageForSend(MessageModel message)
