@@ -59,12 +59,36 @@ namespace VectorRestApi.Controllers
         }
 
         [HttpPost]
-        [Route("SendMessage")]
-        public IActionResult SendMessage(MessageModel message)
+        [Route("SendMessageWithCrc")]
+        public IActionResult SendMessageCrc(MessageModel message)
         {
             string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfÏnsertingMessage(message.Message, message.DLC, true);
-            VectorBusApiProcessor.SetNewMessage(message);
-            return Ok($"Message was send - {result}");
+            if (result == "OK")
+            {
+                VectorBusApiProcessor.SetNewMessage(message,true);
+                return Ok($"Message was send - {result}");
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("SendMessageWithoutCrc")]
+        public IActionResult SendMessageNonCrc(MessageModel message)
+        {
+            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfÏnsertingMessage(message.Message, message.DLC, false);
+            if (result == "OK")
+            {
+                VectorBusApiProcessor.SetNewMessage(message,false);
+                return Ok($"Message was send - {result}");
+            }
+            else
+            {
+                return BadRequest(result);
+            }    
         }
 
         [HttpGet]

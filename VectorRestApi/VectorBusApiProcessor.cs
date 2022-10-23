@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
@@ -72,6 +71,7 @@ namespace VectorRestApi
                 DLC = 4,
                 Message = "10101110101011101010"
             };
+            crcIncluded = true;
 
             string testMsgOut = JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true });
             return model;
@@ -100,17 +100,29 @@ namespace VectorRestApi
             txTimer.Enabled = false;
         }
 
-        public static void SetNewMessage(MessageModel newMessage)
+        public static void SetNewMessage(MessageModel newMessage,bool withCrcAndBz)
         {
             txTimer.Enabled = false;
             tempMessage = newMessage;
+            crcIncluded = withCrcAndBz;
             txTimer.Enabled = true;
         }
 
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
             bzCounter += 1;
-            MessageModel message = GetFinalMessageWithCrc(tempMessage, bzCounter);
+            MessageModel message;
+            if (crcIncluded == true)
+            {
+                message = GetFinalMessageWithCrc(tempMessage, bzCounter);
+                Trace.WriteLine("With CRC");
+            }
+            else
+            {
+                message = GetFinalMessageWithoutCrc(tempMessage, bzCounter);
+                Trace.WriteLine("NON CRC");
+            }
+            
             if (bzCounter >= 15)
             {
                 bzCounter = 0;
@@ -128,7 +140,7 @@ namespace VectorRestApi
             editedMessage.DLC = originalMessage.DLC;
             string addBzToOriginalMsg = $"{ConverterBinDecHex.FillZerosToFull(ConverterBinDecHex.DecimalToBinary(counter))}{originalMessage.Message}";
             //Trace.WriteLine($"addBzToOriginalMsg: {addBzToOriginalMsg} and lengh: {addBzToOriginalMsg.Length}");
-            var _tempResult = "";
+            var _tempResultCrc = "";
 
             try
             {
@@ -136,7 +148,7 @@ namespace VectorRestApi
                 //Trace.WriteLine($"binaryToHex: {binaryToHex}");
                 string crcResult = CrcProcessor.GetCrc(binaryToHex, 0xc3, CrcProcessor.Endianness.LittleEndian);
                 //Trace.WriteLine($"crcResult HEX: {crcResult} and lengh: {crcResult.Length}");
-                _tempResult = ConverterBinDecHex.FillZerosToFull(ConverterBinDecHex.HexToBinary(crcResult));
+                _tempResultCrc = ConverterBinDecHex.FillZerosToFull(ConverterBinDecHex.HexToBinary(crcResult));
                 //Trace.WriteLine($"crcResult BINARY: {_tempResult} and length: {_tempResult.Length}");
 
             }
@@ -146,11 +158,25 @@ namespace VectorRestApi
                 errCounter = errCounter + 1;
             }
 
-            editedMessage.Message = $"{_tempResult}{addBzToOriginalMsg}";
+            editedMessage.Message = $"{_tempResultCrc}{addBzToOriginalMsg}";
             return editedMessage;
         }
 
-        public static string CheckDlcAndBinaryLenghOfÏnsertingMessage(string messageBinary,int DLC, bool isThisMessageWithCrcAndBz) 
+        private static MessageModel GetFinalMessageWithoutCrc(MessageModel originalMessage, int counter)
+        {
+            //Trace.WriteLine($"Counter err : {errCounter}");
+            MessageModel editedMessage = new MessageModel();
+            editedMessage.MessageId = originalMessage.MessageId;
+            editedMessage.DLC = originalMessage.DLC;
+            string addBzToOriginalMsg = $"{ConverterBinDecHex.FillZerosToFull(ConverterBinDecHex.DecimalToBinary(counter))}{originalMessage.Message}";
+            //Trace.WriteLine($"addBzToOriginalMsg: {addBzToOriginalMsg} and lengh: {addBzToOriginalMsg.Length}");
+
+            errCounter = errCounter + 1;
+            editedMessage.Message = $"{addBzToOriginalMsg}";
+            return editedMessage;
+        }
+
+        public static string CheckDlcAndBinaryLenghOfÏnsertingMessage(string messageBinary, int DLC, bool isThisMessageWithCrcAndBz)
         {
             const int crcAndBzLenghBits = 12;
             string _tempResult;
@@ -162,7 +188,7 @@ namespace VectorRestApi
                 if (isThisMessageWithCrcAndBz == true)
                 {
                     int fullLengthMessageWithCrcAndBz = crcAndBzLenghBits + lengthOfMessage;
-                    if ((fullLengthMessageWithCrcAndBz % 8 == 0) & (fullLengthMessageWithCrcAndBz/8 == DLC))
+                    if ((fullLengthMessageWithCrcAndBz % 8 == 0) & (fullLengthMessageWithCrcAndBz / 8 == DLC))
                     {
                         return "OK";
                     }
@@ -173,7 +199,7 @@ namespace VectorRestApi
                 }
                 else
                 {
-                    if ((lengthOfMessage % 8 == 0) & (lengthOfMessage/8 == DLC)) 
+                    if ((lengthOfMessage % 8 == 0) & (lengthOfMessage / 8 == DLC))
                     {
                         return "OK";
                     }
@@ -185,10 +211,9 @@ namespace VectorRestApi
             }
             else
             {
-                return $"Error imput message: binary length of message is odd !";
+                return $"Error imput message: binary length of message is odd (length: {lengthOfMessage} and DLC: {DLC})!";
             }
         }
-
 
         private static XLClass.xl_event_collection ConvertMessageForSend(MessageModel message)
         {
@@ -204,7 +229,7 @@ namespace VectorRestApi
 
             for (int i = 1; i < message.DLC; i++)
             {
-                int index = (i*8)-1;
+                int index = (i * 8) - 1;
                 //Trace.WriteLine($"Msg before splitig: {message.Message} - Lengh: {message.Message.Length}");
                 try
                 {
@@ -219,10 +244,10 @@ namespace VectorRestApi
                     //Trace.WriteLine(">>>end loop spliting....");
                 }
                 catch (System.Exception ex)
-                {                
-                    Trace.WriteLine($"***********************ConvertMessageForSend forLoop  err : {ex.Message}");  
+                {
+                    Trace.WriteLine($"***********************ConvertMessageForSend forLoop  err : {ex.Message}");
                 }
-                
+
             }
 
             xlEventCollection.xlEvent[0].tag = XL_EventTags.XL_TRANSMIT_MSG;
