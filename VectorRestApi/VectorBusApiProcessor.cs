@@ -81,7 +81,7 @@ namespace VectorRestApi
         public static void InitTxLoop()
         {
             txTimer.Elapsed += TimerForTx_Elapsed;
-            txTimer.Interval = 1000;
+            txTimer.Interval = 100;
             txTimer.AutoReset = true;
            
             if (tempMessage == null)
@@ -112,32 +112,29 @@ namespace VectorRestApi
 
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
-            bzCounter += 1;
-            MessageModel message;
-            if (crcIncluded == true)
-            {
-                message = GetFinalMessageWithCrc(tempMessage, bzCounter);
-                Trace.WriteLine("With CRC");
-            }
-            else
-            {
-                message = GetFinalMessageWithoutCrc(tempMessage, bzCounter);
-                Trace.WriteLine("NON CRC");
-            }
-            
-            if (bzCounter >= 15)
-            {
-                bzCounter = 0;
-            }
-            XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
-
-
-            long newRealInterval = 1000/ tempMessage.CycleTime;
+            long newRealInterval = 100/ tempMessage.CycleTime;
             for (long i = 0; i < newRealInterval; i++)
             {
+                bzCounter += 1;
+                MessageModel message;
+                if (crcIncluded == true)
+                {
+                    message = GetFinalMessageWithCrc(tempMessage, bzCounter);
+                    Trace.WriteLine("With CRC");
+                }
+                else
+                {
+                    message = GetFinalMessageWithoutCrc(tempMessage, bzCounter);
+                    Trace.WriteLine("NON CRC");
+                }
+
+                if (bzCounter >= 15)
+                {
+                    bzCounter = 0;
+                }
+                XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
                 SendMessageEvent(_Collection);
-            }
-            
+            }           
         }
 
         static int errCounter = 0;

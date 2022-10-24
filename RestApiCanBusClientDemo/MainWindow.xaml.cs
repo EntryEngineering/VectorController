@@ -27,7 +27,10 @@ namespace RestApiCanBusClientDemo
 
         private void btnSendCall_Click(object sender, RoutedEventArgs e)
         {
-
+            //RestClientProcessor.SendApiCall(txtBoxUrl.Text,, txtBodyPost.Text);
+            RestClientProcessor.SendApiCall(@"https://HW000449", "api/VectorBus/BusSetup", txtBodyPost.Text);
         }
+
+
     }
 }
