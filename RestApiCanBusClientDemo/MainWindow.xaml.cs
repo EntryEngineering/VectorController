@@ -24,5 +24,10 @@ namespace RestApiCanBusClientDemo
         {
             InitializeComponent();
         }
+
+        private void btnSendCall_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

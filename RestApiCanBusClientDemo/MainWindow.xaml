@@ -5,8 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RestApiCanBusClientDemo"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
 
+        Height="500"
+        Width="600"
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow" >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1*"/>
+
+
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        
+        <TextBlock Text="URL REST API" Grid.Column="0" Grid.Row="0" Margin="5" HorizontalAlignment="Right"/>
+        <TextBox x:Name="txtBoxUrl" Grid.Column="1" Grid.Row="0"  />
+
+        <TextBlock Text="Body" Grid.Column="0" Grid.Row="1" Margin="10" HorizontalAlignment="Right"/>
+        <TextBox x:Name="txtBodyPost" Grid.Column="1" Grid.Row="1" Height="200" TextWrapping="Wrap" />
+
+        <Button x:Name="btnSendCall" Content="Send" Grid.Column="1" Grid.Row="2" Margin="10"  Click="btnSendCall_Click"/>
+
+        <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Grid.Column="0" Grid.Row="3"  Margin="10" Grid.ColumnSpan="2" >
+            <TextBlock x:Name="textBlockResponse" Text="response is...."  Margin="5" MaxWidth="350" HorizontalAlignment="Left" TextWrapping="Wrap" FontSize="10"/>
+        </Border>
+        
     </Grid>
 </Window>
