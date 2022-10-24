@@ -34,7 +34,7 @@ namespace VectorRestApi
         {
             busConfiguration = config;
             XL_Status initStatus;
-            canBus = new(XL_HardwareType.XL_HWTYPE_VN1610, config.AppName);
+            canBus = new(config.hardwareType, config.AppName);
 
             Trace.WriteLine("****************************");
             Trace.WriteLine("CanBus - Vector");
@@ -68,6 +68,7 @@ namespace VectorRestApi
             MessageModel model = new()
             {
                 MessageId = 0x3c0,
+                CycleTime = 100,
                 DLC = 4,
                 Message = "10101110101011101010"
             };
@@ -80,8 +81,9 @@ namespace VectorRestApi
         public static void InitTxLoop()
         {
             txTimer.Elapsed += TimerForTx_Elapsed;
+            txTimer.Interval = 1000;
             txTimer.AutoReset = true;
-            txTimer.Interval = busConfiguration.CycleTime;
+           
             if (tempMessage == null)
             {
                 tempMessage = GetTestMessage();
@@ -128,7 +130,14 @@ namespace VectorRestApi
                 bzCounter = 0;
             }
             XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
-            SendMessageEvent(_Collection);
+
+
+            long newRealInterval = 1000/ tempMessage.CycleTime;
+            for (long i = 0; i < newRealInterval; i++)
+            {
+                SendMessageEvent(_Collection);
+            }
+            
         }
 
         static int errCounter = 0;
