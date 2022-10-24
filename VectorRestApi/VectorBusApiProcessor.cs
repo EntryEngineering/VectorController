@@ -182,7 +182,7 @@ namespace VectorRestApi
             return editedMessage;
         }
 
-        public static string CheckDlcAndBinaryLenghOfÏnsertingMessage(string messageBinary, int DLC, bool isThisMessageWithCrcAndBz)
+        public static string CheckDlcAndBinaryLenghOfInsertingMessage(string messageBinary, int DLC, bool isThisMessageWithCrcAndBz)
         {
             const int crcAndBzLenghBits = 12;
             string _tempResult;

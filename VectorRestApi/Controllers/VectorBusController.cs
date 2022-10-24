@@ -62,7 +62,7 @@ namespace VectorRestApi.Controllers
         [Route("SendMessageWithCrc")]
         public IActionResult SendMessageCrc(MessageModel message)
         {
-            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfÏnsertingMessage(message.Message, message.DLC, true);
+            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, true);
             if (result == "OK")
             {
                 VectorBusApiProcessor.SetNewMessage(message,true);
@@ -79,7 +79,7 @@ namespace VectorRestApi.Controllers
         [Route("SendMessageWithoutCrc")]
         public IActionResult SendMessageNonCrc(MessageModel message)
         {
-            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfÏnsertingMessage(message.Message, message.DLC, false);
+            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, false);
             if (result == "OK")
             {
                 VectorBusApiProcessor.SetNewMessage(message,false);
@@ -108,40 +108,40 @@ namespace VectorRestApi.Controllers
             return Ok($"Tx lool stoped");
         }
 
-        [HttpGet("/ws")]
-        public async Task Get()
-        {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                _logger.Log(LogLevel.Information, "WebSocket connection established");
-                await Echo(webSocket);
-            }
-            else
-            {
-                HttpContext.Response.StatusCode = 400;
-            }
-        }
+        //[HttpGet("/ws")]
+        //public async Task Get()
+        //{
+        //    if (HttpContext.WebSockets.IsWebSocketRequest)
+        //    {
+        //        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        //        _logger.Log(LogLevel.Information, "WebSocket connection established");
+        //        await Echo(webSocket);
+        //    }
+        //    else
+        //    {
+        //        HttpContext.Response.StatusCode = 400;
+        //    }
+        //}
 
-        private async Task Echo(WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            _logger.Log(LogLevel.Information, "Message received from Client");
+        //private async Task Echo(WebSocket webSocket)
+        //{
+        //    var buffer = new byte[1024 * 4];
+        //    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        //    _logger.Log(LogLevel.Information, "Message received from Client");
 
-            while (!result.CloseStatus.HasValue)
-            {
-                var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
-                await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
-                _logger.Log(LogLevel.Information, "Message sent to Client");
+        //    while (!result.CloseStatus.HasValue)
+        //    {
+        //        var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+        //        await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+        //        _logger.Log(LogLevel.Information, "Message sent to Client");
 
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                _logger.Log(LogLevel.Information, "Message received from Client");
+        //        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        //        _logger.Log(LogLevel.Information, "Message received from Client");
 
-            }
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            _logger.Log(LogLevel.Information, "WebSocket connection closed");
-        }
+        //    }
+        //    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+        //    _logger.Log(LogLevel.Information, "WebSocket connection closed");
+        //}
 
     }
 }
