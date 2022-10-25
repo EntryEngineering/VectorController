@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -53,24 +54,38 @@ namespace VectorRestApi.Controllers
         [Route("StartTx")]
         public IActionResult StartTx()
         {
-            VectorBusApiProcessor.StartTxLoop();
-            Trace.WriteLine("TX START");
-            return Ok($"Tx loop start with test message");
+            if (VectorBusApiProcessor.InitCanDone == true)
+            {
+                VectorBusApiProcessor.StartTxLoop();
+                Trace.WriteLine("TX START");
+                return Ok($"Tx loop start with test message");
+            }
+            else
+            {
+                return BadRequest($"The setting of CanBus has not been done");
+            }
         }
 
         [HttpPost]
         [Route("SendMessageWithCrc")]
         public IActionResult SendMessageCrc(MessageModel message)
         {
-            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, true);
-            if (result == "OK")
+            if (VectorBusApiProcessor.InitCanDone == true)
             {
-                VectorBusApiProcessor.SetNewMessage(message,true);
-                return Ok($"Message was send - {result}");
+                string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, true);
+                if (result == "OK")
+                {
+                    VectorBusApiProcessor.SetNewMessage(message, true);
+                    return Ok($"Message was send - {result}");
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
             }
             else
             {
-                return BadRequest(result);
+                return BadRequest($"The setting of CanBus has not been done");
             }
         }
 
@@ -79,23 +94,29 @@ namespace VectorRestApi.Controllers
         [Route("SendMessageWithoutCrc")]
         public IActionResult SendMessageNonCrc(MessageModel message)
         {
-            string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, false);
-            if (result == "OK")
+            if (VectorBusApiProcessor.InitCanDone == true)
             {
-                VectorBusApiProcessor.SetNewMessage(message,false);
-                return Ok($"Message was send - {result}");
+                string result = VectorBusApiProcessor.CheckDlcAndBinaryLenghOfInsertingMessage(message.Message, message.DLC, false);
+                if (result == "OK")
+                {
+                    VectorBusApiProcessor.SetNewMessage(message, false);
+                    return Ok($"Message was send - {result}");
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
             }
             else
             {
-                return BadRequest(result);
-            }    
+                return BadRequest($"The setting of CanBus has not been done");
+            }
         }
 
         [HttpGet]
         [Route("GetServerState")]
         public IActionResult GetTxState()
         {
-
             return Ok($"Tx loop state is: {VectorBusApiProcessor.InitCanDone}");
         }
 
@@ -103,9 +124,16 @@ namespace VectorRestApi.Controllers
         [Route("StopTx")]
         public IActionResult StopTx()
         {
-            VectorBusApiProcessor.StopTxLoop();
-            Trace.WriteLine("TX STOPED");
-            return Ok($"Tx lool stoped");
+            if (VectorBusApiProcessor.InitCanDone == true)
+            {
+                VectorBusApiProcessor.StopTxLoop();
+                Trace.WriteLine("TX STOPED");
+                return Ok($"Tx lool stoped");
+            }
+            else
+            {
+                return BadRequest($"The setting of CanBus has not been done");
+            }
         }
 
         //[HttpGet("/ws")]
