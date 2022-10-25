@@ -26,6 +26,8 @@ namespace VectorRestApi.Controllers
             _logger = logger;
         }
 
+        private static string appVersion = $"[app v1.0]";
+        
 
         [HttpPost]
         [Route("BusSetup")]
@@ -36,7 +38,7 @@ namespace VectorRestApi.Controllers
                 if (VectorBusApiProcessor.InitCanControloler(canBusConfiguration) == XLDefine.XL_Status.XL_SUCCESS)
                 {
                     VectorBusApiProcessor.GetTestMessage();
-                    return Ok($"CanBus setup is done");
+                    return Ok($"CanBus setup is done {appVersion}");
                 }
                 else
                 {
@@ -45,7 +47,7 @@ namespace VectorRestApi.Controllers
             }
             else
             {
-                return BadRequest("Error CanBus setup");
+                return BadRequest($"Error CanBus setup {appVersion}");
             }
 
         }
