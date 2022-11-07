@@ -1,10 +1,17 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Diagnostics;
+using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using VectorBusLibrary.Processors;
 using VectorRestApi.Model;
 using vxlapi_NET;
 using static vxlapi_NET.XLDefine;
+using Timer = System.Timers.Timer;
 
 namespace VectorRestApi
 {
@@ -25,6 +32,9 @@ namespace VectorRestApi
         private static int bzCounter = 0;
 
         private static CanBusConfiguration busConfiguration = null;
+
+        public static HttpContext httpContext { get; set; }
+        public static WebSocket webSocket { get; set; }
 
         /// <summary>
         /// Init Can Bus driver, driver config, open port, acvive channel, set notification and reset clock
@@ -83,7 +93,7 @@ namespace VectorRestApi
             txTimer.Elapsed += TimerForTx_Elapsed;
             txTimer.Interval = 100;
             txTimer.AutoReset = true;
-           
+
             if (tempMessage == null)
             {
                 tempMessage = GetTestMessage();
@@ -102,7 +112,7 @@ namespace VectorRestApi
             txTimer.Enabled = false;
         }
 
-        public static void SetNewMessage(MessageModel newMessage,bool withCrcAndBz)
+        public static void SetNewMessage(MessageModel newMessage, bool withCrcAndBz)
         {
             txTimer.Enabled = false;
             tempMessage = newMessage;
@@ -112,7 +122,7 @@ namespace VectorRestApi
 
         private static void TimerForTx_Elapsed(object sender, ElapsedEventArgs e)
         {
-            long newRealInterval = 100/ tempMessage.CycleTime;
+            long newRealInterval = 100 / tempMessage.CycleTime;
             for (long i = 0; i < newRealInterval; i++)
             {
                 bzCounter += 1;
@@ -134,7 +144,7 @@ namespace VectorRestApi
                 }
                 XLClass.xl_event_collection _Collection = ConvertMessageForSend(message);
                 SendMessageEvent(_Collection);
-            }           
+            }
         }
 
         static int errCounter = 0;
@@ -264,6 +274,43 @@ namespace VectorRestApi
         {
             return canBus.CanTransmit(rawMessage);
         }
+
+
+        public static async Task RxCanMessageAndPassToWsAsync()
+        {
+            await Send(httpContext, webSocket, "Test message",true);
+
+
+        }
+
+
+
+
+        private static async Task Send(HttpContext context, WebSocket webSocket, string message, bool loopEnable)
+        {
+            var buffer = new byte[1024 * 4];
+            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
+            if (result != null)
+            {
+                while (!result.CloseStatus.HasValue)
+                {
+                    string msg = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer, 0, result.Count));
+                    Trace.WriteLine($"client says: {msg}");
+                    while (loopEnable)
+                    {
+                        DateTime dt = new();
+                        await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"Server says {dt}{message}")), result.MessageType, result.EndOfMessage, System.Threading.CancellationToken.None);
+                        Thread.Sleep(100);
+                    }
+                        
+
+                    result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), System.Threading.CancellationToken.None);
+                    //Trace.WriteLine($"Result :{result}");
+                }
+            }
+            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, System.Threading.CancellationToken.None);
+        }
+
 
     }
 }
